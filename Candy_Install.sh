@@ -1939,27 +1939,6 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
 
-# Define colors file path
-COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
-
-# Function to initialize colors file
-initialize_colors_file() {
-    echo "🎨 Initializing colors file..."
-    
-    mkdir -p "$(dirname "$COLORS_FILE")"
-    local css_file="$HOME/.config/nwg-dock-hyprland/colors.css"
-    
-    if [ -f "$css_file" ]; then
-        grep -E "@define-color (blur_background8|primary)" "$css_file" > "$COLORS_FILE"
-        echo "✅ Colors file initialized with current values"
-    else
-        touch "$COLORS_FILE"
-        echo "⚠️ CSS file not found, created empty colors file"
-    fi
-}
-
-# MAIN EXECUTION
-initialize_colors_file
 echo "🎯 All services started successfully"
 EOF
 
@@ -5053,40 +5032,7 @@ chmod +x "$HOME/.config/waybar/scripts/toggle-weather-format.sh"
         echo "⚠️  'Candy' folder not found in $hyprcandy_dir"
     fi
 
-    # Change Start Button Icon
-    # ⚙️ Step 1: Remove old grid.svg from nwg-dock-hyprland
-    echo "🔄 Replacing 'grid.svg' in /usr/share/nwg-dock-hyprland/images..."
-
-    print_status "Removing old start button icon"
-
-    if cd /usr/share/nwg-dock-hyprland/images 2>/dev/null; then
-        sudo rm -f grid.svg && echo "🗑️  Removed old grid.svg"
-    else
-        echo "❌ Failed to access /usr/share/nwg-dock-hyprland/images"
-    fi
-
-    # 🏠 Step 2: Return to home
-    cd "$HOME"
-    
-    # Add all custom cursors from ~/.icons to system icons
-    print_status "Adding custom cursors"
-    sudo cp -r $HOME/.icons/* /usr/share/icons
-    print_status "Custom sursors added"
-    
-    # 📂 Step 3: Copy new grid.svg from custom SVG folder
-    SVG_SOURCE="$HOME/Pictures/Candy/Dock-SVGs/grid.svg"
-    SVG_DEST="/usr/share/nwg-dock-hyprland/images"
-
-    print_status "Changing start button icon"
-
-    if [ -f "$SVG_SOURCE" ]; then
-        sudo cp "$SVG_SOURCE" "$SVG_DEST" && echo "✅ grid.svg copied successfully."
-    else
-        echo "❌ grid.svg not found at $SVG_SOURCE"
-    fi
-
     # 🔐 Add sudoers entry for background script
-    echo
     echo "🔄 Adding sddm background auto-update settings..."
     
     # Get the current username
@@ -5872,8 +5818,8 @@ layerrule = blur on,match:namespace swaync-notification-window
 layerrule = ignore_alpha 0.01,match:namespace swaync-notification-window
 layerrule = blur on,xray on,no_anim on,match:namespace swaync-control-center
 layerrule = ignore_alpha 0.01,match:namespace swaync-control-center
-layerrule = blur on,no_anim on,match:namespace nwg-dock
-layerrule = ignore_alpha 0.01,match:namespace nwg-dock
+layerrule = blur on,no_anim on,match:namespace hyprcandy-dock
+layerrule = ignore_alpha 0.01,match:namespace hyprcandy-dock
 layerrule = blur on,match:namespace logout_dialog
 layerrule = ignore_alpha 0.01,match:namespace logout_dialog
 layerrule = blur on,match:namespace gtk-layer-shell
