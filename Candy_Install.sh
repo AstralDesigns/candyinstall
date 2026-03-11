@@ -7467,9 +7467,6 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-swww-daemon &
-sleep 1
-
 # Start the correct services
 
 echo "🔄 Setting up services..."
@@ -7484,7 +7481,9 @@ fi
 systemctl enable --now bluetooth
 echo "✅ Services set..."
 
-bash "$HOME/.config/waypaper/wallpaper-cycle.sh"
+swww-daemon &
+sleep 1
+"$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
 
     # 🔄 Reload Hyprland
     echo
