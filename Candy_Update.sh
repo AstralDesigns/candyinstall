@@ -7440,7 +7440,7 @@ echo "✅ Services set..."
 
 swww-daemon &
 sleep 1
-"$HOME/.config/waypaper/wallpaper-cycle.sh"
+"$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
 
     # 🔄 Reload Hyprland
     echo
