@@ -7449,13 +7449,9 @@ else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
 
-systemctl enable --now bluetooth
-echo "✅ Services set..."
-
 if swww query &>/dev/null; then
-    bash "$HOME/.config/waypaper/wallpaper-cycle.sh"
+    bash "$HOME/.config/waypaper/waypaper_integration.sh"
     echo "✅ Initial background set"
-    touch "$STAMP"
 else
     echo "⚠️  swww-daemon not ready — background not set"
 fi
