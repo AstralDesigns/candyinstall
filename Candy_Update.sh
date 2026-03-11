@@ -1068,125 +1068,41 @@ setup_hyprcandy() {
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
     XDG_MENU_PREFIX=arch- kbuildsycoca6 --noincremental
 
-    print_status "Setting up HyprCandy configuration..."
-    
-    # Check if stow is available
-    if ! command -v stow &> /dev/null; then
-        print_error "stow is not installed. Cannot proceed with configuration setup."
-        return 1
-    fi
+    print_status "Updating HyprCandy configuration..."
 
-    # Ensure ~/.config exists, then remove specified subdirectories
-    [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
-    cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava dolphinrc fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcustom hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct quickshell rofi swaync wallust waybar waypaper wlogout xsettingsd
+UPDATE_DIR="$HOME/.hyprcandy-update"
+HYPRCANDY_DIR="$HOME/.hyprcandy"
 
-    # Go to the home directory
-    cd "$HOME"
+# Clone fresh copy into temp dir
+echo "🌐 Cloning latest HyprCandy into temporary directory..."
+rm -rf "$UPDATE_DIR"
+git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR"
+echo "✅ Clone complete"
 
-    # Remove existing .hyprcandy folder
-    if [ -d "$HOME/.hyprcandy" ]; then
-        echo "🗑️  Removing existing .hyprcandy folder..."
-        rm -rf "$HOME/.hyprcandy"
-        rm -rf "$HOME/.ultrcandy"
-        sleep 2
-    else
-        echo "✅ .hyprcandy dotfiles folder doesn't exist — seems to be a fresh install."
-        rm -rf "$HOME/.ultracandy"
-        sleep 2
-    fi
+# Folders with user-specific changes — never overwritten on update
+SKIP_DIRS=("waybar" "waypaper" "hypr" "wlogout" "fastfetch")
 
-    # Clone HyprCandy repository
-    hyprcandy_dir="$HOME/.hyprcandy"
-    echo "🌐 Cloning HyprCandy repository ..." #into $hyprcandy_dir
-    git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$hyprcandy_dir"
-    echo "✅ Cloning complete"
-    
-    # Clone overview repository
-    #overview_dir="$HOME/.config/quickshell/overview"
-    #if [ ! -d "$overview_dir" ]; then
-        #echo "🌐 Cloning overview repository ..."
-        #git clone https://github.com/Shanu-Kumawat/quickshell-overview "$overview_dir"
-        #echo "✅ Cloning complete"
-    #fi
-    
-    # Go to the home directory
-    cd "$HOME"
+echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
-    # Remove present .zshrc file 
-    rm -rf .face.icon .hyprcandy-zsh.zsh .icons Candy GJS
-    rm -rf "$HOME/Pictures/HyprCandy"
+# Build rsync exclude args
+EXCLUDES=()
+for dir in "${SKIP_DIRS[@]}"; do
+    EXCLUDES+=(--exclude="**/$dir/")
+done
 
-    # Safely remove existing .zshrc, .hyprcandy-zsh.zsh and .icons files (only if they exist)
-    # [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
-    [ -f "$HOME/.face.icon" ] && rm -f "$HOME/.face.icon"
-    [ -f "$HOME/.hyprcandy-zsh.zsh" ] && rm -f "$HOME/.hyprcandy-zsh.zsh"
-    [ -f "$HOME/.icons" ] && rm -f "$HOME/.icons"
-    [ -f "$HOME/Candy" ] && rm -f "$HOME/Candy"
-    [ -f "$HOME/GJS" ] && rm -f "$HOME/GJS"
+# rsync: copy everything from the update clone into the live dotfiles dir,
+# skipping the protected folders. Stow symlinks already point here so the
+# running environment picks up changes immediately — no re-stow needed.
+rsync -a --delete \
+    "${EXCLUDES[@]}" \
+    --exclude='.git/' \
+    "$UPDATE_DIR/" "$HYPRCANDY_DIR/"
 
-    # 📁 Create Screenshots and Recordings directories if they don't exist
-    echo "📁 Ensuring directories for screenshots and recordings exist..."
-    mkdir -p "$HOME/Pictures/Screenshots" "$HOME/Videos/Recordings"
-    echo "✅ Created ~/Pictures/Screenshots and ~/Videos/Recordings (if missing)"
+echo "✅ Update merged — waybar, waypaper and hypr preserved"
 
-    # Return to the home directory
-    cd "$HOME"
-    
-    # Change to the HyprCandy dotfiles directory
-    cd "$hyprcandy_dir" || { echo "❌ Error: Could not find HyprCandy directory"; exit 1; }
-
-    # Define only the configs to be stowed
-    config_dirs=(".config" ".icons" ".hyprcandy-zsh.zsh")
-
-    # Add files/folders to exclude from deletion
-    preserve_items=("GJS" "Candy" "LISCENSE" "README.md" ".git")
-
-    if [ ${#config_dirs[@]} -eq 0 ]; then
-        echo "❌ No configuration directories specified."
-        exit 1
-    fi
-
-    echo "🔍 Found configuration directories: ${config_dirs[*]}"
-    echo "📦 Automatically installing all configurations..."
-
-    # Backup: remove everything not in the allowlist
-    for item in * .*; do
-        # Skip special entries
-        [[ "$item" == "." || "$item" == ".." ]] && continue
-
-        # Skip allowed config items
-        if [[ " ${config_dirs[*]} " == *" $item "* ]]; then
-            continue
-        fi
-
-        # Skip explicitly preserved items
-        if [[ " ${preserve_items[*]} " == *" $item "* ]]; then
-            echo "❎ Preserving: $item"
-            continue
-        fi
-
-        echo "🗑️  Removing: $item"
-        rm -rf "$item"
-    done
-
-# Stow all configurations at once, ignoring Candy folder
-if stow -v -t "$HOME" --ignore='Candy' --ignore='GJS' . 2>/dev/null; then
-    echo "✅ Successfully stowed all configurations"
-else
-    echo "⚠️  Stow operation failed — attempting restow..."
-    if stow -R -v -t "$HOME" --ignore='Candy' --ignore='GJS' . 2>/dev/null; then
-        echo "✅ Successfully restowed all configurations"
-    else
-        echo "❌ Failed to stow configurations"
-    fi
-fi
-    # Final summary
-    echo
-    echo "✅ Installation completed. Successfully installed: $stow_success"
-    if [ ${#stow_failed[@]} -ne 0 ]; then
-        echo "❌ Failed to install: ${stow_failed[*]}"
-    fi
+# Clean up temp clone
+rm -rf "$UPDATE_DIR"
+echo "🗑️  Cleaned up temporary update directory"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
