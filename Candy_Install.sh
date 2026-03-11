@@ -21,9 +21,9 @@ NC='\033[0m' # No Color
 
 # Global variables
 DISPLAY_MANAGER="sddm"
-DISPLAY_MANAGER_SERVICE=""
+DISPLAY_MANAGER_SERVICE="sddm"
 SHELL_CHOICE=""
-PANEL_CHOICE=waybar
+PANEL_CHOICE="waybar"
 BROWSER_CHOICE=""
 
 # Function to display multicolored ASCII art
