@@ -7450,7 +7450,7 @@ else
 fi
 
 if swww query &>/dev/null; then
-    bash "$HOME/.config/waypaper/waypaper_integration.sh"
+    bash "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
     echo "✅ Initial background set"
 else
     echo "⚠️  swww-daemon not ready — background not set"
