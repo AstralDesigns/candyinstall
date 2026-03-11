@@ -7472,7 +7472,7 @@ setup_keyboard_layout() {
 if [ -z "$WAYLAND_DISPLAY" ]; then
     export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
 fi
-swww-daemon &
+pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &
 sleep 1
 # Wait for swww-daemon socket — it may still be starting up
 RETRIES=10
