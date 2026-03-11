@@ -7481,7 +7481,7 @@ prompt_logout() {
     read -r reboot_choice
     case "$reboot_choice" in
         [nN][oO]|[nN])
-            echo "✅ Starting chosen bar (re-login post update is advised)..."
+            echo "✅ Update complete (re-login post update is advised)..."
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
                 rm -rf "$HOME/candyinstall" && systemctl --user stop hyprpanel.service &>/dev/null && systemctl --user restart waybar.service &>/dev/null
