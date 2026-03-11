@@ -4964,64 +4964,7 @@ chmod +x "$HOME/.config/waybar/scripts/toggle-weather-format.sh"
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
     
-    # 📁 Copy Candy folder to ~/Pictures
-    echo
-    echo "📁 Attempting to copy 'Candy' images folder to ~/Pictures..."
-    if [ -d "$hyprcandy_dir/Candy" ]; then
-        if [ -d "$HOME/Pictures" ]; then
-            cp -r "$hyprcandy_dir/Candy" "$HOME/Pictures/"
-            echo "✅ 'Candy' copied successfully to ~/Pictures"
-        else
-            echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
-        fi
-    else
-        echo "⚠️  'Candy' folder not found in $hyprcandy_dir"
-    fi
-
-    # 🔐 Add sudoers entry for background script
-    echo "🔄 Adding sddm background auto-update settings..."
-    
-    # Get the current username
-    sudo rm -f /etc/sudoers.d/hyprcandy-background
-USERNAME=$(whoami)
-
-# Create the sudoers entries for background script and required commands
-SUDOERS_ENTRIES=(
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Background=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BackgroundColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^AccentColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/sugar-candy.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/sugar-candy.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/mkdir -p /usr/local/share/gtk3-reload"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/gtk3-reload.c"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/.gtk3-version"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/gcc * /usr/local/lib/gtk3-reload.so"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/gcc -shared -fPIC -o /usr/local/lib/gtk3-reload.so /usr/local/share/gtk3-reload/gtk3-reload.c *"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/dconf update"
-    # GPU monitoring permissions for system monitor widget
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/gpu_busy_percent"
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/hwmon/hwmon*/temp*_input"
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_vram_total"
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_vram_used"
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_gtt_total"
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_gtt_used"
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/product_name"
-    "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/address"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/readlink -f /sys/class/drm/card*/device/driver"
-)
-
-# Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background
-
-# Set proper permissions on the sudoers file
-sudo chmod 440 /etc/sudoers.d/hyprcandy-background
-
-    echo "✅ Added sddm background auto-update settings successfully"
-    
     # 🎨 Update wlogout style.css with correct username
-    echo
     echo "🎨 Updating wlogout style.css with current username..."
     
 	WLOGOUT_STYLE="$HOME/.config/wlogout/style.css"
