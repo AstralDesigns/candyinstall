@@ -3576,10 +3576,10 @@ jq --arg unit "$CURRENT_UNIT" \
         
         # CODE 3 OVERRIDE: If Overcast + High Humidity (85%+), trigger Rain Icon
         elif (code == 3) then 
-            (if humidity >= 85 then {text: "Overcast (Rainy)", icon: "󰖖"} 
-             else {text: "Overcast", icon: "󰼰"} end)
+            (if humidity >= 85 then {text: "Overcast (Rainy)", icon: (if is_day == 1 then "" else "" end)} 
+             else {text: "Overcast", icon: (if is_day == 1 then "󰼰" else "󰖑" end)} end)
         
-        elif (code == 45 or code == 48) then {text: "Fog", icon: "󰖑"}
+        elif (code == 45 or code == 48) then {text: "Fog", icon: (if is_day == 1 then "" else "" end)}
         elif (code == 51 or code == 53 or code == 55) then {text: "Drizzle", icon: "󰖗"}
         elif (code == 56 or code == 57) then {text: "Freezing Drizzle", icon: "󰖒"}
         elif (code == 61) then {text: "Slight Rain", icon: "󰖗"}
