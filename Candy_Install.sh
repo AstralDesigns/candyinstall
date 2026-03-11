@@ -4395,26 +4395,18 @@ get_waypaper_background() {
 
 update_config_background() {
     local bg_path="$1"
-    if [ -f "$bg_path" ]; then
-        magick "$bg_path" "$HOME/.config/background" && magick "$HOME/.config/background[0]" "$HOME/.config/wallpaper.png"
+    if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
+        echo "🎨 Triggering matugen color generation..."
+        matugen image "$bg_path" --type scheme-content -m dark --base16-backend wal --lightness-dark -0.1 --source-color-index 0 -r nearest --contrast 0.2
+        sleep 0.5
+        reload_colors
+        update_hypr_group_text
+        magick "$bg_path" "$HOME/.config/background" #&& magick "$HOME/.config/background[0]" "$HOME/.config/wallpaper.png"
         echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
     else
         echo "❌ Background file not found: $bg_path"
         return 1
-    fi
-}
-
-trigger_matugen() {
-    if [ -f "$MATUGEN_CONFIG" ]; then
-        echo "🎨 Triggering matugen color generation..."
-        matugen image "$HOME/.config/wallpaper.png" --type scheme-content -m dark --base16-backend wal --lightness-dark -0.1 --source-color-index 0 -r nearest --contrast 0.2
-        sleep 0.5
-        reload_colors
-        update_hypr_group_text
-        echo "✅ Matugen color generation complete"
-    else
-        echo "⚠️  Matugen config not found at: $MATUGEN_CONFIG"
     fi
 }
 
@@ -4501,21 +4493,13 @@ update_hypr_group_text() {
     echo "update_hypr_group_text: source_color luminance=${LUMINANCE_INT}/255 saturation=${SATURATION}% → text_color = $TEXT_COLOR"
 }
 
-execute_color_generation() {
-    echo "🚀 Starting color generation for new background..."
-    trigger_matugen
-    sleep 1
-    echo "✅ Color generation processes initiated"
-}
-
 main() {
-    ensure_gtk3_reload
     echo "🎯 Waypaper integration triggered"
     current_bg=$(get_waypaper_background)
     if [ $? -eq 0 ]; then
         echo "📸 Current Waypaper background: $current_bg"
         if update_config_background "$current_bg"; then
-            execute_color_generation
+           echo "✅ Color generation processes initiated"
         fi
     else
         echo "⚠️  Could not determine current Waypaper background"
@@ -7482,33 +7466,19 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-BACKGROUND="$HOME/.hyprcandy/.config/background"
-STAMP="$HOME/.config/hyprcandy/.background-set"
-
-# Only run on first install — stamp file prevents re-running on every login
-[ -f "$STAMP" ] && exit 0
-[ -f "$BACKGROUND" ] || exit 0
-
 # WAYLAND_DISPLAY is inherited from the Hyprland session when called correctly.
 # If somehow unset, derive it from the running compositor socket.
 if [ -z "$WAYLAND_DISPLAY" ]; then
     export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
 fi
-swww &
+swww-daemon &
+sleep 1
 # Wait for swww-daemon socket — it may still be starting up
 RETRIES=10
 until swww query &>/dev/null || [ $RETRIES -eq 0 ]; do
     sleep 1
     (( RETRIES-- ))
 done
-
-if swww query &>/dev/null; then
-    swww img "$BACKGROUND" --transition-type fade --transition-duration 1
-    echo "✅ Initial background set"
-    touch "$STAMP"
-else
-    echo "⚠️  swww-daemon not ready — background not set"
-fi
 
 # Start the correct services
 
@@ -7523,6 +7493,14 @@ fi
 
 systemctl enable --now bluetooth
 echo "✅ Services set..."
+
+if swww query &>/dev/null; then
+    bash "$HOME/.config/wayaper/wallpaper-cycle.sh"
+    echo "✅ Initial background set"
+    touch "$STAMP"
+else
+    echo "⚠️  swww-daemon not ready — background not set"
+fi
 
     # 🔄 Reload Hyprland
     echo
