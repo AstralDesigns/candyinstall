@@ -7536,17 +7536,23 @@ prompt_reboot() {
             if [ "$PANEL_CHOICE" = "waybar" ]; then
                 qs -c overview >/dev/null 2>&1 &
                 sleep 0.5
-                rm -rf "$HOME/candyinstall" && systemctl --user restart waybar.service &>/dev/null
+                bash -c "rm -rf ~/candyinstall"
+				sleep 0.5
+				systemctl --user restart waybar.service &>/dev/null
             else
                 qs -c overview >/dev/null 2>&1 &
                 sleep 0.5
-                rm -rf "$HOME/candyinstall" && systemctl --user restart hyprpanel.service &>/dev/null
+                bash -c "rm -rf ~/candyinstall"
+				sleep 0.5
+				systemctl --user restart hyprpanel.service &>/dev/null
             fi
             ;;
         *)
             print_status "Restarting system..."
             sleep 2
-            rm -rf "$HOME/hyprcandyinstall" && reboot
+            bash -c "rm -rf ~/candyinstall"
+			sleep 0.5
+			systemctl  && reboot
             ;;
     esac
 }
