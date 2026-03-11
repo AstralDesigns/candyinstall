@@ -20,7 +20,7 @@ LIGHT_RED='\033[1;31m'
 NC='\033[0m' # No Color
 
 # Global variables
-DISPLAY_MANAGER=""
+DISPLAY_MANAGER="sddm"
 DISPLAY_MANAGER_SERVICE=""
 SHELL_CHOICE=""
 PANEL_CHOICE=waybar
@@ -7566,8 +7566,8 @@ main() {
     echo
     
     # Choose display manager first
-    choose_display_manager
-    echo
+    #choose_display_manager
+    #echo
     
     # Choose a panel
     #choose_panel
