@@ -990,14 +990,14 @@ setup_hyprcandy() {
     # Backup previous default config folder if it exists
     PREVIOUS_CONFIG_FOLDER="$HOME/.config/hypr"
     
-    if [ ! -d "$PREVIOUS_CONFIG_FOLDER" ]; then
-        print_error "Default config folder not found: $PREVIOUS_CONFIG_FOLDER"
-        echo -e "${RED}Skipping default config backup${NC}"
-    else
-        cp -r "$PREVIOUS_CONFIG_FOLDER" "${PREVIOUS_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
-        echo -e "${GREEN}Previous default config folder backup created${NC}"
-    fi
-    sleep 1
+    #if [ ! -d "$PREVIOUS_CONFIG_FOLDER" ]; then
+        #print_error "Default config folder not found: $PREVIOUS_CONFIG_FOLDER"
+        #echo -e "${RED}Skipping default config backup${NC}"
+    #else
+        #cp -r "$PREVIOUS_CONFIG_FOLDER" "${PREVIOUS_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
+        #echo -e "${GREEN}Previous default config folder backup created${NC}"
+    #fi
+    #sleep 1
     
     # Backup previous custom config folder if it exists
     PREVIOUS_CUSTOM_CONFIG_FOLDER="$HOME/.config/hyprcustom"
@@ -1080,7 +1080,7 @@ git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR
 echo "✅ Clone complete"
 
 # Folders with user-specific changes — never overwritten on update
-SKIP_DIRS=("waybar" "waypaper" "hypr" "wlogout" "fastfetch")
+SKIP_DIRS=("background" "waybar" "waypaper" "hypr" "wlogout" "fastfetch")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
