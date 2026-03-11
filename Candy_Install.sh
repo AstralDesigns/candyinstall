@@ -7496,7 +7496,7 @@ systemctl enable --now bluetooth
 echo "✅ Services set..."
 
 if swww query &>/dev/null; then
-    bash "$HOME/.config/wayaper/wallpaper-cycle.sh"
+    bash "$HOME/.config/waypaper/wallpaper-cycle.sh"
     echo "✅ Initial background set"
     touch "$STAMP"
 else
