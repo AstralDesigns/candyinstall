@@ -1080,7 +1080,7 @@ git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR
 echo "✅ Clone complete"
 
 # Folders with user-specific changes — never overwritten on update
-SKIP_DIRS=("background" "waybar" "waypaper" "hypr" "wlogout" "fastfetch")
+SKIP_DIRS=("background" "waybar" "waypaper" "hypr" "hyprcandy" "wlogout" "fastfetch")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -4408,26 +4408,18 @@ get_waypaper_background() {
 
 update_config_background() {
     local bg_path="$1"
-    if [ -f "$bg_path" ]; then
-        magick "$bg_path" "$HOME/.config/background" && magick "$HOME/.config/background[0]" "$HOME/.config/wallpaper.png"
+    if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
+        echo "🎨 Triggering matugen color generation..."
+        matugen image "$bg_path" --type scheme-content -m dark --base16-backend wal --lightness-dark -0.1 --source-color-index 0 -r nearest --contrast 0.2
+        sleep 0.5
+        reload_colors
+        update_hypr_group_text
+        magick "$bg_path" "$HOME/.config/background" #&& magick "$HOME/.config/background[0]" "$HOME/.config/wallpaper.png"
         echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
     else
         echo "❌ Background file not found: $bg_path"
         return 1
-    fi
-}
-
-trigger_matugen() {
-    if [ -f "$MATUGEN_CONFIG" ]; then
-        echo "🎨 Triggering matugen color generation..."
-        matugen image "$HOME/.config/wallpaper.png" --type scheme-content -m dark --base16-backend wal --lightness-dark -0.1 --source-color-index 0 -r nearest --contrast 0.2
-        sleep 0.5
-        reload_colors
-        update_hypr_group_text
-        echo "✅ Matugen color generation complete"
-    else
-        echo "⚠️  Matugen config not found at: $MATUGEN_CONFIG"
     fi
 }
 
@@ -4514,21 +4506,13 @@ update_hypr_group_text() {
     echo "update_hypr_group_text: source_color luminance=${LUMINANCE_INT}/255 saturation=${SATURATION}% → text_color = $TEXT_COLOR"
 }
 
-execute_color_generation() {
-    echo "🚀 Starting color generation for new background..."
-    trigger_matugen
-    sleep 1
-    echo "✅ Color generation processes initiated"
-}
-
 main() {
-    ensure_gtk3_reload
     echo "🎯 Waypaper integration triggered"
     current_bg=$(get_waypaper_background)
     if [ $? -eq 0 ]; then
         echo "📸 Current Waypaper background: $current_bg"
         if update_config_background "$current_bg"; then
-            execute_color_generation
+           echo "✅ Color generation processes initiated"
         fi
     else
         echo "⚠️  Could not determine current Waypaper background"
@@ -7451,6 +7435,8 @@ else
     systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null # hyprpanel.service
 fi
 echo "✅ Services set..."
+
+bash "$HOME/.config/wayaper/wallpaper-cycle.sh"
 
     # 🔄 Reload Hyprland
     echo
