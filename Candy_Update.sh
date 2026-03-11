@@ -7424,19 +7424,8 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-# WAYLAND_DISPLAY is inherited from the Hyprland session when called correctly.
-# If somehow unset, derive it from the running compositor socket.
-if [ -z "$WAYLAND_DISPLAY" ]; then
-    export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
-fi
 swww-daemon &
 sleep 1
-# Wait for swww-daemon socket — it may still be starting up
-RETRIES=10
-until swww query &>/dev/null || [ $RETRIES -eq 0 ]; do
-    sleep 1
-    (( RETRIES-- ))
-done
 
 # Start the correct services
 
@@ -7452,13 +7441,7 @@ fi
 systemctl enable --now bluetooth
 echo "✅ Services set..."
 
-if swww query &>/dev/null; then
-    bash "$HOME/.config/waypaper/wallpaper-cycle.sh"
-    echo "✅ Initial background set"
-    touch "$STAMP"
-else
-    echo "⚠️  swww-daemon not ready — background not set"
-fi
+bash "$HOME/.config/waypaper/wallpaper-cycle.sh"
 
     # 🔄 Reload Hyprland
     echo
