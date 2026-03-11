@@ -7451,12 +7451,6 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-hyprctl reload
-
-pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &
-sleep 1
-swww img "$HOME/.hyprcandy/.config/background"
-
 # Start the correct services
 
 echo "🔄 Setting up services..."
