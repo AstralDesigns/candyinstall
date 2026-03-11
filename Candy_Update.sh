@@ -7488,18 +7488,18 @@ prompt_logout() {
             echo "✅ Update complete (re-login post update is advised)..."
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
-                kitty -e bash -c "rm -rf ~/candyinstall"
+                bash -c "rm -rf ~/candyinstall"
 				sleep 0.5
 				systemctl --user stop hyprpanel.service &>/dev/null && systemctl --user restart waybar.service &>/dev/null
             else
-                kitty -e bash -c "rm -rf ~/candyinstall"
+                bash -c "rm -rf ~/candyinstall"
 				sleep 0.5
 				systemctl --user stop waybar.service &>/dev/null && systemctl --user restart hyprpanel.service &>/dev/null
             fi
             ;;
         *)
             print_status "Logging out..."
-            kitty -e bash -c "rm -rf ~/candyinstall"
+            bash -c "rm -rf ~/candyinstall"
 			sleep 0.5
 			hyprctl dispatch exit
             ;;
