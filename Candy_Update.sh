@@ -7436,7 +7436,7 @@ else
 fi
 echo "✅ Services set..."
 
-bash "$HOME/.config/wayaper/wallpaper-cycle.sh"
+bash "$HOME/.config/waypaper/wallpaper-cycle.sh"
 
     # 🔄 Reload Hyprland
     echo
