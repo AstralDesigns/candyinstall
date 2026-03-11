@@ -4971,6 +4971,9 @@ org.gnome.Nautilus
 org.gnome.gedit
 zen
 kitty
+nwg-displays
+nwg-look
+waypaper
 EOF
 
 else
