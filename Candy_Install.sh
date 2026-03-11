@@ -25,6 +25,7 @@ DISPLAY_MANAGER_SERVICE="sddm"
 SHELL_CHOICE=""
 PANEL_CHOICE="waybar"
 BROWSER_CHOICE=""
+AUR_HELPER=""
 
 # Function to display multicolored ASCII art
 show_ascii_art() {
