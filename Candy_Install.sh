@@ -7482,11 +7482,33 @@ setup_keyboard_layout() {
         print_error "Please run setup_custom_config() first"
     fi
 
-hyprctl reload
+BACKGROUND="$HOME/.hyprcandy/.config/background"
+STAMP="$HOME/.config/hyprcandy/.background-set"
 
-pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &
-sleep 1
-swww img "$HOME/.hyprcandy/.config/background"
+# Only run on first install — stamp file prevents re-running on every login
+[ -f "$STAMP" ] && exit 0
+[ -f "$BACKGROUND" ] || exit 0
+
+# WAYLAND_DISPLAY is inherited from the Hyprland session when called correctly.
+# If somehow unset, derive it from the running compositor socket.
+if [ -z "$WAYLAND_DISPLAY" ]; then
+    export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
+fi
+swww &
+# Wait for swww-daemon socket — it may still be starting up
+RETRIES=10
+until swww query &>/dev/null || [ $RETRIES -eq 0 ]; do
+    sleep 1
+    (( RETRIES-- ))
+done
+
+if swww query &>/dev/null; then
+    swww img "$BACKGROUND" --transition-type fade --transition-duration 1
+    echo "✅ Initial background set"
+    touch "$STAMP"
+else
+    echo "⚠️  swww-daemon not ready — background not set"
+fi
 
 # Start the correct services
 
@@ -7531,7 +7553,7 @@ prompt_reboot() {
     read -r reboot_choice
     case "$reboot_choice" in
         [nN][oO]|[nN])
-            echo "✅ Starting chosen bar (reboot post install is advised)..."
+            echo "✅ Installation complete (reboot post install is advised)..."
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
                 qs -c overview >/dev/null 2>&1 &
