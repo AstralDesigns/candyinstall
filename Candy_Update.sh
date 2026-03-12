@@ -7518,6 +7518,14 @@ fi
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload. Run 'hyprctl reload' on next start and Hyprland login."
     fi
 
+	# Only create sentinel if xray is actually on in the running config
+XRAY_STATE=$(hyprctl getoption decoration:blur:xray -j 2>/dev/null | jq -r '.int // .value // 0')
+if [ "$XRAY_STATE" = "1" ]; then
+    touch "$HOME/.config/hyprcandy/settings/xray-on"
+else
+    rm -f "$HOME/.config/hyprcandy/settings/xray-on"
+fi
+
     print_success "HyprCandy updated completed!"  
 }
 
