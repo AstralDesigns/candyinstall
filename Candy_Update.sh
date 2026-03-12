@@ -5054,9 +5054,6 @@ sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
     else
         echo "⚠️  wlogout style.css not found at $WLOGOUT_STYLE"
     fi
-    
-	mkdir -p "$HOME/.config/hyprcandy/settings"
-	touch "$HOME/.config/hyprcandy/settings/xray-on"
 }
 
 # Function to enable display manager and prompt for reboot
