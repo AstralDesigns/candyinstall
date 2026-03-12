@@ -4998,7 +4998,6 @@ chmod +x "$HOME/.config/waybar/scripts/toggle-weather-format.sh"
     echo "🔄 Adding sddm background auto-update settings..."
     
     # Get the current username
-    sudo rm -f /etc/sudoers.d/hyprcandy-background
 USERNAME=$(whoami)
 
 # Create the sudoers entries for background script and required commands
