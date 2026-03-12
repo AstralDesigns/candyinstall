@@ -3852,7 +3852,7 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
         | sed "s|~|$HOME|g" \
         | xargs)
 
-    if [[ -n "$CURRENT_WP" && -f "$CURRENT_WP" ]]; then
+   if [[ -n "$CURRENT_WP" && -f "$CURRENT_WP" ]]; then
         WP_FILENAME=$(basename "$CURRENT_WP")
         WP_EXT="${WP_FILENAME##*.}"
 
@@ -3860,9 +3860,11 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
         if [[ "${WP_EXT,,}" == "webp" ]]; then
             WP_FILENAME="${WP_FILENAME%.*}.jpg"
             sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
             echo "🔄 Converted webp → $WP_FILENAME"
         else
             sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
         fi
 
         sudo sed -i "s|^Background=.*|Background=\"Backgrounds/$WP_FILENAME\"|" "$SDDM_CONF"
