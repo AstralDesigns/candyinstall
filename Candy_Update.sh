@@ -5034,10 +5034,10 @@ SUDOERS_ENTRIES=(
 )
 
 # Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background
+printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
 # Set proper permissions on the sudoers file
-sudo chmod 440 /etc/sudoers.d/hyprcandy-background
+sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
 	
