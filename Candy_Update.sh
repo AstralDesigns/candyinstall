@@ -3861,6 +3861,41 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
     CURRENT_WP=$(grep -E "^\s*wallpaper\s*=" "$WAYPAPER_CONFIG" \
         | head -n1 \
         | sed 's/.*=\s*//' \
+        | sed "s#!/bin/bash
+set +e
+
+restart_swaync() {
+    swaync &
+    sleep 1
+    swaync-client -rs & >/dev/null 2>&1
+}
+
+restart_swaync
+
+# Update ROFI background 
+ROFI_RASI="$HOME/.config/rofi/colors.rasi"
+
+if command -v sed >/dev/null; then
+    sed -i "2s/, 1)/, 0.4)/" "$ROFI_RASI"
+    echo "Rofi color updated"
+fi
+
+# Update local background.png
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
+fi
+
+# ── Update SDDM background path and BackgroundColor from waypaper/colors.css ──
+WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
+SDDM_CONF="/usr/share/sddm/themes/sugar-candy/theme.conf"
+SDDM_BG_DIR="/usr/share/sddm/themes/sugar-candy/Backgrounds"
+COLORS_CSS="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/colors.css"
+
+if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
+    # ── Wallpaper path ────────────────────────────────────────────────────────
+    CURRENT_WP=$(grep -E "^\s*wallpaper\s*=" "$WAYPAPER_CONFIG" \
+        | head -n1 \
+        | sed 's/.*=\s*//' \
         | sed "s|~|$HOME|g" \
         | xargs)
 
@@ -3872,9 +3907,11 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
         if [[ "${WP_EXT,,}" == "webp" ]]; then
             WP_FILENAME="${WP_FILENAME%.*}.jpg"
             sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
             echo "🔄 Converted webp → $WP_FILENAME"
         else
             sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
         fi
 
         sudo sed -i "s|^Background=.*|Background=\"Backgrounds/$WP_FILENAME\"|" "$SDDM_CONF"
@@ -5028,6 +5065,7 @@ SUDOERS_ENTRIES=(
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^HeaderText=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^FormPosition=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BlurRadius=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 )
 
 # Add all entries to sudoers safely using visudo
