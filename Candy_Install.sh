@@ -4969,6 +4969,27 @@ fi
 chmod +x "$HOME/.config/waybar/scripts/waybar-weather.sh"
 chmod +x "$HOME/.config/waybar/scripts/toggle-weather-format.sh"
 
+# ═══════════════════════════════════════════════════════════════
+#               		  	   XRAY
+# ═══════════════════════════════════════════════════════════════
+	cat > "$HOME/.config/hypr/scritps/xray.sh" << 'EOF'
+#!/bin/bash
+HYPR="$HOME/.config/hypr/hyprviz.conf"
+XRAY="$HOME/.config/hyprcandy/settings/xray-on"
+if [ ! -f "$XRAY" ]; then
+    sed -i "s/xray = false/xray = true/" "$HYPR"
+    sed -i "s/xray off/xray on/" "$HYPR"
+    hyprctl reload
+    touch "$XRAY"
+else
+    sed -i "s/xray = true/xray = false/" "$HYPR"
+    sed -i "s/xray on/xray off/" "$HYPR"
+    hyprctl reload
+    rm "$XRAY"
+fi
+EOF
+chmod +x "$HOME/.config/hypr/scritps/xray.sh"
+
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
     echo "🛠️ Disabling GNOME titlebar buttons..."
@@ -7526,7 +7547,6 @@ if [ "$XRAY_STATE" = "1" ]; then
 else
     rm -f "$HOME/.config/hyprcandy/settings/xray-on"
 fi
-chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 
     print_success "HyprCandy configuration setup completed!"  
 }
