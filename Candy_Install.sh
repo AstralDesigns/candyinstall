@@ -5056,8 +5056,9 @@ sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
     else
         echo "⚠️  wlogout style.css not found at $WLOGOUT_STYLE"
     fi
-    # Symlink GTK3 and GTK4 settings files
-    #ln -sf ~/.config/gtk-3.0/settings.ini ~/.config/gtk-4.0/settings.ini
+    
+	mkdir -p "$HOME/.config/hyprcandy/settings"
+	touch "$HOME/.config/hyprcandy/settings/xray-on"
 }
 
 # Function to enable display manager and prompt for reboot
