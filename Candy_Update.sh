@@ -5275,7 +5275,7 @@ env = GDK_BACKEND,wayland
 env = CLUTTER_BACKEND,wayland
 
 # Packages to have full env path access
-env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/king/.cargo/bin
+env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USER/.cargo/bin
 
 # After using nwg-look, also change the cursor settings here to maintain changes after every reboot
 env = XCURSOR_THEME,Marci-Crystal
