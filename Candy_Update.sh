@@ -5004,6 +5004,9 @@ else
 fi
 EOF
 chmod +x "$HOME/.hyprcandy/.config/hypr/scritps/xray.sh"
+if [ -f "$HOME/.hyprcandy/.config/hypr/scritps/xray.sh" ]; then
+echo "✅ Created X-RAY mode script..."
+fi
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
