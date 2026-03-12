@@ -7522,6 +7522,7 @@ if [ "$XRAY_STATE" = "1" ]; then
 else
     rm -f "$HOME/.config/hyprcandy/settings/xray-on"
 fi
+chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 
     print_success "HyprCandy updated completed!"  
 }
