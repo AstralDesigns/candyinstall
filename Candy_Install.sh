@@ -4972,9 +4972,7 @@ chmod +x "$HOME/.config/waybar/scripts/toggle-weather-format.sh"
 # ═══════════════════════════════════════════════════════════════
 #               		  	   XRAY
 # ═══════════════════════════════════════════════════════════════
-	
-touch "$HOME/.hyprcandy/.config/hypr/scritps/xray.sh"
-	cat > "$HOME/.hyprcandy/.config/hypr/scritps/xray.sh" << 'EOF'
+	cat > "$HOME/.config/hypr/scripts/xray.sh" << 'EOF'
 #!/bin/bash
 HYPR="$HOME/.config/hypr/hyprviz.conf"
 XRAY="$HOME/.config/hyprcandy/settings/xray-on"
@@ -4990,7 +4988,7 @@ else
     rm "$XRAY"
 fi
 EOF
-chmod +x "$HOME/.hyprcandy/.config/hypr/scritps/xray.sh"
+chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
