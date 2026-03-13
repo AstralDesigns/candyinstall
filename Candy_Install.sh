@@ -5242,7 +5242,7 @@ exec-once = /usr/bin/pypr
 exec-once = swaync
 exec-once = blueman-applet
 exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
-exec-once = bash ~/.config/hyprcandy/scripts/toggle-dock.sh --login
+exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
 
 # Wallpaper — after swww-daemon is running
 #exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
