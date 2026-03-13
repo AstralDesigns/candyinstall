@@ -5195,7 +5195,7 @@ setup_custom_config() {
             echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
 
  # Add default content to the custom.conf file
-sudo cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
+		cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
 # ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 #██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 #██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
@@ -5275,7 +5275,7 @@ env = GDK_BACKEND,wayland
 env = CLUTTER_BACKEND,wayland
 
 # Packages to have full env path access
-env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USER/.cargo/bin
+env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
 # After using nwg-look, also change the cursor settings here to maintain changes after every reboot
 env = XCURSOR_THEME,Marci-Crystal
