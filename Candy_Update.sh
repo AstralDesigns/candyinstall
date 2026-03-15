@@ -1014,14 +1014,7 @@ setup_hyprcandy() {
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         if pacman -Qi sddm &>/dev/null; then
-            $AUR_HELPER -R --noconfirm gdm gdm-settings
-            $AUR_HELPER -R --noconfirm gnome-software
-            $AUR_HELPER -R --noconfirm gnome-weather
-            $AUR_HELPER -R --noconfirm waypaper-git
-            $AUR_HELPER -R --noconfirm qt6ct
-            $AUR_HELPER -R --noconfirm qt5ct
-            $AUR_HELPER -R --noconfirm spotify
-            $AUR_HELPER -R --noconfirm nwg-dock-hyprland
+            $AUR_HELPER -R --noconfirm quickshell
             $AUR_HELPER -S --noconfirm sddm sddm-sugar-candy-git
             print_status "Installed SDDM packages"
         else
@@ -1029,14 +1022,7 @@ setup_hyprcandy() {
         fi
     elif [ "$DISPLAY_MANAGER" = "gdm" ]; then
         if pacman -Qi gdm &>/dev/null; then
-            $AUR_HELPER -R --noconfirm sddm sddm-sugar-candy-git
-            $AUR_HELPER -R --noconfirm gnome-software
-            $AUR_HELPER -R --noconfirm gnome-weather
-            $AUR_HELPER -R --noconfirm waypaper-git
-            $AUR_HELPER -R --noconfirm qt6ct
-            $AUR_HELPER -R --noconfirm qt5ct
-            $AUR_HELPER -R --noconfirm spotify
-            $AUR_HELPER -R --noconfirm nwg-dock-hyprland
+            $AUR_HELPER -R --noconfirm quickshell
             $AUR_HELPER -S --noconfirm gdm gdm-settings
             print_status "Installed GDM packages"
         else
@@ -1057,7 +1043,7 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm waybar waypaper-git swaync equibop-bin waypaper qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
+        $AUR_HELPER -S --noconfirm quickshell-git
     else
         print_status "Ensuring necessary packages are installed"
         echo
