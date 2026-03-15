@@ -5825,7 +5825,7 @@ label {
     monitor =
     #date
     text = cmd[update:60000] date +"%A, %d %B %Y"
-    color = $primary_fixed_dim
+    color = $primary
     font_size = 20
     font_family = C059 Bold
     position = 0, -35
