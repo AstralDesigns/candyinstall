@@ -3815,14 +3815,6 @@ cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 set +e
 
-restart_swaync() {
-    swaync &
-    sleep 1
-    swaync-client -rs & >/dev/null 2>&1
-}
-
-restart_swaync
-
 # Update ROFI background 
 ROFI_RASI="$HOME/.config/rofi/colors.rasi"
 
@@ -4398,7 +4390,7 @@ update_config_background() {
     local bg_path="$1"
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         echo "🎨 Triggering matugen color generation..."
-        matugen image "$bg_path" --type scheme-content -m dark --base16-backend wal --lightness-dark -0.1 --source-color-index 0 -r nearest --contrast 0.2
+        matugen image "$bg_path" --type scheme-rainbow -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
         sleep 0.5
         reload_colors
         update_hypr_group_text
@@ -4426,6 +4418,14 @@ reload_colors() {
     sleep 0.5
     #gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-dark"
     gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
+    
+    restart_swaync() {
+    swaync &
+    sleep 1
+    swaync-client -rs & >/dev/null 2>&1
+    }
+
+    restart_swaync
     
     sudo dconf update
 }
