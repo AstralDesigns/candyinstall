@@ -318,7 +318,7 @@ build_package_list() {
         "nwg-displays"
         "wlogout"
         "uwsm"
-        "quickshell"
+        "quickshell-git"
         "flatpak"
         
         # Application launcher and menus
