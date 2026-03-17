@@ -5125,6 +5125,7 @@ exec-once = systemctl --user start rofi-font-watcher
 exec-once = systemctl --user start cursor-theme-watcher
 
 # Daemons
+exec-once = gjs ~/.hyprcandy/GJS/candy-daemon.js
 exec-once = swww-daemon
 exec-once = hypridle
 exec-once = /usr/bin/pypr
