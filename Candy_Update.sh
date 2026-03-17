@@ -1065,8 +1065,8 @@ rm -rf "$UPDATE_DIR"
 git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR"
 echo "✅ Clone complete"
 
-# Folders with user-specific changes — never overwritten on update
-SKIP_DIRS=("background" "background.png" "fastfetch" "hypr" "hyprcandy" "waybar" "waypaper" "wlogout")
+# Folders with user-specific changes — never overwritten on update > readd later "hypr" "hyprcandy"
+SKIP_DIRS=("background" "background.png" "fastfetch" "waybar" "waypaper" "wlogout")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
