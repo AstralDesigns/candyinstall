@@ -1043,7 +1043,7 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm quickshell-git
+        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control
     else
         print_status "Ensuring necessary packages are installed"
         echo
@@ -6745,6 +6745,10 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
+
+echo "Enabling switcheroo service for the HyprCandy-dock gpu detection..."
+sudo systemctl enable --now switcheroo-control &>/dev/null
+echo "✅ Service set"
 
 if swww query &>/dev/null; then
     bash "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
