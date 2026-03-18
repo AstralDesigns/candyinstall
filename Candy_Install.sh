@@ -314,6 +314,7 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
+		"switcheroo-control"
         "blueman"
         "nwg-displays"
         "wlogout"
@@ -7423,7 +7424,7 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
-
+sudo systemctl enable switcheroo-control
 sudo systemctl enable bluetooth
 echo "✅ Services set..."
 
