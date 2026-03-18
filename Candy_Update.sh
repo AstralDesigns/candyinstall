@@ -4860,6 +4860,7 @@ PINNED_FILE="$HOME/.config/pinned"
 if [ ! -f "$PINNED_FILE" ]; then
 	cat > "$PINNED_FILE" << 'EOF'
 org.gnome.Nautilus
+io.github.timasoft.hyprviz
 org.gnome.gedit
 zen
 kitty
