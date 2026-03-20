@@ -1799,87 +1799,6 @@ echo "Config updated → wallpaper = $NEXT_STORED"
 EOF
 
 chmod +x "$HOME/.config/waypaper/wallpaper-cycle.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#                          Hyprlock Script
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/hypr/scripts/hyprlock-watcher.sh" << 'EOF'
-#!/bin/bash
-# hyprlock-watcher.sh - Watches for hyprlock unlock and refreshes waybar
-
-WEATHER_CACHE_FILE="/tmp/astal-weather-cache.json"
-
-# Wait for Hyprland to start
-while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
-    sleep 1
-done
-
-echo "Hyprlock watcher started"
-
-# Continuously monitor for hyprlock
-while true; do
-    # Wait for hyprlock to start
-    while ! pgrep -x hyprlock >/dev/null 2>&1; do
-        sleep 1
-    done
-    
-    echo "Hyprlock detected - waiting for unlock..."
-    
-    # Wait for hyprlock to end (unlock)
-    while pgrep -x hyprlock >/dev/null 2>&1; do
-        sleep 0.5
-    done
-    
-    echo "Unlocked! Checking waybar status..."
-    
-    # Only refresh waybar if it was running before lock
-    if pgrep -x waybar >/dev/null 2>&1; then
-        echo "Waybar is running - refreshing..."
-        
-        # Remove cached weather file
-        rm -f "$WEATHER_CACHE_FILE"
-        #rm -f "${WEATHER_CACHE_FILE}.tmp"
-        
-        # Wait a moment for system to fully resume
-        sleep 3
-        
-        # Full waybar restart
-        systemctl --user restart waybar.service
-    else
-        echo "Waybar was hidden before session lock - skipping refresh"
-    fi
-    
-    # Wait a bit before checking for next lock
-    sleep 3
-done
-EOF
-
-chmod +x "$HOME/.config/hypr/scripts/hyprlock-watcher.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#                         Hyprlock Service
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/systemd/user/hyprlock-watcher.service" << 'EOF'
-[Unit]
-Description=Hyprlock Unlock Watcher - Refreshes Waybar on Resume
-Documentation=https://wiki.hyprland.org/Hypr-Ecosystem/hyprlock/
-PartOf=graphical-session.target
-After=graphical-session.target
-Requisite=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=%h/.config/hypr/scripts/hyprlock-watcher.sh
-Restart=on-failure
-RestartSec=3
-
-[Install]
-WantedBy=graphical-session.target
-EOF
-
-echo "✅ Hyprlock service to re-initialize waybar set"
 fi
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -5119,7 +5038,6 @@ exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 
 # System services
 exec-once = systemctl --user start hyprpolkitagent
-exec-once = systemctl --user start hyprlock-watcher.service
 exec-once = systemctl --user start waybar-idle-monitor
 exec-once = systemctl --user start waypaper-watcher
 exec-once = systemctl --user start rofi-font-watcher
@@ -6742,7 +6660,7 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart waybar-idle-monitor.service waypaper-watcher.service background-watcher.service hyprlock-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart waybar-idle-monitor.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
