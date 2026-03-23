@@ -4170,7 +4170,7 @@ while true; do
         #rm -f "${WEATHER_CACHE_FILE}.tmp"
         
         # Wait a moment for system to fully resume
-        sleep 3
+        sleep 0.5
         
         # Full weather restart
         bash "$WEATHER"
