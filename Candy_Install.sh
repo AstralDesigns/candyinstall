@@ -7417,9 +7417,9 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart waybar.service waybar-idle-monitor.service hyprlock-watcher.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart waybar-idle-monitor.service hyprlock-watcher.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 else
-    systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
 sudo systemctl enable switcheroo-control
 sudo systemctl enable bluetooth
@@ -7476,13 +7476,13 @@ prompt_reboot() {
                 sleep 0.5
                 bash -c "rm -rf ~/candyinstall"
 				sleep 0.5
-				systemctl --user restart waybar.service &>/dev/null
+				systemctl --user restart waybar.service &>/dev/null && reboot
             else
                 qs -c overview >/dev/null 2>&1 &
                 sleep 0.5
                 bash -c "rm -rf ~/candyinstall"
 				sleep 0.5
-				systemctl --user restart hyprpanel.service &>/dev/null
+				systemctl --user restart hyprpanel.service &>/dev/null && reboot
             fi
             ;;
         *)
