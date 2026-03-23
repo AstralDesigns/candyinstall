@@ -7429,7 +7429,10 @@ if swww query &>/dev/null; then
     bash "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
     echo "✅ Initial background set"
 else
-    echo "⚠️  swww-daemon not ready — background not set"
+    echo "Setting background..."
+	swww-daemon &
+	sleep 1
+	swww img "$HOME/.ultracandy/.config/background"
 fi
 
     # 🔄 Reload Hyprland
