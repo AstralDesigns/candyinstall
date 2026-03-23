@@ -5248,7 +5248,7 @@ input {
 
 general {
     gaps_in = 6
-    gaps_out = 8	
+    gaps_out = 12	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
     col.active_border = $source_color
@@ -5327,7 +5327,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 15
+    rounding = 20
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
