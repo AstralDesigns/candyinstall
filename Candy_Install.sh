@@ -3958,15 +3958,19 @@ chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
 cat > "$HOME/.config/hyprcandy/scripts/overview.sh" << 'EOF'
 #!/bin/bash
 
-# Check if the process is running
-if pgrep - f "qs -c overview" > /dev/null; then
-    # If running, just toggle the overview
+# If the overview instance is already running, just toggle it.
+# If not, start it and then toggle open.
+if pgrep -f "qs -c overview" > /dev/null; then
     qs ipc -c overview call overview toggle
 else
-    # If not running, start it then toggle the overview
     qs -c overview &
-    sleep 0.5
-    qs ipc -c overview call overview toggle
+    # Wait for the IPC socket to be ready before calling toggle
+    for i in $(seq 1 20); do
+        sleep 0.1
+        if qs ipc -c overview call overview toggle 2>/dev/null; then
+            break
+        fi
+    done
 fi
 EOF
 
