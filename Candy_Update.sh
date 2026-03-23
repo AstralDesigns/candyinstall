@@ -3738,7 +3738,7 @@ set +e
 ROFI_RASI="$HOME/.config/rofi/colors.rasi"
 
 if command -v sed >/dev/null; then
-    sed -i "2s/, 1)/, 0.4)/" "$ROFI_RASI"
+    sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
     echo "Rofi color updated"
 fi
 
@@ -3834,7 +3834,7 @@ set +e
 ROFI_RASI="$HOME/.config/rofi/colors.rasi"
 
 if command -v sed >/dev/null; then
-    sed -i "2s/, 1)/, 0.4)/" "$ROFI_RASI"
+    sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
     echo "Rofi color updated"
 fi
 
