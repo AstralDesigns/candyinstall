@@ -4140,7 +4140,6 @@ cat > "$HOME/.config/hypr/scripts/hyprlock-watcher.sh" << 'EOF'
 # hyprlock-watcher.sh - Watches for hyprlock unlock and refreshes waybar
 
 WEATHER_CACHE_FILE="/tmp/astal-weather-cache.json"
-WEATHER="$HOME/.config/waybar/scripts/waybar-weather.sh"
 
 # Wait for Hyprland to start
 while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
@@ -4176,8 +4175,8 @@ while true; do
         # Wait a moment for system to fully resume
         sleep 0.5
         
-        # Full weather restart
-        bash "$WEATHER"
+        # Quick waybar restart
+        killall -SIGUSR2 waybar
     else
         echo "Waybar was hidden before session lock - skipping refresh"
     fi
