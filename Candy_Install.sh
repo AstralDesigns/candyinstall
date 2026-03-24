@@ -6608,7 +6608,7 @@ bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculat
 #### Bar/Panel ####
 
 bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/kill_waybar_safe.sh #Hide/kill waybar and start automatic idle-inhibitor
-bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/restart_waybar.sh #Restart or reload waybar and stop automatic idle-inhibitor
+bind = ALT, 2, exec, killall -SIGUSR2 waybar #Quick waybar restart/reload
 
 #### Dock keybinds ####
 
