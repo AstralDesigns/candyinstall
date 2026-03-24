@@ -49,7 +49,7 @@ show_ascii_art() {
     echo
     # Decorative line with gradient
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
-    echo -e "${WHITE}                    Welcome to the HyprCandy Installer!${NC}"
+    echo -e "${WHITE}                      Welcome to the HyprCandy Installer!${NC}"
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
     echo
 }
@@ -1526,7 +1526,15 @@ chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh"
 echo "✅ Hyprland adjustment scripts created and made executable!"
 
 # ═══════════════════════════════════════════════════════════════
-#                    SWAYNC RECORDER SCRIPT
+#                BRAVE BROWSER KWALLET SUPPRESSION
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/brave-flags.conf" << 'EOF'
+--password-store=basic
+EOF
+
+# ═══════════════════════════════════════════════════════════════
+#                      SWAYNC RECORDER SCRIPT
 # ═══════════════════════════════════════════════════════════════
 
 cat > "$HOME/.config/swaync/recorder.sh" << 'EOF'
