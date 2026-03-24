@@ -5391,7 +5391,7 @@ decoration {
 
 windowrule = group barred, match:class .*
 windowrule = pin on,border_size 0,move 520 45,match:title (candy.utils)#center
-windowrule = pin on,border_size 0,move 960 45,match:title (candy.systemmonitor) #top right
+windowrule = pin on,border_size 0,move 880 45,match:title (candy.systemmonitor) #top right
 windowrule = pin on,border_size 0,move 380 45,match:title (candy.media) #center
 windowrule = pin on,border_size 0,move 10 45,match:title (candy.weather) #top left
 windowrule = opacity 0.85 0.85,match:class ^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
