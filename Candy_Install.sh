@@ -4358,22 +4358,23 @@ WantedBy=default.target
 EOF
 
 # ═══════════════════════════════════════════════════════════════
-#             Waybar Restart and Kill Scripts
+#              			Waybar Toggle Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/restart_waybar.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/toggle-bar.sh" << 'EOF'
 #!/bin/bash
-systemctl --user restart waybar.service
+
+if pgrep -f "/usr/bin/waybar" > /dev/null; then
+    # If running, kill it
+    systemctl --user stop waybar.service
+    pkill -x waybar
+else
+    # If not running, start it
+    systemctl --user restart waybar.service
+fi
 EOF
 
-cat > "$HOME/.config/hyprcandy/hooks/kill_waybar_safe.sh" << 'EOF'
-#!/bin/bash
-systemctl --user stop waybar.service
-pkill -x waybar
-EOF
-
-chmod +x "$HOME/.config/hyprcandy/hooks/restart_waybar.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/kill_waybar_safe.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/toggle-bar.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #               Waypaper Integration Scripts
@@ -6625,16 +6626,15 @@ bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculat
 
 #### Bar/Panel ####
 
-bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/kill_waybar_safe.sh || ~/.config/hyprcandy/hooks/restart_waybar.sh #Hide/Show bar
-bind = ALT, 2, exec, killall -SIGUSR2 waybar #Quick bar reload
+bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/toggle-bar.sh #Hide/Show bar
 
 #### Dock keybinds ####
 
-bind = ALT, 3, exec, ~/.hyprcandy/GJS/hyprcandydock/toggle.sh #Hide/Show dock
+bind = ALT, 2, exec, ~/.hyprcandy/GJS/hyprcandydock/toggle.sh #Hide/Show dock
 
 #### Status display ####
 
-bind = ALT, 4, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprland status display
+bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprland status display
 
 #### Recorder ####
 
