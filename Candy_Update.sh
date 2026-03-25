@@ -319,7 +319,7 @@ build_package_list() {
         "rofi-nerdy"
         
         # Wallpaper and screenshot tools
-        "swww"
+        "awww"
         "grimblast-git"
         "wob"
         "wf-recorder"
@@ -1676,7 +1676,7 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 cat > "$HOME/.config/waypaper/wallpaper-cycle.sh" << 'EOF'
 #!/usr/bin/env bash
 # wallpaper-cycle.sh
-# Cycles through wallpapers in the waypaper folder using swww (or configured backend)
+# Cycles through wallpapers in the waypaper folder using awww (or configured backend)
 # and updates the waypaper config with the new wallpaper path.
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -1701,11 +1701,11 @@ FOLDER="$(get_ini_value folder)"
 BACKEND="$(get_ini_value backend)"
 CURRENT="$(get_ini_value wallpaper)"
 FILL="$(get_ini_value fill)"
-TRANSITION_TYPE="$(get_ini_value swww_transition_type)"
-TRANSITION_STEP="$(get_ini_value swww_transition_step)"
-TRANSITION_ANGLE="$(get_ini_value swww_transition_angle)"
-TRANSITION_DURATION="$(get_ini_value swww_transition_duration)"
-TRANSITION_FPS="$(get_ini_value swww_transition_fps)"
+TRANSITION_TYPE="$(get_ini_value awww_transition_type)"
+TRANSITION_STEP="$(get_ini_value awww_transition_step)"
+TRANSITION_ANGLE="$(get_ini_value awww_transition_angle)"
+TRANSITION_DURATION="$(get_ini_value awww_transition_duration)"
+TRANSITION_FPS="$(get_ini_value awww_transition_fps)"
 
 # ── Validate folder ───────────────────────────────────────────────────────────
 if [[ ! -d "$FOLDER" ]]; then
@@ -1746,15 +1746,15 @@ echo "Next    : $NEXT"
 echo "Backend : $BACKEND"
 
 # ── Apply wallpaper via backend ───────────────────────────────────────────────
-apply_swww() {
-  # Ensure swww daemon is running
-  if ! swww query &>/dev/null; then
-    echo "Starting swww daemon..."
-    swww-daemon &
+apply_awww() {
+  # Ensure awww daemon is running
+  if ! awww query &>/dev/null; then
+    echo "Starting awww daemon..."
+    awww-daemon &
     sleep 0.5
   fi
 
-  swww img "$NEXT" \
+  awww img "$NEXT" \
     --transition-type  "${TRANSITION_TYPE:-any}" \
     --transition-step  "${TRANSITION_STEP:-90}" \
     --transition-angle "${TRANSITION_ANGLE:-0}" \
@@ -1777,7 +1777,7 @@ apply_hyprpaper() {
 }
 
 case "$BACKEND" in
-  swww)      apply_swww      ;;
+  awww)      apply_awww      ;;
   feh)       apply_feh       ;;
   swaybg)    apply_swaybg    ;;
   hyprpaper) apply_hyprpaper ;;
@@ -1861,13 +1861,13 @@ wait_for_hyprpanel() {
     return 1
 }
 
-restart_swww() {
-    echo "🔄 Restarting swww-daemon..."
-    pkill swww-daemon 2>/dev/null
+restart_awww() {
+    echo "🔄 Restarting awww-daemon..."
+    pkill awww-daemon 2>/dev/null
     sleep 0.5
-    swww-daemon &
+    awww-daemon &
     sleep 1
-    echo "✅ swww-daemon restarted"
+    echo "✅ awww-daemon restarted"
 }
 
 # MAIN EXECUTION
@@ -1875,10 +1875,10 @@ initialize_colors_file
     
 if wait_for_hyprpanel; then
     sleep 0.5
-    restart_swww
+    restart_awww
 else
-    echo "⚠️ Proceeding with swww restart anyway..."
-    restart_swww
+    echo "⚠️ Proceeding with awww restart anyway..."
+    restart_awww
 fi
 
 echo "🎯 All services started successfully"
@@ -3709,20 +3709,20 @@ RestartPreventExitStatus=143
 [Install]
 WantedBy=graphical-session.target
 EOF
-# Just waybar service. No swww cache clearing needed
+# Just waybar service. No awww cache clearing needed
 
 else
 
 # ═══════════════════════════════════════════════════════════════
-#                  Clear Swww Cache Script
+#                  Clear awww Cache Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/clear_swww.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/clear_awww.sh" << 'EOF'
 #!/bin/bash
-CACHE_DIR="$HOME/.cache/swww"
+CACHE_DIR="$HOME/.cache/awww"
 [ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
 EOF
-chmod +x "$HOME/.config/hyprcandy/hooks/clear_swww.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/clear_awww.sh"
 fi
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -4045,7 +4045,7 @@ execute_hooks() {
         echo "🚫 Auto-relaunch disabled by user, skipping dock relaunch"
     fi
     
-    "$HOOKS_DIR/clear_swww.sh"
+    "$HOOKS_DIR/clear_awww.sh"
     "$HOOKS_DIR/update_background.sh"
 }
 
@@ -4110,7 +4110,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
 
 cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
-Description=Watch ~/.config/background, clear swww cache and update background images
+Description=Watch ~/.config/background, clear awww cache and update background images
 After=hyprland-session.target
 PartOf=hyprland-session.target
 
@@ -4633,13 +4633,13 @@ WantedBy=default.target
 EOF
 
 # ═══════════════════════════════════════════════════════════════
-#             Safe hyprpanel Killer Script (Preserve swww)
+#             Safe hyprpanel Killer Script (Preserve awww)
 # ═══════════════════════════════════════════════════════════════
 
 cat > "$HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh" << 'EOF'
 #!/bin/bash
 
-echo "🔄 Safely closing hyprpanel while preserving swww-daemon..."
+echo "🔄 Safely closing hyprpanel while preserving awww-daemon..."
 
 # Try graceful shutdown
 if pgrep -f "hyprpanel" > /dev/null; then
@@ -4659,18 +4659,18 @@ if pgrep -f "hyprpanel" > /dev/null; then
     fi
 fi
 
-# Ensure swww-daemon continues running
-if ! pgrep -f "swww-daemon" > /dev/null; then
-    echo "🔄 swww-daemon not found, restarting it..."
-    swww-daemon &
+# Ensure awww-daemon continues running
+if ! pgrep -f "awww-daemon" > /dev/null; then
+    echo "🔄 awww-daemon not found, restarting it..."
+    awww-daemon &
     sleep 1
     if [ -f "$HOME/.config/background" ]; then
         echo "🖼️  Restoring wallpaper..."
-        swww img "$HOME/.config/background" --transition-type fade --transition-duration 1
+        awww img "$HOME/.config/background" --transition-type fade --transition-duration 1
     fi
 fi
 
-echo "✅ hyprpanel safely closed, swww-daemon preserved"
+echo "✅ hyprpanel safely closed, awww-daemon preserved"
 EOF
 
 chmod +x "$HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh"
@@ -5136,7 +5136,7 @@ exec-once = systemctl --user start cursor-theme-watcher
 
 # Daemons
 exec-once = gjs ~/.hyprcandy/GJS/candy-daemon.js
-exec-once = swww-daemon
+exec-once = awww-daemon
 exec-once = hypridle
 exec-once = /usr/bin/pypr
 
@@ -5146,7 +5146,7 @@ exec-once = blueman-applet
 exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
 exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
 
-# Wallpaper — after swww-daemon is running
+# Wallpaper — after awww-daemon is running
 #exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
 exec-once = systemctl --user start background-watcher
 
@@ -6416,13 +6416,13 @@ update_custom() {
             echo "exec-once = swaync &" >> "$CUSTOM_CONFIG_FILE"
         fi
         
-        # Handle swww-daemon line - uncomment if commented
-        if grep -q "^#.*exec-once = swww-daemon &" "$CUSTOM_CONFIG_FILE"; then
+        # Handle awww-daemon line - uncomment if commented
+        if grep -q "^#.*exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
             # Line is commented, uncomment it
-            sed -i 's/^#\+\s*exec-once = swww-daemon &/exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        elif ! grep -q "^exec-once = swww-daemon &" "$CUSTOM_CONFIG_FILE"; then
+            sed -i 's/^#\+\s*exec-once = awww-daemon &/exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
+        elif ! grep -q "^exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
             # Line doesn't exist at all, add it (optional - you might want to handle this case)
-            echo "exec-once = swww-daemon &" >> "$CUSTOM_CONFIG_FILE"
+            echo "exec-once = awww-daemon &" >> "$CUSTOM_CONFIG_FILE"
         fi
         sed -i 's/#exec-once = systemctl --user start waypaper-watcher/exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,bar-0/layerrule = blur,waybar/g' "$CUSTOM_CONFIG_FILE"
@@ -6439,13 +6439,13 @@ update_custom() {
             sed -i 's/^exec-once = swaync &#exec-once = swaync \&/g' "$CUSTOM_CONFIG_FILE"
         fi
         
-        # Handle swww-daemon line - comment if uncommented
-        if grep -q "^exec-once = swww-daemon &" "$CUSTOM_CONFIG_FILE"; then
+        # Handle awww-daemon line - comment if uncommented
+        if grep -q "^exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
             # Line is uncommented, comment it
-            sed -i 's/^exec-once = swww-daemon &#exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
+            sed -i 's/^exec-once = awww-daemon &#exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
         fi
         
-        sed -i 's/exec-once = swww-daemon &/#exec-once = swww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
+        sed -i 's/exec-once = awww-daemon &/#exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/exec-once = systemctl --user start waypaper-watcher/#exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,waybar/layerrule = blur,bar-0/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = ignorezero,waybar/layerrule = ignorezero,bar-0/g' "$CUSTOM_CONFIG_FILE"
@@ -6736,11 +6736,11 @@ setup_keyboard_layout() {
 if [ -z "$WAYLAND_DISPLAY" ]; then
     export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
 fi
-pgrep -x swww-daemon > /dev/null 2>&1 || swww-daemon &
+pgrep -x awww-daemon > /dev/null 2>&1 || awww-daemon &
 sleep 1
-# Wait for swww-daemon socket — it may still be starting up
+# Wait for awww-daemon socket — it may still be starting up
 RETRIES=10
-until swww query &>/dev/null || [ $RETRIES -eq 0 ]; do
+until awww query &>/dev/null || [ $RETRIES -eq 0 ]; do
     sleep 1
     (( RETRIES-- ))
 done
@@ -6760,11 +6760,11 @@ echo "Enabling switcheroo service for the HyprCandy-dock gpu detection..."
 sudo systemctl enable --now switcheroo-control &>/dev/null
 echo "✅ Service set"
 
-if swww query &>/dev/null; then
+if awww query &>/dev/null; then
     bash "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
     echo "✅ Initial background set"
 else
-    echo "⚠️  swww-daemon not ready — background not set"
+    echo "⚠️  awww-daemon not ready — background not set"
 fi
 
     # 🔄 Reload Hyprland
@@ -6916,7 +6916,7 @@ main() {
     print_status "• Find default wallpapers check the ${CYAN}~/Pictures/Candy${NC} or ${CYAN}Candy${NC} folder"
     print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
     print_status "• If the wallpaper doesn't apply through the configuration interface, then toggle the button to apply wallpapers"
-    print_status "• Ths will quickly reset swww and apply the background"
+    print_status "• Ths will quickly reset awww and apply the background"
     print_status "• Remember to reload the dock with ${CYAN}SHIFT + K${NC} to update its colors"
     echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
