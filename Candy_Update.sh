@@ -5936,13 +5936,12 @@ bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #Launch the filemanager
 bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
 
 #### Bar/Panel ####
-
-bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/kill_waybar_safe.sh #Hide/kill waybar and start automatic idle-inhibitor
-bind = ALT, 2, exec, killall -SIGUSR2 waybar #Quick waybar restart/reload
+bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/kill_waybar_safe.sh || ~/.config/hyprcandy/hooks/restart_waybar.sh #Hide/Show bar
+bind = ALT, 2, exec, killall -SIGUSR2 waybar #Quick bar reload
 
 #### Dock keybinds ####
 
-bind = ALT, 3, exec, ~/.hyprcandy/GJS/hyprcandydock/toggle.sh #Hide/kill or launch dock
+bind = ALT, 3, exec, ~/.hyprcandy/GJS/hyprcandydock/toggle.sh #Hide/Show dock
 
 #### Status display ####
 
