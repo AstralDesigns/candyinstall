@@ -5398,7 +5398,7 @@ decoration {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 windowrule = group barred, match:class .*
-windowrule = pin on,border_size 0,match:class (com.candy.widgets)
+windowrule = pin on,border_size 0,match:class (com.candy.widgets|gjs|widgets)
 windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.utils)#center
 windowrule = move ((monitor_w*1)-((window_w*1)+10)) 45,match:title (candy.systemmonitor) #top right
 windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.media) #center
