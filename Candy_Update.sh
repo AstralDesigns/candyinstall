@@ -5094,9 +5094,9 @@ EOF
 # Function to setup default "custom.conf" file
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
-        if [ ! -d "$HOME/.config/hyprcustom" ]; then
-            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
-            echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
+        if [ -d "$HOME/.config/hyprcustom" ]; then
+            touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
+            echo "📁 Updating the custom settings directory..."
 
  # Add default content to the custom.conf file
 		cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
