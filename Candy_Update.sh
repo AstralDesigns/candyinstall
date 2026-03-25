@@ -1014,7 +1014,8 @@ setup_hyprcandy() {
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         if pacman -Qi sddm &>/dev/null; then
-            $AUR_HELPER -R --noconfirm quickshell
+            $AUR_HELPER -R --noconfirm swww
+			$AUR_HELPER -R --noconfirm waypaper
             $AUR_HELPER -S --noconfirm sddm sddm-sugar-candy-git
             print_status "Installed SDDM packages"
         else
@@ -1022,7 +1023,8 @@ setup_hyprcandy() {
         fi
     elif [ "$DISPLAY_MANAGER" = "gdm" ]; then
         if pacman -Qi gdm &>/dev/null; then
-            $AUR_HELPER -R --noconfirm quickshell
+            $AUR_HELPER -R --noconfirm swww
+			$AUR_HELPER -R --noconfirm waypaper
             $AUR_HELPER -S --noconfirm gdm gdm-settings
             print_status "Installed GDM packages"
         else
@@ -1043,11 +1045,11 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control gnome-software
+        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control gnome-software awww waypaper-git
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm ags-hyprpanel-git mako equibop-bin gnome-software waypaper qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
+        $AUR_HELPER -S --noconfirm ags-hyprpanel-git mako equibop-bin gnome-software awww waypaper-git qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
     fi
 
     # Add flathub repo
