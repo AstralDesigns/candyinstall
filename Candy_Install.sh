@@ -2300,19 +2300,19 @@ class CSSColorUpdater:
             
             # Define the patterns for cava-left and cava-right blocks
             if make_transparent:
-                # Change @primary_container to transparent in cava blocks
-                pattern_left = r'(#custom-cava-left\s*\{[^}]*?color:\s*)@primary_container(\s*;)'
+                # Change @primary to transparent in cava blocks
+                pattern_left = r'(#custom-cava-left\s*\{[^}]*?color:\s*)@primary(\s*;)'
                 content = re.sub(pattern_left, r'\1transparent\2', content)
                 
-                pattern_right = r'(#custom-cava-right\s*\{[^}]*?color:\s*)@primary_container(\s*;)'
+                pattern_right = r'(#custom-cava-right\s*\{[^}]*?color:\s*)@primary(\s*;)'
                 content = re.sub(pattern_right, r'\1transparent\2', content)
             else:
-                # Restore transparent back to @primary_container in cava blocks
+                # Restore transparent back to @primary in cava blocks
                 pattern_left = r'(#custom-cava-left\s*\{[^}]*?color:\s*)transparent(\s*;)'
-                content = re.sub(pattern_left, r'\1@primary_container\2', content)
+                content = re.sub(pattern_left, r'\1@primary\2', content)
                 
                 pattern_right = r'(#custom-cava-right\s*\{[^}]*?color:\s*)transparent(\s*;)'
-                content = re.sub(pattern_right, r'\1@primary_container\2', content)
+                content = re.sub(pattern_right, r'\1@primary\2', content)
             
             # Check if any changes were actually made
             if content == original_content:
@@ -2497,9 +2497,9 @@ class CavaServer:
         self.runtime_dir = os.getenv(
             "XDG_RUNTIME_DIR", os.path.join("/run/user", str(os.getuid()))
         )
-        self.socket_file = os.path.join(self.runtime_dir, "hyde", "cava.sock")
-        self.pid_file = os.path.join(self.runtime_dir, "hyde", "cava.pid")
-        self.temp_dir = Path(os.path.join(self.runtime_dir, "hyde"))
+        self.socket_file = os.path.join(self.runtime_dir, "hyprcandy", "cava.sock")
+        self.pid_file = os.path.join(self.runtime_dir, "hyprcandy", "cava.pid")
+        self.temp_dir = Path(os.path.join(self.runtime_dir, "hyprcandy"))
         self.config_file = self.temp_dir / "cava.manager.conf"
 
         self.clients = []
@@ -2698,7 +2698,7 @@ class CavaServer:
                 self.cava_process.kill()
         # Always use latest config values
         cava_config = CavaConfig()
-        bars = int(cava_config.get_value("CAVA_BARS", 16))
+        bars = int(cava_config.get_value("CAVA_BARS", 64))
         range_val = int(cava_config.get_value("CAVA_RANGE", 15))
         channels = cava_config.get_value("CAVA_CHANNELS", "stereo")
         reverse = cava_config.get_value("CAVA_REVERSE", 0)
@@ -2927,7 +2927,7 @@ reverse = {reverse}
         """Check if the server is running"""
         return self._quick_check_running()
 
-    def start_in_background(self, bars=16, range_val=15):
+    def start_in_background(self, bars=64, range_val=15):
         """Start the manager in background and return immediately"""
         if self.is_running():
             return True
@@ -2974,12 +2974,12 @@ class CavaClient:
         self.runtime_dir = os.getenv(
             "XDG_RUNTIME_DIR", os.path.join("/run/user", str(os.getuid()))
         )
-        self.socket_file = os.path.join(self.runtime_dir, "hyde", "cava.sock")
+        self.socket_file = os.path.join(self.runtime_dir, "hyprcandy", "cava.sock")
         self.parser = CavaDataParser()
         self.media_detector = MediaDetector()
         self.css_updater = None  # Will be initialized if transparent_when_inactive is True
 
-    def _auto_start_manager_if_needed(self, bars=16, range_val=15):
+    def _auto_start_manager_if_needed(self, bars=64, range_val=15):
         """Automatically start manager if not running"""
         server = CavaServer()
         if not server.is_running():
@@ -2998,7 +2998,7 @@ class CavaClient:
         width=None,
         standby_mode=0,
         timeout=10,
-        bars=16,
+        bars=64,
         range_val=15,
         json_output=False,
         hide_when_inactive=False,
@@ -3266,7 +3266,7 @@ class CavaReloadClient:
         self.runtime_dir = os.getenv(
             "XDG_RUNTIME_DIR", os.path.join("/run/user", str(os.getuid()))
         )
-        self.socket_file = os.path.join(self.runtime_dir, "hyde", "cava.sock")
+        self.socket_file = os.path.join(self.runtime_dir, "hyprcandy", "cava.sock")
 
     def reload(self):
         if not os.path.exists(self.socket_file):
@@ -3335,7 +3335,7 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     manager_parser = subparsers.add_parser("manager", help="Start cava manager")
-    manager_parser.add_argument("--bars", type=int, default=16, help="Number of bars")
+    manager_parser.add_argument("--bars", type=int, default=64, help="Number of bars")
     manager_parser.add_argument("--range", type=int, default=15, help="ASCII range")
     manager_parser.add_argument(
         "--channels",
@@ -3375,7 +3375,7 @@ def main():
             cava_config, args.command, args
         )
 
-        bars = width
+        bars = int(cava_config.get_value("CAVA_BARS", 64))  # FFT bar count for the manager — independent of display width
         range_val = int(cava_config.get_value("CAVA_RANGE", "15"))
 
         json_output = args.command == "waybar" and hasattr(args, "json") and args.json
