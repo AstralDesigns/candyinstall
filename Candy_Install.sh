@@ -4761,7 +4761,7 @@ EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
 
 # ═══════════════════════════════════════════════════════════════
-#                  Sync GTK and QT Icon Theme
+#                Sync GTK, QT and ROFI Icon Themes
 # ═══════════════════════════════════════════════════════════════
 
 cat > "$HOME/.config/hyprcandy/hooks/update_icon_theme.sh" << 'EOF'
@@ -4772,6 +4772,7 @@ QT6CT_CONF="$HOME/.config/qt6ct/qt6ct.conf"
 QT5CT_CONF="$HOME/.config/qt5ct/qt5ct.conf"
 KDEGLOBALS="$HOME/.config/kdeglobals"
 UC_COLORS="$HOME/.local/share/color-schemes/HyprCandy.colors"
+ROFI_MENU="$HOME/.config/rofi/config.rasi"
 
 ICON_THEME=$(grep "^gtk-icon-theme-name=" "$GTK_FILE" | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
@@ -4801,6 +4802,13 @@ for FILE in "$KDEGLOBALS" "$UC_COLORS"; do
     fi
     echo "✅ $(basename $FILE) icon theme → $ICON_THEME"
 done
+
+if [ -f "$ROFI_MENU" ]; then
+    sed -i "16s|^.*|    icon-theme:                 \"$ICON_THEME\";|" "$ROFI_MENU"
+    echo "✅ $(basename $ROFI_MENU) icon theme → $ICON_THEME"
+fi
+
+killall -9 qs c- overview
 
 dbus-send --session --type=signal /kdeglobals \
     org.kde.kconfig.notify.ConfigChanged \
@@ -5415,10 +5423,11 @@ decoration {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 windowrule = group barred, match:class .*
-windowrule = pin on,border_size 0,move 520 45,match:title (candy.utils)#center
-windowrule = pin on,border_size 0,move 880 45,match:title (candy.systemmonitor) #top right
-windowrule = pin on,border_size 0,move 380 45,match:title (candy.media) #center
-windowrule = pin on,border_size 0,move 10 45,match:title (candy.weather) #top left
+windowrule = pin on,border_size 0,match:class (com.candy.widgets)
+windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.utils)#center
+windowrule = move ((monitor_w*1)-((window_w*1)+10)) 45,match:title (candy.systemmonitor) #top right
+windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.media) #center
+windowrule = move (monitor_w*0.01) 45,match:title (candy.weather) #top left
 windowrule = opacity 0.85 0.85,match:class ^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
 windowrule = float on, center on,size 800 500,match:class (kitty-scratchpad)
 windowrule = suppress_event maximize, match:class .* #nofocus,match:class ^$,match:title ^$,xwayland:1,floating:1,fullscreen:0,pinned:0
@@ -6076,10 +6085,11 @@ decoration {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 windowrule = group barred, match:class .*
-windowrule = pin on,border_size 0,match:title (candy.utils)
-windowrule = pin on,border_size 0,move 880 45,match:title (candy.systemmonitor)
-windowrule = pin on,border_size 0,move 380 45,match:title (candy.media)
-windowrule = pin on,border_size 0,move 10 45,match:title (candy.weather)
+windowrule = pin on,border_size 0,match:class (com.candy.widgets)
+windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.utils)#center
+windowrule = move ((monitor_w*1)-((window_w*1)+10)) 45,match:title (candy.systemmonitor) #top right
+windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.media) #center
+windowrule = move (monitor_w*0.01) 45,match:title (candy.weather) #top left
 windowrule = opacity 0.85 0.85,match:class ^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
 windowrule = float on, center on,size 800 500,match:class (kitty-scratchpad)
 windowrule = suppress_event maximize, match:class .* #nofocus,match:class ^$,match:title ^$,xwayland:1,floating:1,fullscreen:0,pinned:0
