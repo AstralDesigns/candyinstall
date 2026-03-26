@@ -463,7 +463,6 @@ build_package_list() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         packages+=(
         "waybar"
-        "waypaper-git"
         "swaync"
         )
         print_status "Added Waybar to package list"
@@ -1643,9 +1642,8 @@ sleep 1
 systemctl --user stop \
     pipewire \
     wireplumber \
-    background-watcher \
     waybar-idle-monitor \
-    waypaper-watcher \
+	hyprlock-watcher \
     xdg-desktop-portal \
     xdg-desktop-portal-hyprland \
     xdg-desktop-portal-gtk
@@ -1665,9 +1663,8 @@ sleep 1
 systemctl --user start \
     pipewire \
     wireplumber \
-    background-watcher \
+	hyprlock-watcher \
     waybar-idle-monitor \
-    waypaper-watcher
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
@@ -1724,140 +1721,6 @@ systemctl --user start \
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
-fi
-
-if [ "$PANEL_CHOICE" = "waybar" ]; then
-
-# ═══════════════════════════════════════════════════════════════
-#                          Wallpaper Script
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/waypaper/wallpaper-cycle.sh" << 'EOF'
-#!/usr/bin/env bash
-# wallpaper-cycle.sh
-# Cycles through wallpapers in the waypaper folder using awww (or configured backend)
-# and updates the waypaper config with the new wallpaper path.
-
-# ── Config ────────────────────────────────────────────────────────────────────
-WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
-
-if [[ ! -f "$WAYPAPER_CONFIG" ]]; then
-  echo "Error: waypaper config not found at $WAYPAPER_CONFIG"
-  exit 1
-fi
-
-# ── Read values from config.ini ───────────────────────────────────────────────
-get_ini_value() {
-  local key="$1"
-  grep -E "^\s*${key}\s*=" "$WAYPAPER_CONFIG" \
-    | head -n1 \
-    | sed 's/.*=\s*//' \
-    | sed "s|~|$HOME|g" \
-    | xargs   # trim whitespace
-}
-
-FOLDER="$(get_ini_value folder)"
-BACKEND="$(get_ini_value backend)"
-CURRENT="$(get_ini_value wallpaper)"
-FILL="$(get_ini_value fill)"
-TRANSITION_TYPE="$(get_ini_value awww_transition_type)"
-TRANSITION_STEP="$(get_ini_value awww_transition_step)"
-TRANSITION_ANGLE="$(get_ini_value awww_transition_angle)"
-TRANSITION_DURATION="$(get_ini_value awww_transition_duration)"
-TRANSITION_FPS="$(get_ini_value awww_transition_fps)"
-
-# ── Validate folder ───────────────────────────────────────────────────────────
-if [[ ! -d "$FOLDER" ]]; then
-  echo "Error: wallpaper folder not found: $FOLDER"
-  exit 1
-fi
-
-# ── Collect wallpapers (sorted by name, matching common image types) ──────────
-mapfile -t WALLPAPERS < <(
-  find "$FOLDER" -maxdepth 1 -type f \
-    \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \
-       -o -iname "*.webp" -o -iname "*.gif" -o -iname "*.bmp" \) \
-    | sort
-)
-
-if [[ ${#WALLPAPERS[@]} -eq 0 ]]; then
-  echo "Error: no wallpapers found in $FOLDER"
-  exit 1
-fi
-
-# ── Find the next wallpaper ───────────────────────────────────────────────────
-NEXT=""
-FOUND=false
-
-for WP in "${WALLPAPERS[@]}"; do
-  if $FOUND; then
-    NEXT="$WP"
-    break
-  fi
-  [[ "$WP" == "$CURRENT" ]] && FOUND=true
-done
-
-# If current wasn't found, or it was the last one, wrap around to first
-[[ -z "$NEXT" ]] && NEXT="${WALLPAPERS[0]}"
-
-echo "Current : $CURRENT"
-echo "Next    : $NEXT"
-echo "Backend : $BACKEND"
-
-# ── Apply wallpaper via backend ───────────────────────────────────────────────
-apply_awww() {
-  # Ensure awww daemon is running
-  if ! awww query &>/dev/null; then
-    echo "Starting awww daemon..."
-    awww-daemon &
-    sleep 0.5
-  fi
-
-  awww img "$NEXT" \
-    --transition-type  "${TRANSITION_TYPE:-any}" \
-    --transition-step  "${TRANSITION_STEP:-90}" \
-    --transition-angle "${TRANSITION_ANGLE:-0}" \
-    --transition-duration "${TRANSITION_DURATION:-2}" \
-    --transition-fps   "${TRANSITION_FPS:-60}"
-}
-
-apply_feh() {
-  feh --bg-fill "$NEXT"
-}
-
-apply_swaybg() {
-  pkill swaybg 2>/dev/null
-  swaybg -i "$NEXT" -m "${FILL:-fill}" &
-}
-
-apply_hyprpaper() {
-  hyprctl hyprpaper preload "$NEXT"
-  hyprctl hyprpaper wallpaper ",$NEXT"
-}
-
-case "$BACKEND" in
-  awww)      apply_awww      ;;
-  feh)       apply_feh       ;;
-  swaybg)    apply_swaybg    ;;
-  hyprpaper) apply_hyprpaper ;;
-  *)
-    echo "Warning: unsupported backend '$BACKEND'. Add it to the case block."
-    exit 1
-    ;;
-esac
-
-# ── Update config.ini with the new wallpaper path ────────────────────────────
-# Store path with ~ abbreviated for cleanliness (optional — comment out if unwanted)
-NEXT_STORED="${NEXT/$HOME/\~}"
-
-sed -i "s|^wallpaper\s*=.*|wallpaper = $NEXT_STORED|" "$WAYPAPER_CONFIG"
-
-systemctl --user restart waypaper-watcher.service
-
-echo "Config updated → wallpaper = $NEXT_STORED"
-EOF
-
-chmod +x "$HOME/.config/waypaper/wallpaper-cycle.sh"
 fi
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -3760,7 +3623,10 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
 fi
 
 # ── Update SDDM background path and BackgroundColor from waypaper/colors.css ──
+WP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/wallpaper/wallpaper.ini"
 WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
+# Prefer quickshell wallpaper picker config; fall back to waypaper
+[[ -f "$WP_CONFIG" ]] && WAYPAPER_CONFIG="$WP_CONFIG"
 SDDM_CONF="/usr/share/sddm/themes/sugar-candy/theme.conf"
 SDDM_BG_DIR="/usr/share/sddm/themes/sugar-candy/Backgrounds"
 COLORS_CSS="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/colors.css"
@@ -4182,7 +4048,7 @@ while true; do
         
         # Remove cached weather file
         rm -f "$WEATHER_CACHE_FILE"
-        #rm -f "${WEATHER_CACHE_FILE}.tmp"
+        rm -f "${WEATHER_CACHE_FILE}.tmp"
         
         # Wait a moment for system to fully resume
         sleep 0.5
@@ -4377,26 +4243,31 @@ EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/toggle-bar.sh"
 
 # ═══════════════════════════════════════════════════════════════
-#               Waypaper Integration Scripts
+#                  Wallpaper Integration Scripts
 # ═══════════════════════════════════════════════════════════════
 
-    cat > "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh" << 'EOF'
+    cat > "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" << 'EOF'
 #!/bin/bash
 CONFIG_BG="$HOME/.config/background"
+WP_CONFIG="$HOME/.config/wallpaper/wallpaper.ini"
 WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
 MATUGEN_CONFIG="$HOME/.config/matugen/config.toml"
 RELOAD_SO="/usr/local/lib/gtk3-reload.so"
 RELOAD_SRC="/usr/local/share/gtk3-reload/gtk3-reload.c"
+HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 
 get_waypaper_background() {
-    if [ -f "$WAYPAPER_CONFIG" ]; then
-        current_bg=$(grep "^wallpaper = " "$WAYPAPER_CONFIG" | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-        if [ -n "$current_bg" ]; then
-            current_bg=$(echo "$current_bg" | sed "s|^~|$HOME|")
-            echo "$current_bg"
-            return 0
+    # Prefer quickshell wallpaper picker config, fall back to waypaper config
+    for cfg in "$WP_CONFIG" "$WAYPAPER_CONFIG"; do
+        if [ -f "$cfg" ]; then
+            current_bg=$(grep -E "^wallpaper\s*=" "$cfg" | head -n1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            if [ -n "$current_bg" ]; then
+                current_bg=$(echo "$current_bg" | sed "s|^~|$HOME|")
+                echo "$current_bg"
+                return 0
+            fi
         fi
-    fi
+    done
     return 1
 }
 
@@ -4407,6 +4278,8 @@ update_config_background() {
         matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
+        sleep 0.5
+        "$HOOKS_DIR/update_background.sh"
         echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
     else
@@ -4430,65 +4303,7 @@ main() {
 
 main
 EOF
-    chmod +x "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
-
-    cat > "$HOME/.config/hyprcandy/hooks/waypaper_watcher.sh" << 'EOF'
-#!/bin/bash
-WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
-INTEGRATION_SCRIPT="$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
-wait_for_config() {
-    while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
-        echo "Waiting for Hyprland to start..."
-        sleep 1
-    done
-    echo "Hyprland started"
-    echo "🔍 Waiting for Waypaper config to appear..."
-    while [ ! -f "$WAYPAPER_CONFIG" ]; do
-        echo "⏳ Waiting for Waypaper config to appear..."
-        sleep 1
-    done
-    echo "✅ Waypaper config found"
-}
-monitor_waypaper() {
-    echo "🔍 Starting Waypaper config monitoring..."
-    wait_for_config
-    inotifywait -m -e modify "$WAYPAPER_CONFIG" | while read -r path action file; do
-        echo "🎯 Waypaper config changed, triggering integration..."
-        sleep 0.5
-        "$INTEGRATION_SCRIPT"
-    done
-}
-initial_setup() {
-    echo "🚀 Initial Waypaper integration setup..."
-    wait_for_config
-    "$INTEGRATION_SCRIPT"
-    monitor_waypaper
-}
-echo "🎨 Starting Waypaper integration watcher..."
-initial_setup
-EOF
-    chmod +x "$HOME/.config/hyprcandy/hooks/waypaper_watcher.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#               Systemd Service: Waypaper Watcher
-# ═══════════════════════════════════════════════════════════════
-    cat > "$HOME/.config/systemd/user/waypaper-watcher.service" << 'EOF'
-[Unit]
-Description=Monitor Waypaper config changes and trigger color generation
-After=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=%h/.config/hyprcandy/hooks/waypaper_watcher.sh
-Restart=always
-RestartSec=10
-KillMode=mixed
-KillSignal=SIGTERM
-TimeoutStopSec=15
-
-[Install]
-WantedBy=default.target
-EOF
+    chmod +x "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
 
 else
 
@@ -4888,7 +4703,6 @@ zen
 kitty
 nwg-displays
 nwg-look
-waypaper
 EOF
 
 else
@@ -5156,31 +4970,27 @@ exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 # System services
 exec-once = systemctl --user start hyprpolkitagent
 exec-once = systemctl --user start waybar-idle-monitor
-exec-once = systemctl --user start waypaper-watcher
 exec-once = systemctl --user start rofi-font-watcher
 exec-once = systemctl --user start cursor-theme-watcher
 
 # Daemons
 exec-once = gjs ~/.hyprcandy/GJS/candy-daemon.js
-exec-once = awww-daemon
+exec-once = gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js
+exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
 exec-once = hypridle
 exec-once = /usr/bin/pypr
 
 # UI — after daemons are up
+exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
+exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
 exec-once = swaync
 exec-once = blueman-applet
-exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
-exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
 
-# Wallpaper — after awww-daemon is running
-#exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
-exec-once = systemctl --user start background-watcher
 
 # Clipboard
 exec-once = wl-paste --watch cliphist store
 
 # Overview
-env = QS_NO_RELOAD_POPUP,1
 exec-once = qs -c overview
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -5746,6 +5556,8 @@ layerrule = blur on,match:namespace dashboardmenu
 layerrule = ignore_alpha 0.01,match:namespace dashboardmenu
 layerrule = blur on,xray on,match:namespace quickshell:overview
 layerrule = ignore_alpha 0.01,match:namespace quickshell:overview
+layerrule = blur on,xray on,match:namespace quickshell:wallpaper
+layerrule = ignore_alpha 0.01,match:namespace quickshell:wallpaper
 layerrule = blur on,match:namespace notificationsmenu
 layerrule = ignore_alpha 0.01,match:namespace notificationsmenu
 layerrule = blur on,match:namespace networkmenu
@@ -6612,8 +6424,8 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 
 #### Applications ####
 
-bind = $mainMod, W, exec, waypaper #Waypaper
-bind = ALT, W, exec, ~/.config/waypaper/wallpaper-cycle.sh  #Alternate wallpapers
+bind = $mainMod, W, exec, $SCRIPTS/wallpaper.sh #Wallpaper picker
+bind = ALT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh  #Alternate wallpapers
 bind = $mainMod, S, exec, spotify-launcher #Spotify
 bind = $mainMod, D, exec, $DISCORD #Discord
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
@@ -7439,7 +7251,7 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart waybar-idle-monitor.service hyprlock-watcher.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart waybar-idle-monitor.service hyprlock-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 else
     systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
