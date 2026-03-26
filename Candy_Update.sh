@@ -4725,6 +4725,9 @@ else
 fi
 EOF
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
+chmod +x "$HOME/.config/hyprcandy/scripts/wallpaper.sh"
+chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
+chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
