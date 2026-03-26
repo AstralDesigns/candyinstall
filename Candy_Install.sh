@@ -106,8 +106,7 @@ choose_panel() {
     echo -e "${CYAN}Choose your panel: you can also rerun the script to switch from either or regenerate HyprCandy's default panel setup:${NC}"
     echo -e "${GREEN}1) Waybar${NC}"
     echo "   • Light with fast startup/reload for a 'taskbar' like experience"
-    echo "   • Highly customizable manually"
-    echo "   • Waypaper integration: loads colors through waypaper backgrounds"
+    echo "   • Highly customizable"
     echo "   • Fast live wallpaper application through caching and easier background setup"
     echo ""
     echo -e "${GREEN}2) Hyprpanel${NC}"
@@ -1664,7 +1663,7 @@ systemctl --user start \
     pipewire \
     wireplumber \
 	hyprlock-watcher \
-    waybar-idle-monitor \
+    waybar-idle-monitor
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
@@ -6924,7 +6923,6 @@ update_custom() {
             # Line doesn't exist at all, add it (optional - you might want to handle this case)
             echo "exec-once = awww-daemon &" >> "$CUSTOM_CONFIG_FILE"
         fi
-        sed -i 's/#exec-once = systemctl --user start waypaper-watcher/exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,bar-0/layerrule = blur,waybar/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = ignorezero,bar-0/layerrule = ignorezero,waybar/g' "$CUSTOM_CONFIG_FILE"
         echo -e "${GREEN}Updated custom config layer rules for waybar${NC}"
@@ -6946,7 +6944,6 @@ update_custom() {
         fi
         
         sed -i 's/exec-once = awww-daemon &/#exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/exec-once = systemctl --user start waypaper-watcher/#exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,waybar/layerrule = blur,bar-0/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = ignorezero,waybar/layerrule = ignorezero,bar-0/g' "$CUSTOM_CONFIG_FILE"
         echo -e "${GREEN}Updated custom config layer rules for hyprpanel${NC}"
@@ -7260,7 +7257,7 @@ sudo systemctl enable bluetooth
 echo "✅ Services set..."
 
 if awww query &>/dev/null; then
-    bash "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 else
     echo "Setting background..."
