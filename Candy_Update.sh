@@ -439,7 +439,6 @@ build_package_list() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         packages+=(
             "waybar"
-            "waypaper-git"
             "swaync"
         )
         print_status "Added Waybar to package list"
@@ -1016,6 +1015,7 @@ setup_hyprcandy() {
         if pacman -Qi sddm &>/dev/null; then
             $AUR_HELPER -R --noconfirm swww
 			$AUR_HELPER -R --noconfirm waypaper
+			$AUR_HELPER -R --noconfirm waypaper-git
             $AUR_HELPER -S --noconfirm sddm sddm-sugar-candy-git
             print_status "Installed SDDM packages"
         else
@@ -1025,6 +1025,7 @@ setup_hyprcandy() {
         if pacman -Qi gdm &>/dev/null; then
             $AUR_HELPER -R --noconfirm swww
 			$AUR_HELPER -R --noconfirm waypaper
+			$AUR_HELPER -R --noconfirm waypaper-git
             $AUR_HELPER -S --noconfirm gdm gdm-settings
             print_status "Installed GDM packages"
         else
@@ -1045,11 +1046,11 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control gnome-software awww-bin waypaper-git
+        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control gnome-software awww-bin
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm ags-hyprpanel-git mako equibop-bin gnome-software awww-bin waypaper-git qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
+        $AUR_HELPER -S --noconfirm ags-hyprpanel-git mako equibop-bin gnome-software awww-bin qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
     fi
 
     # Add flathub repo
@@ -3750,7 +3751,10 @@ if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
 fi
 
 # ── Update SDDM background path and BackgroundColor from waypaper/colors.css ──
+WP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/wallpaper/wallpaper.ini"
 WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
+# Prefer quickshell wallpaper picker config; fall back to waypaper
+[[ -f "$WP_CONFIG" ]] && WAYPAPER_CONFIG="$WP_CONFIG"
 SDDM_CONF="/usr/share/sddm/themes/sugar-candy/theme.conf"
 SDDM_BG_DIR="/usr/share/sddm/themes/sugar-candy/Backgrounds"
 COLORS_CSS="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/colors.css"
@@ -4367,26 +4371,31 @@ EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/toggle-bar.sh"
 
 # ═══════════════════════════════════════════════════════════════
-#               Waypaper Integration Scripts
+#               Wallpaper Integration Scripts
 # ═══════════════════════════════════════════════════════════════
 
-    cat > "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh" << 'EOF'
+    cat > "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" << 'EOF'
 #!/bin/bash
 CONFIG_BG="$HOME/.config/background"
+WP_CONFIG="$HOME/.config/wallpaper/wallpaper.ini"
 WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
 MATUGEN_CONFIG="$HOME/.config/matugen/config.toml"
 RELOAD_SO="/usr/local/lib/gtk3-reload.so"
 RELOAD_SRC="/usr/local/share/gtk3-reload/gtk3-reload.c"
+HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 
 get_waypaper_background() {
-    if [ -f "$WAYPAPER_CONFIG" ]; then
-        current_bg=$(grep "^wallpaper = " "$WAYPAPER_CONFIG" | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-        if [ -n "$current_bg" ]; then
-            current_bg=$(echo "$current_bg" | sed "s|^~|$HOME|")
-            echo "$current_bg"
-            return 0
+    # Prefer quickshell wallpaper picker config, fall back to waypaper config
+    for cfg in "$WP_CONFIG" "$WAYPAPER_CONFIG"; do
+        if [ -f "$cfg" ]; then
+            current_bg=$(grep -E "^wallpaper\s*=" "$cfg" | head -n1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            if [ -n "$current_bg" ]; then
+                current_bg=$(echo "$current_bg" | sed "s|^~|$HOME|")
+                echo "$current_bg"
+                return 0
+            fi
         fi
-    fi
+    done
     return 1
 }
 
@@ -4397,6 +4406,8 @@ update_config_background() {
         matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
+        sleep 0.5
+        "$HOOKS_DIR/update_background.sh"
         echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
     else
@@ -4420,66 +4431,7 @@ main() {
 
 main
 EOF
-    chmod +x "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
-
-    cat > "$HOME/.config/hyprcandy/hooks/waypaper_watcher.sh" << 'EOF'
-#!/bin/bash
-WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
-INTEGRATION_SCRIPT="$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
-wait_for_config() {
-    while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
-        echo "Waiting for Hyprland to start..."
-        sleep 1
-    done
-    echo "Hyprland started"
-    echo "🔍 Waiting for Waypaper config to appear..."
-    while [ ! -f "$WAYPAPER_CONFIG" ]; do
-        echo "⏳ Waiting for Waypaper config to appear..."
-        sleep 1
-    done
-    echo "✅ Waypaper config found"
-}
-monitor_waypaper() {
-    echo "🔍 Starting Waypaper config monitoring..."
-    wait_for_config
-    inotifywait -m -e modify "$WAYPAPER_CONFIG" | while read -r path action file; do
-        echo "🎯 Waypaper config changed, triggering integration..."
-        sleep 0.5
-        "$INTEGRATION_SCRIPT"
-    done
-}
-initial_setup() {
-    echo "🚀 Initial Waypaper integration setup..."
-    wait_for_config
-    "$INTEGRATION_SCRIPT"
-    monitor_waypaper
-}
-echo "🎨 Starting Waypaper integration watcher..."
-initial_setup
-EOF
-    chmod +x "$HOME/.config/hyprcandy/hooks/waypaper_watcher.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#               Systemd Service: Waypaper Watcher
-# ═══════════════════════════════════════════════════════════════
-    cat > "$HOME/.config/systemd/user/waypaper-watcher.service" << 'EOF'
-[Unit]
-Description=Monitor Waypaper config changes and trigger color generation
-After=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=%h/.config/hyprcandy/hooks/waypaper_watcher.sh
-Restart=always
-RestartSec=10
-KillMode=mixed
-KillSignal=SIGTERM
-TimeoutStopSec=15
-
-[Install]
-WantedBy=default.target
-EOF
-
+    chmod +x "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
 else
 
 # ═══════════════════════════════════════════════════════════════
@@ -5132,31 +5084,27 @@ exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 # System services
 exec-once = systemctl --user start hyprpolkitagent
 exec-once = systemctl --user start waybar-idle-monitor
-exec-once = systemctl --user start waypaper-watcher
 exec-once = systemctl --user start rofi-font-watcher
 exec-once = systemctl --user start cursor-theme-watcher
 
 # Daemons
 exec-once = gjs ~/.hyprcandy/GJS/candy-daemon.js
-exec-once = awww-daemon
+exec-once = gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js
+exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
 exec-once = hypridle
 exec-once = /usr/bin/pypr
 
 # UI — after daemons are up
+exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
+exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
 exec-once = swaync
 exec-once = blueman-applet
-exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
-exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
 
-# Wallpaper — after awww-daemon is running
-#exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
-exec-once = systemctl --user start background-watcher
 
 # Clipboard
 exec-once = wl-paste --watch cliphist store
 
 # Overview
-env = QS_NO_RELOAD_POPUP,1
 exec-once = qs -c overview
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -5723,6 +5671,8 @@ layerrule = blur on,match:namespace dashboardmenu
 layerrule = ignore_alpha 0.01,match:namespace dashboardmenu
 layerrule = blur on,xray on,match:namespace quickshell:overview
 layerrule = ignore_alpha 0.01,match:namespace quickshell:overview
+layerrule = blur on,xray on,match:namespace quickshell:wallpaper
+layerrule = ignore_alpha 0.01,match:namespace quickshell:wallpaper
 layerrule = blur on,match:namespace notificationsmenu
 layerrule = ignore_alpha 0.01,match:namespace notificationsmenu
 layerrule = blur on,match:namespace networkmenu
@@ -5926,8 +5876,8 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 
 #### Applications ####
 
-bind = $mainMod, W, exec, waypaper #Waypaper
-bind = ALT, W, exec, ~/.config/waypaper/wallpaper-cycle.sh  #Alternate wallpapers
+bind = $mainMod, W, exec, $SCRIPTS/wallpaper.sh #Wallpaper picker
+bind = ALT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh  #Alternate wallpapers
 bind = $mainMod, S, exec, spotify-launcher #Spotify
 bind = $mainMod, D, exec, $DISCORD #Discord
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
