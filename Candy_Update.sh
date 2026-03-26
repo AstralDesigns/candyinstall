@@ -1069,7 +1069,7 @@ git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR
 echo "✅ Clone complete"
 
 # Folders with user-specific changes — never overwritten on update > readd later "hypr" "hyprcandy" "waybar"
-SKIP_DIRS=("background" "background.png" "fastfetch" "waypaper" "wlogout")
+SKIP_DIRS=("background" "background.png" "fastfetch" "wlogout")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -1087,7 +1087,7 @@ rsync -a --delete \
     --exclude='.git/' \
     "$UPDATE_DIR/" "$HYPRCANDY_DIR/"
 
-echo "✅ Update merged — waybar, waypaper and hypr preserved"
+echo "✅ Update merged — waybar, and hypr preserved"
 
 # Clean up temp clone
 rm -rf "$UPDATE_DIR"
@@ -1586,9 +1586,8 @@ sleep 1
 systemctl --user stop \
     pipewire \
     wireplumber \
-    background-watcher \
+	hyprlock-watcher \
     waybar-idle-monitor \
-    waypaper-watcher \
     xdg-desktop-portal \
     xdg-desktop-portal-hyprland \
     xdg-desktop-portal-gtk
@@ -1608,9 +1607,8 @@ sleep 1
 systemctl --user start \
     pipewire \
     wireplumber \
-    background-watcher \
-    waybar-idle-monitor \
-    waypaper-watcher
+    hyprlock-watcher \
+    waybar-idle-monitor
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
@@ -1668,140 +1666,6 @@ systemctl --user start \
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
-fi
-
-if [ "$PANEL_CHOICE" = "waybar" ]; then
-
-# ═══════════════════════════════════════════════════════════════
-#                          Wallpaper Script
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/waypaper/wallpaper-cycle.sh" << 'EOF'
-#!/usr/bin/env bash
-# wallpaper-cycle.sh
-# Cycles through wallpapers in the waypaper folder using awww (or configured backend)
-# and updates the waypaper config with the new wallpaper path.
-
-# ── Config ────────────────────────────────────────────────────────────────────
-WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
-
-if [[ ! -f "$WAYPAPER_CONFIG" ]]; then
-  echo "Error: waypaper config not found at $WAYPAPER_CONFIG"
-  exit 1
-fi
-
-# ── Read values from config.ini ───────────────────────────────────────────────
-get_ini_value() {
-  local key="$1"
-  grep -E "^\s*${key}\s*=" "$WAYPAPER_CONFIG" \
-    | head -n1 \
-    | sed 's/.*=\s*//' \
-    | sed "s|~|$HOME|g" \
-    | xargs   # trim whitespace
-}
-
-FOLDER="$(get_ini_value folder)"
-BACKEND="$(get_ini_value backend)"
-CURRENT="$(get_ini_value wallpaper)"
-FILL="$(get_ini_value fill)"
-TRANSITION_TYPE="$(get_ini_value awww_transition_type)"
-TRANSITION_STEP="$(get_ini_value awww_transition_step)"
-TRANSITION_ANGLE="$(get_ini_value awww_transition_angle)"
-TRANSITION_DURATION="$(get_ini_value awww_transition_duration)"
-TRANSITION_FPS="$(get_ini_value awww_transition_fps)"
-
-# ── Validate folder ───────────────────────────────────────────────────────────
-if [[ ! -d "$FOLDER" ]]; then
-  echo "Error: wallpaper folder not found: $FOLDER"
-  exit 1
-fi
-
-# ── Collect wallpapers (sorted by name, matching common image types) ──────────
-mapfile -t WALLPAPERS < <(
-  find "$FOLDER" -maxdepth 1 -type f \
-    \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \
-       -o -iname "*.webp" -o -iname "*.gif" -o -iname "*.bmp" \) \
-    | sort
-)
-
-if [[ ${#WALLPAPERS[@]} -eq 0 ]]; then
-  echo "Error: no wallpapers found in $FOLDER"
-  exit 1
-fi
-
-# ── Find the next wallpaper ───────────────────────────────────────────────────
-NEXT=""
-FOUND=false
-
-for WP in "${WALLPAPERS[@]}"; do
-  if $FOUND; then
-    NEXT="$WP"
-    break
-  fi
-  [[ "$WP" == "$CURRENT" ]] && FOUND=true
-done
-
-# If current wasn't found, or it was the last one, wrap around to first
-[[ -z "$NEXT" ]] && NEXT="${WALLPAPERS[0]}"
-
-echo "Current : $CURRENT"
-echo "Next    : $NEXT"
-echo "Backend : $BACKEND"
-
-# ── Apply wallpaper via backend ───────────────────────────────────────────────
-apply_awww() {
-  # Ensure awww daemon is running
-  if ! awww query &>/dev/null; then
-    echo "Starting awww daemon..."
-    awww-daemon &
-    sleep 0.5
-  fi
-
-  awww img "$NEXT" \
-    --transition-type  "${TRANSITION_TYPE:-any}" \
-    --transition-step  "${TRANSITION_STEP:-90}" \
-    --transition-angle "${TRANSITION_ANGLE:-0}" \
-    --transition-duration "${TRANSITION_DURATION:-2}" \
-    --transition-fps   "${TRANSITION_FPS:-60}"
-}
-
-apply_feh() {
-  feh --bg-fill "$NEXT"
-}
-
-apply_swaybg() {
-  pkill swaybg 2>/dev/null
-  swaybg -i "$NEXT" -m "${FILL:-fill}" &
-}
-
-apply_hyprpaper() {
-  hyprctl hyprpaper preload "$NEXT"
-  hyprctl hyprpaper wallpaper ",$NEXT"
-}
-
-case "$BACKEND" in
-  awww)      apply_awww      ;;
-  feh)       apply_feh       ;;
-  swaybg)    apply_swaybg    ;;
-  hyprpaper) apply_hyprpaper ;;
-  *)
-    echo "Warning: unsupported backend '$BACKEND'. Add it to the case block."
-    exit 1
-    ;;
-esac
-
-# ── Update config.ini with the new wallpaper path ────────────────────────────
-# Store path with ~ abbreviated for cleanliness (optional — comment out if unwanted)
-NEXT_STORED="${NEXT/$HOME/\~}"
-
-sed -i "s|^wallpaper\s*=.*|wallpaper = $NEXT_STORED|" "$WAYPAPER_CONFIG"
-
-systemctl --user restart waypaper-watcher.service
-
-echo "Config updated → wallpaper = $NEXT_STORED"
-EOF
-
-chmod +x "$HOME/.config/waypaper/wallpaper-cycle.sh"
 fi
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -4830,7 +4694,6 @@ zen
 kitty
 nwg-displays
 nwg-look
-waypaper
 EOF
 
 else
@@ -6376,7 +6239,6 @@ update_custom() {
             # Line doesn't exist at all, add it (optional - you might want to handle this case)
             echo "exec-once = awww-daemon &" >> "$CUSTOM_CONFIG_FILE"
         fi
-        sed -i 's/#exec-once = systemctl --user start waypaper-watcher/exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,bar-0/layerrule = blur,waybar/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = ignorezero,bar-0/layerrule = ignorezero,waybar/g' "$CUSTOM_CONFIG_FILE"
         echo -e "${GREEN}Updated custom config layer rules for waybar${NC}"
@@ -6398,7 +6260,6 @@ update_custom() {
         fi
         
         sed -i 's/exec-once = awww-daemon &/#exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/exec-once = systemctl --user start waypaper-watcher/#exec-once = systemctl --user start waypaper-watcher/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = blur,waybar/layerrule = blur,bar-0/g' "$CUSTOM_CONFIG_FILE"
         sed -i 's/layerrule = ignorezero,waybar/layerrule = ignorezero,bar-0/g' "$CUSTOM_CONFIG_FILE"
         echo -e "${GREEN}Updated custom config layer rules for hyprpanel${NC}"
@@ -6703,7 +6564,7 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart waybar-idle-monitor.service hyprlock-watcher.service waypaper-watcher.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart waybar-idle-monitor.service hyprlock-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
@@ -6713,7 +6574,7 @@ sudo systemctl enable --now switcheroo-control &>/dev/null
 echo "✅ Service set"
 
 if awww query &>/dev/null; then
-    bash "$HOME/.config/hyprcandy/hooks/waypaper_integration.sh"
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 else
     echo "⚠️  awww-daemon not ready — background not set"
