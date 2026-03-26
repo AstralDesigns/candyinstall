@@ -319,7 +319,7 @@ build_package_list() {
         "rofi-nerdy"
         
         # Wallpaper and screenshot tools
-        "awww"
+        "awww-bin"
         "grimblast-git"
         "wob"
         "wf-recorder"
@@ -1045,11 +1045,11 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control gnome-software awww waypaper-git
+        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control gnome-software awww-bin waypaper-git
     else
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm ags-hyprpanel-git mako equibop-bin gnome-software awww waypaper-git qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
+        $AUR_HELPER -S --noconfirm ags-hyprpanel-git mako equibop-bin gnome-software awww-bin waypaper-git qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
     fi
 
     # Add flathub repo
