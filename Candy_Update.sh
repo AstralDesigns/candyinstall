@@ -4971,8 +4971,6 @@ exec-once = /usr/bin/pypr
 exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
 exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
 exec-once = swaync
-exec-once = blueman-applet
-
 
 # Clipboard
 exec-once = wl-paste --watch cliphist store
