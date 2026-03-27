@@ -462,7 +462,6 @@ build_package_list() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         packages+=(
         "waybar"
-        "swaync"
         )
         print_status "Added Waybar to package list"
     else
@@ -4732,12 +4731,16 @@ else
 fi
 EOF
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
+cd "$HOME/.config/hyprcandy/scripts"
+chmod +x *
+cd "$HOME"
 chmod +x "$HOME/.config/hyprcandy/candylock/auth.sh"
-chmod +x "$HOME/.config/hyprcandy/scripts/wallpaper.sh"
-chmod +x "$HOME/.config/hyprcandy/scripts/startmenu.sh"
 chmod +x "$HOME/.config/quickshell/startmenu/recorder.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
+chmod +x "$HOME/.config/quickshell/notifications/install.sh"
+chmod +x "$HOME/.config/quickshell/notifications/bt-agent.sh"
+chmod +x "$HOME/.config/quickshell/notifications/notify-daemon.sh"
 mkdir -p "$HOME/.cache/quickshell/overview"
 mkdir -p "$HOME/.cache/quickshell/wallpaper"
 
@@ -4992,13 +4995,14 @@ exec-once = /usr/bin/pypr
 # UI — after daemons are up
 exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
 exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
-exec-once = swaync
 
 # Clipboard
 exec-once = wl-paste --watch cliphist store
 
 # Overview
 exec-once = qs -c overview
+# Quickshell notification center
+exec-once = qs -c /home/king/.config/quickshell/notifications
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Animations                        ┃
@@ -5567,6 +5571,10 @@ layerrule = blur on,xray on,match:namespace quickshell:wallpaper
 layerrule = ignore_alpha 0.01,match:namespace quickshell:wallpaper
 layerrule = blur on,xray on,match:namespace quickshell:startmenu
 layerrule = ignore_alpha 0.01,match:namespace quickshell:startmenu
+layerrule = blur on,xray on,match:namespace quickshell:notifications:toasts
+layerrule = ignore_alpha 0.01,match:namespace quickshell:notifications:toasts
+layerrule = blur on,xray on,match:namespace quickshell:notifications:history
+layerrule = ignore_alpha 0.01,match:namespace quickshell:notifications:history
 layerrule = blur on,match:namespace notificationsmenu
 layerrule = ignore_alpha 0.01,match:namespace notificationsmenu
 layerrule = blur on,match:namespace networkmenu
