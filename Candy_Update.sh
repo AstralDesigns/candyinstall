@@ -4727,6 +4727,7 @@ EOF
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 chmod +x "$HOME/.config/hyprcandy/candylock/auth.sh"
 chmod +x "$HOME/.config/hyprcandy/scripts/wallpaper.sh"
+chmod +x "$HOME/.config/hyprcandy/scripts/startmenu.sh"
 chmod +x "$HOME/.config/quickshell/startmenu/recorder.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
