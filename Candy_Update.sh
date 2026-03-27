@@ -1013,6 +1013,7 @@ setup_hyprcandy() {
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         if pacman -Qi sddm &>/dev/null; then
             $AUR_HELPER -R --noconfirm swww
+			$AUR_HELPER -R --noconfirm wlogout
 			$AUR_HELPER -R --noconfirm waypaper
 			$AUR_HELPER -R --noconfirm waypaper-git
             $AUR_HELPER -S --noconfirm sddm sddm-sugar-candy-git
@@ -1023,6 +1024,7 @@ setup_hyprcandy() {
     elif [ "$DISPLAY_MANAGER" = "gdm" ]; then
         if pacman -Qi gdm &>/dev/null; then
             $AUR_HELPER -R --noconfirm swww
+			$AUR_HELPER -R --noconfirm wlogout
 			$AUR_HELPER -R --noconfirm waypaper
 			$AUR_HELPER -R --noconfirm waypaper-git
             $AUR_HELPER -S --noconfirm gdm gdm-settings
