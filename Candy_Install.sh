@@ -317,7 +317,6 @@ build_package_list() {
 		"switcheroo-control"
         "blueman"
         "nwg-displays"
-        "wlogout"
         "uwsm"
         "quickshell-git"
         "flatpak"
