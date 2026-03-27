@@ -559,6 +559,7 @@ install_packages() {
         if pacman -Qi mako &>/dev/null; then
             print_status "Removing mako since you chose waybar to avoid conflicts with swaync..."
             $AUR_HELPER -R --noconfirm mako
+			$AUR_HELPER -R --noconfirm swaync
         else
             echo ""
         fi
@@ -6924,15 +6925,6 @@ update_custom() {
         sed -i '18s/exec-once = systemctl --user start hyprpanel/exec-once = waybar \&/g' "$CUSTOM_CONFIG_FILE"
         sed -i '22s/exec-once = systemctl --user start hyprpanel-idle-monitor/exec-once = systemctl --user start waybar-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
         
-        # Handle swaync line - uncomment if commented, or ensure it's uncommented
-        if grep -q "^#.*exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
-            # Line is commented, uncomment it
-            sed -i 's/^#\+\s*exec-once = swaync &/exec-once = swaync \&/g' "$CUSTOM_CONFIG_FILE"
-        elif ! grep -q "^exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
-            # Line doesn't exist at all, add it (optional - you might want to handle this case)
-            echo "exec-once = swaync &" >> "$CUSTOM_CONFIG_FILE"
-        fi
-        
         # Handle awww-daemon line - uncomment if commented
         if grep -q "^#.*exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
             # Line is commented, uncomment it
@@ -6948,12 +6940,6 @@ update_custom() {
         # Replace bar-0 with hyprpanel in layer rules
         sed -i '18s/exec-once = waybar \&/exec-once = systemctl --user start hyprpanel/g' "$CUSTOM_CONFIG_FILE"
         sed -i '22s/exec-once = systemctl --user start waybar-idle-monitor/exec-once = systemctl --user start hyprpanel-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
-        
-        # Handle swaync line - comment if uncommented
-        if grep -q "^exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
-            # Line is uncommented, comment it
-            sed -i 's/^exec-once = swaync &#exec-once = swaync \&/g' "$CUSTOM_CONFIG_FILE"
-        fi
         
         # Handle awww-daemon line - comment if uncommented
         if grep -q "^exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
