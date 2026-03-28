@@ -4958,10 +4958,12 @@ exec-once = bash ~/.config/hyprcandy/hooks/toggle-bar.sh
 # Clipboard
 exec-once = wl-paste --watch cliphist store
 
+# StartMenu
+exec-once = qs -c startmenu
 # Overview
 exec-once = qs -c overview
 # Quickshell notification center
-exec-once = qs -c /home/king/.config/quickshell/notifications
+exec-once = qs -c notifications
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Animations                        ┃
