@@ -1643,7 +1643,7 @@ systemctl --user stop \
     pipewire \
     wireplumber \
     waybar-idle-monitor \
-	hyprlock-watcher \
+	lock-watcher \
     xdg-desktop-portal \
     xdg-desktop-portal-hyprland \
     xdg-desktop-portal-gtk
@@ -1663,7 +1663,7 @@ sleep 1
 systemctl --user start \
     pipewire \
     wireplumber \
-	hyprlock-watcher \
+	lock-watcher \
     waybar-idle-monitor
 EOF
 
@@ -4013,9 +4013,9 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 #         	Weather script reload on session resume
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hypr/scripts/hyprlock-watcher.sh" << 'EOF'
+cat > "$HOME/.config/hypr/scripts/lock-watcher.sh" << 'EOF'
 #!/bin/bash
-# hyprlock-watcher.sh - Watches for hyprlock unlock and refreshes waybar
+# lock-watcher.sh - Watches for candylock unlock and refreshes the bar
 
 WEATHER_CACHE_FILE="/tmp/astal-weather-cache.json"
 
@@ -4024,19 +4024,19 @@ while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
     sleep 1
 done
 
-echo "Hyprlock watcher started"
+echo "candylock watcher started"
 
-# Continuously monitor for hyprlock
+# Continuously monitor for candylock
 while true; do
-    # Wait for hyprlock to start
-    while ! pgrep -x hyprlock >/dev/null 2>&1; do
+    # Wait for candylock to start
+    while ! pgrep -f "qs -c candylock" >/dev/null 2>&1; do
         sleep 1
     done
     
-    echo "Hyprlock detected - waiting for unlock..."
+    echo "candylock detected - waiting for unlock..."
     
-    # Wait for hyprlock to end (unlock)
-    while pgrep -x hyprlock >/dev/null 2>&1; do
+    # Wait for candylock to end (unlock)
+    while pgrep -f "qs -c candylock" >/dev/null 2>&1; do
         sleep 0.5
     done
     
@@ -4063,23 +4063,22 @@ while true; do
     sleep 3
 done
 EOF
-chmod +x "$HOME/.config/hypr/scripts/hyprlock-watcher.sh"
+chmod +x "$HOME/.config/hypr/scripts/lock-watcher.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #            			   Hyprlock Service
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/hyprlock-watcher.service" << 'EOF'
+cat > "$HOME/.config/systemd/user/lock-watcher.service" << 'EOF'
 [Unit]
-Description=Hyprlock Unlock Watcher - Refreshes Waybar on Resume
-Documentation=https://wiki.hyprland.org/Hypr-Ecosystem/hyprlock/
+Description=Candylock Unlock Watcher - Refreshes bar on Resume
 PartOf=graphical-session.target
 After=graphical-session.target
 Requisite=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=%h/.config/hypr/scripts/hyprlock-watcher.sh
+ExecStart=%h/.config/hypr/scripts/lock-watcher.sh
 Restart=on-failure
 RestartSec=3
 
@@ -7251,7 +7250,7 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart waybar-idle-monitor.service hyprlock-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart waybar-idle-monitor.service lock-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 else
     systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
