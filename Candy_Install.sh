@@ -2475,16 +2475,6 @@ class CavaServer:
 
         return False
 
-    def _check_auto_shutdown(self):
-        """Check if manager should auto-shutdown when no clients are connected"""
-        while not self.should_shutdown:
-            time.sleep(1)
-            with self.clients_lock:
-                if not self.clients and time.time() - self.last_client_time > 1:
-                    print("No clients connected for 5 seconds, shutting down...")
-                    self.should_shutdown = True
-                    break
-
     def _broadcast_data(self, data):
         """Broadcast data to all connected clients"""
         with self.clients_lock:
@@ -2503,16 +2493,9 @@ class CavaServer:
                 if client in self.clients:
                     self.clients.remove(client)
 
-            # If no clients remain, trigger shutdown immediately
-            if not self.clients and not self.should_shutdown:
-                print("All clients disconnected, shutting down cava manager.")
-                self.should_shutdown = True
-                # Terminate cava process to unblock main loop
-                if self.cava_process and self.cava_process.poll() is None:
-                    try:
-                        self.cava_process.terminate()
-                    except Exception:
-                        pass
+            # If no clients remain, just log it — manager stays alive to accept new connections
+            if not self.clients:
+                print("All clients disconnected, waiting for new connections...")
 
     def _handle_client_connections(self):
         """Handle incoming client connections and listen for reload command"""
@@ -2737,15 +2720,9 @@ reverse = {reverse}
                         break
 
             def check_auto_shutdown():
-                while not self.shutdown_event.is_set():
-                    time.sleep(1)
-                    with self.clients_lock:
-                        if not self.clients and time.time() - self.last_client_time > 1:
-                            print(
-                                "No clients connected for 5 seconds, shutting down..."
-                            )
-                            self.shutdown_event.set()
-                            break
+                # Auto-shutdown disabled: manager stays alive between waybar restarts
+                # so media.js and other clients can reconnect without a re-launch.
+                pass
 
             threads.append(
                 threading.Thread(target=handle_client_connections, daemon=True)
@@ -4236,6 +4213,7 @@ if pgrep -f "/usr/bin/waybar" > /dev/null; then
 else
     # If not running, start it
     systemctl --user restart waybar.service
+    bash "$HOME/.config/waybar/scripts/idle-inhibitor.sh"
 fi
 EOF
 
@@ -4740,6 +4718,7 @@ chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
 chmod +x "$HOME/.config/quickshell/notifications/install.sh"
 chmod +x "$HOME/.config/quickshell/notifications/bt-agent.sh"
 chmod +x "$HOME/.config/quickshell/notifications/notify-daemon.sh"
+chmod +x "$HOME/.config/waybar/scripts/idle-inhibitor.sh"
 mkdir -p "$HOME/.cache/quickshell/overview"
 mkdir -p "$HOME/.cache/quickshell/wallpaper"
 
@@ -4985,6 +4964,7 @@ exec-once = systemctl --user start rofi-font-watcher
 exec-once = systemctl --user start cursor-theme-watcher
 
 # Daemons
+exec-once = ~/.config/waybar/scripts/manager.sh
 exec-once = gjs ~/.hyprcandy/GJS/candy-daemon.js
 exec-once = gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js
 exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
@@ -4993,7 +4973,7 @@ exec-once = /usr/bin/pypr
 
 # UI — after daemons are up
 exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
-exec-once = bash ~/.config/hyprcandy/hooks/restart_waybar.sh
+exec-once = bash ~/.config/hyprcandy/hooks/toggle-bar.sh
 
 # Clipboard
 exec-once = wl-paste --watch cliphist store
