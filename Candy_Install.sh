@@ -1642,8 +1642,6 @@ sleep 1
 systemctl --user stop \
     pipewire \
     wireplumber \
-    waybar-idle-monitor \
-	lock-watcher \
     xdg-desktop-portal \
     xdg-desktop-portal-hyprland \
     xdg-desktop-portal-gtk
@@ -1663,8 +1661,6 @@ sleep 1
 systemctl --user start \
     pipewire \
     wireplumber \
-	lock-watcher \
-    waybar-idle-monitor
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
@@ -4957,9 +4953,8 @@ exec-once = bash ~/.config/hypr/scripts/xdg.sh
 exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
 exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 
-# System services
+# System Services
 exec-once = systemctl --user start hyprpolkitagent
-exec-once = systemctl --user start waybar-idle-monitor
 exec-once = systemctl --user start rofi-font-watcher
 exec-once = systemctl --user start cursor-theme-watcher
 
@@ -4973,17 +4968,18 @@ exec-once = /usr/bin/pypr
 
 # UI — after daemons are up
 exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
-exec-once = bash ~/.config/hyprcandy/hooks/toggle-bar.sh
+exec-once = bash ~/.config/hyprcandy/hooks/bar.sh
+# Bar
+exec-once = qs -c bar
+# Overview
+exec-once = qs -c overview
+# Notification Center
+exec-once = qs -c notifications
+# Start Menu
+exec-once = qs -c startmenu
 
 # Clipboard
 exec-once = wl-paste --watch cliphist store
-
-# StartMenu
-exec-once = qs -c startmenu
-# Overview
-exec-once = qs -c overview
-# Quickshell notification center
-exec-once = qs -c notifications
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                           Animations                        ┃
@@ -5528,7 +5524,7 @@ workspace = 10, layoutopt:orientation:right
 
 # Layers Rules #
 layerrule = animation slide top, match:namespace logout_dialog
-layerrule = blur on,xray on,match:namespace rofi
+layerrule = blur on,xray on,no_anim on,match:namespace rofi
 layerrule = ignore_alpha 0.01,match:namespace rofi
 layerrule = blur on,match:namespace notifications
 layerrule = ignore_alpha 0.01,match:namespace notifications
@@ -5546,15 +5542,19 @@ layerrule = blur on,no_anim on,match:namespace waybar
 layerrule = ignore_alpha 0.01,match:namespace waybar
 layerrule = blur on,match:namespace dashboardmenu
 layerrule = ignore_alpha 0.01,match:namespace dashboardmenu
-layerrule = blur on,xray on,match:namespace quickshell:overview
+layerrule = blur on,no_anim on,match:namespace quickshell
+layerrule = ignore_alpha 0.01,match:namespace quickshell
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell:overview
 layerrule = ignore_alpha 0.01,match:namespace quickshell:overview
-layerrule = blur on,xray on,match:namespace quickshell:wallpaper
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell:wallpaper
 layerrule = ignore_alpha 0.01,match:namespace quickshell:wallpaper
-layerrule = blur on,xray on,match:namespace quickshell:startmenu
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell:startmenu
 layerrule = ignore_alpha 0.01,match:namespace quickshell:startmenu
-layerrule = blur on,xray on,match:namespace quickshell:notifications:toasts
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell-controlcenter
+layerrule = ignore_alpha 0.01,match:namespace quickshell-controlcenter
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell:notifications:toasts
 layerrule = ignore_alpha 0.01,match:namespace quickshell:notifications:toasts
-layerrule = blur on,xray on,match:namespace quickshell:notifications:history
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell:notifications:history
 layerrule = ignore_alpha 0.01,match:namespace quickshell:notifications:history
 layerrule = blur on,match:namespace notificationsmenu
 layerrule = ignore_alpha 0.01,match:namespace notificationsmenu
@@ -7232,7 +7232,7 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart waybar-idle-monitor.service lock-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 else
     systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
