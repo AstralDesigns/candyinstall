@@ -1528,26 +1528,6 @@ cat > "$HOME/.config/brave-flags.conf" << 'EOF'
 EOF
 
 # ═══════════════════════════════════════════════════════════════
-#                      SWAYNC RECORDER SCRIPT
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/swaync/recorder.sh" << 'EOF'
-#!/bin/env bash
-
-if pgrep -x "wf-recorder" > /dev/null; then
-  pkill -x wf-recorder 
-  sleep 0.1
-  notify-send "Recorder" "Stopped " -t 2000
-else
-  notify-send "Recorder" "Started " -t 2000
-  sleep 0.5
-  bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)'
-fi
-EOF
-
-chmod +x "$HOME/.config/swaync/recorder.sh"
-
-# ═══════════════════════════════════════════════════════════════
 #                           GJS SCRIPTS
 # ═══════════════════════════════════════════════════════════════
 
@@ -4694,18 +4674,13 @@ else
     rm "$XRAY"
 fi
 EOF
-
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
-chmod +x "$HOME/.config/hyprcandy/scripts/*.sh"
-chmod +x "$HOME/.config/quickshell/bar/*.sh"
-chmod +x "$HOME/.config/quickshell/bar/scripts/*.sh"
+find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
+find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
+find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
 chmod +x "$HOME/.config/hyprcandy/candylock/auth.sh"
-chmod +x "$HOME/.config/quickshell/startmenu/recorder.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
-chmod +x "$HOME/.config/quickshell/notifications/install.sh"
-chmod +x "$HOME/.config/quickshell/notifications/bt-agent.sh"
-chmod +x "$HOME/.config/quickshell/notifications/notify-daemon.sh"
 mkdir -p "$HOME/.cache/quickshell/overview"
 mkdir -p "$HOME/.cache/quickshell/wallpaper"
 
