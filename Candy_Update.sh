@@ -1014,6 +1014,7 @@ setup_hyprcandy() {
         if pacman -Qi sddm &>/dev/null; then
             $AUR_HELPER -R --noconfirm swww
 			$AUR_HELPER -R --noconfirm wlogout
+			$AUR_HELPER -R --noconfirm waybar
 			$AUR_HELPER -R --noconfirm waypaper
 			$AUR_HELPER -R --noconfirm waypaper-git
             $AUR_HELPER -S --noconfirm sddm sddm-sugar-candy-git
@@ -3662,12 +3663,6 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
 else
     [[ ! -f "$WAYPAPER_CONFIG" ]] && echo "⚠️  waypaper config not found: $WAYPAPER_CONFIG"
     [[ ! -f "$SDDM_CONF" ]]      && echo "⚠️  SDDM config not found: $SDDM_CONF"
-fi
-
-# Create lock.png at 661x661 pixels
-if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
-    magick "$HOME/.config/background[0]" -resize 661x661^ -gravity center -extent 661x661 "$HOME/.config/lock.png"
-    echo "🔒 Created lock.png at 661x661 pixels"
 fi
 EOF
 
