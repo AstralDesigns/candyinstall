@@ -4705,7 +4705,11 @@ fi
 EOF
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 cd "$HOME/.config/hyprcandy/scripts"
-chmod +x *
+chmod +x *.sh
+cd "$HOME"
+chmod +x "$HOME/.config/quickshell/bar"
+chmod +x *.sh
+chmod +x scripts/*.sh
 cd "$HOME"
 chmod +x "$HOME/.config/hyprcandy/candylock/auth.sh"
 chmod +x "$HOME/.config/quickshell/startmenu/recorder.sh"
@@ -4714,7 +4718,6 @@ chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
 chmod +x "$HOME/.config/quickshell/notifications/install.sh"
 chmod +x "$HOME/.config/quickshell/notifications/bt-agent.sh"
 chmod +x "$HOME/.config/quickshell/notifications/notify-daemon.sh"
-chmod +x "$HOME/.config/waybar/scripts/idle-inhibitor.sh"
 mkdir -p "$HOME/.cache/quickshell/overview"
 mkdir -p "$HOME/.cache/quickshell/wallpaper"
 
