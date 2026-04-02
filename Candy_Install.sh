@@ -459,10 +459,7 @@ build_package_list() {
     
     # Add panel based on user choice
     if [ "$PANEL_CHOICE" = "waybar" ]; then
-        packages+=(
-        "waybar"
-        )
-        print_status "Added Waybar to package list"
+        echo ""
     else
         packages+=(
         "ags-hyprpanel-git"
@@ -3666,12 +3663,6 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
 else
     [[ ! -f "$WAYPAPER_CONFIG" ]] && echo "⚠️  waypaper config not found: $WAYPAPER_CONFIG"
     [[ ! -f "$SDDM_CONF" ]]      && echo "⚠️  SDDM config not found: $SDDM_CONF"
-fi
-
-# Create lock.png at 661x661 pixels
-if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
-    magick "$HOME/.config/background[0]" -resize 661x661^ -gravity center -extent 661x661 "$HOME/.config/lock.png"
-    echo "🔒 Created lock.png at 661x661 pixels"
 fi
 EOF
 
