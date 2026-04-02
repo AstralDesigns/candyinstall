@@ -4694,14 +4694,11 @@ else
     rm "$XRAY"
 fi
 EOF
+
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
-cd "$HOME/.config/hyprcandy/scripts"
-chmod +x *.sh
-cd "$HOME"
-chmod +x "$HOME/.config/quickshell/bar"
-chmod +x *.sh
-chmod +x scripts/*.sh
-cd "$HOME"
+chmod +x "$HOME/.config/hyprcandy/scripts/*.sh"
+chmod +x "$HOME/.config/quickshell/bar/*.sh"
+chmod +x "$HOME/.config/quickshell/bar/scripts/*.sh"
 chmod +x "$HOME/.config/hyprcandy/candylock/auth.sh"
 chmod +x "$HOME/.config/quickshell/startmenu/recorder.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
