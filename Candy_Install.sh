@@ -6430,7 +6430,7 @@ bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculat
 
 #### Bar/Panel ####
 
-bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/toggle-bar.sh #Hide/Show bar
+bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/bar.sh #Hide/Show bar
 
 #### Dock keybinds ####
 
