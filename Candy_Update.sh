@@ -4701,7 +4701,11 @@ fi
 EOF
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 cd "$HOME/.config/hyprcandy/scripts"
-chmod +x *
+chmod +x *.sh
+cd "$HOME"
+chmod +x "$HOME/.config/quickshell/bar"
+chmod +x *.sh
+chmod +x scripts/*.sh
 cd "$HOME"
 chmod +x "$HOME/.config/hyprcandy/candylock/auth.sh"
 chmod +x "$HOME/.config/quickshell/startmenu/recorder.sh"
@@ -6559,7 +6563,7 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart waybar-idle-monitor.service lock-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
