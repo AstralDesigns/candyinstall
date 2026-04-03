@@ -3082,7 +3082,7 @@ EOF
 
 mkdir -p "$HOME/.config/wallpaper"
 # ═══════════════════════════════════════════════════════════════
-#               		  	   XRAY
+#               		  	WALLPAPER
 # ═══════════════════════════════════════════════════════════════
 	cat > "$HOME/.config/wallpaper/wallpaper.ini" << 'EOF'
 [Settings]
