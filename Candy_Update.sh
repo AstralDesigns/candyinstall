@@ -3027,6 +3027,7 @@ chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
+find "$HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
 chmod +x "$HOME/.config/quickshell/candylock/auth.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
