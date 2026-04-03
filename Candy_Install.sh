@@ -3377,7 +3377,7 @@ source = ~/.config/hypr/colors.conf
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 # Packages to have full env path access
-env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/king/.cargo/bin
+env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
 # After using nwg-look, also change the cursor settings here to maintain changes after every reboot
 env = XCURSOR_THEME,Marci-Crystal
