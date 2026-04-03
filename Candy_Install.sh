@@ -3070,6 +3070,27 @@ else
     rm "$XRAY"
 fi
 EOF
+
+mkdir -p "$HOME/.config/wallpaper"
+# ═══════════════════════════════════════════════════════════════
+#               		  	   XRAY
+# ═══════════════════════════════════════════════════════════════
+	cat > "$HOME/.config/wallpaper/wallpaper.ini" << 'EOF'
+[Settings]
+wallpaper = ~/Pictures/Candy/Candy-Images/Wallpaper/brown-map5.webp
+folder = ~/Pictures/Candy/Candy-Images/Wallpaper
+monitors = All
+fill = fill
+sort = name
+subfolders = True
+show_hidden = False
+awww_transition_type = any
+awww_transition_step = 90
+awww_transition_angle = 0
+awww_transition_duration = 2
+awww_transition_fps = 60
+EOF
+
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
