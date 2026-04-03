@@ -738,11 +738,10 @@ alias g="git clone --depth 1"
 alias ga="git add ."
 alias gc="git commit -m"
 function gp
-    # Ensure .config/hypr and wlogout are gitignored before every push
+    # Ensure .config/hypr are gitignored before every push
     if not grep -qF ".config/hypr" .gitignore 2>/dev/null
         echo ".config/hypr/hyprviz.conf" >> .gitignore
 	    echo ".config/hypr/monitors.conf" >> .gitignore
-	    echo ".config/wlogout/style.css" >> .gitignore
         git add .gitignore
         git commit -m "chore: ignore personal config dirs"
     end
@@ -947,11 +946,10 @@ alias g="git clone --depth 1"
 alias ga="git add ."
 alias gc="git commit -m"
 gp() {
-    # Ensure .config/hypr and wlogout are gitignored before every push
+    # Ensure .config/hypr are gitignored before every push
     if ! grep -qF ".config/hypr" .gitignore 2>/dev/null; then
         echo ".config/hypr/hyprviz.conf" >> .gitignore
 	    echo ".config/hypr/monitors.conf" >> .gitignore
-	    echo ".config/wlogout/style.css" >> .gitignore
         git add .gitignore
         git commit -m "chore: ignore personal config dirs"
     fi
@@ -3155,20 +3153,6 @@ printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudo
 sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
-    
-    # 🎨 Update wlogout style.css with correct username
-    echo
-    echo "🎨 Updating wlogout style.css with current username..."
-    
-    WLOGOUT_STYLE="$HOME/.config/wlogout/style.css"
-    
-    if [ -f "$WLOGOUT_STYLE" ]; then
-        # Replace $USERNAME with actual username in the background image path
-        sed -i "s|\$USERNAME|$USERNAME|g" "$WLOGOUT_STYLE"
-        echo "✅ Updated wlogout style.css with username: $USERNAME"
-    else
-        echo "⚠️  wlogout style.css not found at $WLOGOUT_STYLE"
-    fi
 }
 
 # Function to enable display manager and prompt for reboot
@@ -4830,7 +4814,6 @@ bind = ALT, G, exec, $HYPRSCRIPTS/gamemode.sh						  #Toggle game-mode
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
-bind = $mainMod CTRL, Q, exec, $SCRIPTS/wlogout.sh            				  #Start wlogout ~/.config/hyprcandy/scripts
 bind = $mainMod, V, exec, cliphist wipe 						  #Clear cliphist database
 bind = $mainMod CTRL, D, exec, $ cliphist list | dmenu | cliphist delete 		  #Delete an old item
 bind = $mainMod ALT, D, exec, $ cliphist delete-query "secret item"  			  #Delete an old item quering manually
@@ -5054,7 +5037,6 @@ bind = ALT, G, exec, $HYPRSCRIPTS/gamemode.sh						  #Toggle game-mode
 bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
 bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
 bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
-bind = $mainMod CTRL, Q, exec, $SCRIPTS/wlogout.sh            				  #Start wlogout ~/.config/hyprcandy/scripts
 bind = $mainMod, V, exec, cliphist wipe 						  #Clear cliphist database
 bind = $mainMod CTRL, D, exec, $ cliphist list | dmenu | cliphist delete 		  #Delete an old item
 bind = $mainMod ALT, D, exec, $ cliphist delete-query "secret item"  			  #Delete an old item quering manually
