@@ -1770,7 +1770,7 @@ update_hypr_cursor_env() {
     
     # Sync GTK4 with GTK3
     sed -i "s|^gtk-cursor-theme-name=.*|gtk-cursor-theme-name=$theme|" "$GTK4_FILE"
-    sed -i "s|^gtk-cursor-theme-size=.*|gtk-cursor-theme-size=$size|" "$GTK4_FILE"
+    sed -i "s|^gtk-cursor-theme-size=.*|gtk-cursor-theme-size=$size|" "$GTK4_FILE" 
 
     # SDDM cursor update
     sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/sugar-candy.conf"
@@ -2573,7 +2573,7 @@ update_config_background() {
         matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
-        sleep 0.5
+        sleep 1
         "$HOOKS_DIR/update_background.sh"
         echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
