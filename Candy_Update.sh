@@ -3293,10 +3293,6 @@ source = ~/.config/hypr/colors.conf
 # ┃                         Env-variables                       ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-# Toolkit Backend
-env = GDK_BACKEND,wayland
-env = CLUTTER_BACKEND,wayland
-
 # Packages to have full env path access
 env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
@@ -3319,6 +3315,9 @@ env = QT_AUTO_SCREEN_SCALE_FACTOR,1
 # GDK
 env = GDK_DEBUG,portals
 env = GDK_SCALE,1
+# Toolkit Backend
+env = GDK_BACKEND,wayland
+env = CLUTTER_BACKEND,wayland
 # Mozilla
 env = MOZ_ENABLE_WAYLAND,1
 # Ozone
