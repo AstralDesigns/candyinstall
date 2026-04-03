@@ -3024,6 +3024,7 @@ fi
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
+find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
@@ -4061,7 +4062,7 @@ bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculat
 
 #### Bar/Panel ####
 
-bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/bar.sh #Hide/Show bar
+bind = ALT, 1, exec, ~/.config/hyprcandy/scripts/bar.sh #Hide/Show bar
 
 #### Dock keybinds ####
 
