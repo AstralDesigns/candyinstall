@@ -5627,7 +5627,10 @@ else
     echo "Setting background..."
 	awww-daemon &
 	sleep 1
-	awww img "$HOME/.ultracandy/.config/background"
+	awww img "$HOME/.hyprcandy/.config/background"
+	sleep 0.5
+	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+    echo "✅ Initial background set"
 	sleep 0.5
 	qs -c bar >/dev/null 2>&1 &
 fi
@@ -5673,12 +5676,12 @@ prompt_reboot() {
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
                 bash -c "rm -rf ~/candyinstall"
-				sleep 0.5
-				systemctl --user restart waybar.service &>/dev/null && reboot
+				sleep 1
+				reboot
             else
                 bash -c "rm -rf ~/candyinstall"
-				sleep 0.5
-				systemctl --user restart hyprpanel.service &>/dev/null && reboot
+				sleep 1
+				reboot
             fi
             ;;
         *)
