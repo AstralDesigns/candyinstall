@@ -4060,6 +4060,7 @@ bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #
 bind = $mainMod, W, exec, $SCRIPTS/wallpaper.sh #Wallpaper picker
 bind = ALT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh -n #Alternate wallpapers forward
 bind = ALT SHIFT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh -p #Alternate wallpapers backward
+bind = ALT SHIFT, R, exec, ~/.config/hyprcandy/hooks/wallpaper_integration.sh #Reload system colors
 bind = $mainMod, S, exec, spotify-launcher #Spotify
 bind = $mainMod, D, exec, $DISCORD #Discord
 bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
