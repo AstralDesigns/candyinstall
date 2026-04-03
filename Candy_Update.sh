@@ -4911,7 +4911,6 @@ exec-once = systemctl --user start rofi-font-watcher
 exec-once = systemctl --user start cursor-theme-watcher
 
 # Daemons
-exec-once = ~/.config/waybar/scripts/manager.sh
 exec-once = gjs ~/.hyprcandy/GJS/candy-daemon.js
 exec-once = gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js
 exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
@@ -4919,8 +4918,8 @@ exec-once = hypridle
 exec-once = /usr/bin/pypr
 
 # UI — after daemons are up
+# Dock
 exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
-exec-once = bash ~/.config/hyprcandy/hooks/bar.sh
 # Bar
 exec-once = qs -c bar
 # Overview
