@@ -5613,14 +5613,14 @@ if awww query &>/dev/null; then
     bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 	sleep 0.5
-	qs -c bar
+	qs -c bar >/dev/null 2>&1 &
 else
     echo "Setting background..."
 	awww-daemon &
 	sleep 1
 	awww img "$HOME/.ultracandy/.config/background"
 	sleep 0.5
-	qs -c bar
+	qs -c bar >/dev/null 2>&1 &
 fi
 
     # 🔄 Reload Hyprland
@@ -5663,14 +5663,10 @@ prompt_reboot() {
             echo "✅ Installation complete (reboot post install is advised)..."
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
-                qs -c overview >/dev/null 2>&1 &
-                sleep 0.5
                 bash -c "rm -rf ~/candyinstall"
 				sleep 0.5
 				systemctl --user restart waybar.service &>/dev/null && reboot
             else
-                qs -c overview >/dev/null 2>&1 &
-                sleep 0.5
                 bash -c "rm -rf ~/candyinstall"
 				sleep 0.5
 				systemctl --user restart hyprpanel.service &>/dev/null && reboot
