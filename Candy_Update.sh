@@ -3247,7 +3247,6 @@ exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CUR
 exec-once = bash ~/.config/hypr/scripts/xdg.sh
 
 # Theme
-exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
 exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 
 # System Services
@@ -3306,7 +3305,8 @@ env = XCURSOR_THEME,Marci-Crystal
 env = XCURSOR_SIZE,18
 env = HYPRCURSOR_THEME,Marci-Crystal
 env = HYPRCURSOR_SIZE,18
-
+# GTK
+env =  GTK_THEME,adw-gtk3-dark
 # XDG Desktop Portal
 env = XDG_CURRENT_DESKTOP,Hyprland
 env = XDG_SESSION_TYPE,wayland
