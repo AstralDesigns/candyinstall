@@ -2941,6 +2941,13 @@ fi
 
 echo "🎨 Syncing icon theme: $ICON_THEME"
 
+export QT_QPA_PLATFORMTHEME=qt6ct
+export QT_ICON_THEME="$ICON_THEME"
+
+# Keep user services and dbus-activated apps in sync with the new icon theme.
+systemctl --user import-environment QT_QPA_PLATFORMTHEME QT_ICON_THEME 2>/dev/null || true
+dbus-update-activation-environment --systemd QT_QPA_PLATFORMTHEME QT_ICON_THEME 2>/dev/null || true
+
 for CONF in "$QT6CT_CONF" "$QT5CT_CONF"; do
     [ -f "$CONF" ] || continue
     if grep -q "^icon_theme=" "$CONF"; then
@@ -2966,7 +2973,9 @@ if [ -f "$ROFI_MENU" ]; then
     echo "✅ $(basename $ROFI_MENU) icon theme → $ICON_THEME"
 fi
 
-killall -9 qs c- overview
+# Do not restart quickshell instances here.
+# They hot-reload config; this hook only synchronizes theme config and env for new launches.
+pkill -f "qs -c overview"
 
 dbus-send --session --type=signal /kdeglobals \
     org.kde.kconfig.notify.ConfigChanged \
