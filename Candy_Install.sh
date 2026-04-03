@@ -5,7 +5,7 @@
 
 #set -e  # Exit on any error
 
-# Colors for output
+# Colors for outputf
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -5611,11 +5611,15 @@ echo "✅ Services set..."
 if awww query &>/dev/null; then
     bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
+	sleep 0.5
+	qs -c bar
 else
     echo "Setting background..."
 	awww-daemon &
 	sleep 1
 	awww img "$HOME/.ultracandy/.config/background"
+	sleep 0.5
+	qs -c bar
 fi
 
     # 🔄 Reload Hyprland
