@@ -4878,7 +4878,7 @@ if awww query &>/dev/null; then
     bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 	sleep 0.5
-	qs -c bar
+	qs -c bar >/dev/null 2>&1 &
 else
     echo "⚠️  awww-daemon not ready — background not set"
 fi
