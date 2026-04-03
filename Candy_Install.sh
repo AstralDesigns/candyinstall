@@ -3376,13 +3376,17 @@ source = ~/.config/hypr/colors.conf
 # ┃                         Env-variables                       ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+# Toolkit Backend
+env = GDK_BACKEND,wayland
+env = CLUTTER_BACKEND,wayland
+
 # Packages to have full env path access
 env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
 
 # After using nwg-look, also change the cursor settings here to maintain changes after every reboot
-env = XCURSOR_THEME,Bibata-Modern-Classic
+env = XCURSOR_THEME,Marci-Crystal
 env = XCURSOR_SIZE,18
-env = HYPRCURSOR_THEME,Bibata-Modern-Classic
+env = HYPRCURSOR_THEME,Marci-Crystal
 env = HYPRCURSOR_SIZE,18
 # GTK
 env =  GTK_THEME,adw-gtk3-dark
@@ -3398,9 +3402,6 @@ env = QT_AUTO_SCREEN_SCALE_FACTOR,1
 # GDK
 env = GDK_DEBUG,portals
 env = GDK_SCALE,1
-# Toolkit Backend
-env = GDK_BACKEND,wayland
-env = CLUTTER_BACKEND,wayland
 # Mozilla
 env = MOZ_ENABLE_WAYLAND,1
 # Ozone
