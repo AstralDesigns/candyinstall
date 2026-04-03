@@ -130,25 +130,6 @@ choose_panel() {
     echo -e "${GREEN}Panel selected: $PANEL_CHOICE${NC}"
 }
 
-choose_browser() {
-    echo -e "${CYAN}Choose your browser:${NC}"
-    echo "1) Brave (Seemless integration with HyprCandy GTK and Qt theme through its Appearance settings, fast, secure and privacy-focused browser)"
-    echo "2) Firefox (Themed through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
-    echo "3) Zen Browser (Themed through zen mods and slightly through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
-    echo "4) Librewolf (Open-source browser with a focus on privacy, highly customizable manually)"
-    echo "5) Other (Please install your own browser post-installation)"
-    read -rp "Enter 1, 2, 3, 4 or 5: " browser_choice
-    case $browser_choice in
-        1) BROWSER_CHOICE="brave" ;;
-        2) BROWSER_CHOICE="firefox" ;;
-        3) BROWSER_CHOICE="zen-browser-bin" ;;
-        4) BROWSER_CHOICE="librewolf" ;;
-        5) BROWSER_CHOICE="Other" ;;
-        *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
-    esac
-    echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
-}
-
 # Function to choose shell
 choose_shell() {
     echo -e "${CYAN}Choose your shell: you can also rerun the script to switch from either or regenerate HyprCandy's default shell setup:${NC}"
@@ -175,6 +156,25 @@ choose_shell() {
                 ;;
         esac
     done
+}
+
+choose_browser() {
+    echo -e "${CYAN}Choose your browser:${NC}"
+    echo "1) Brave (Seemless integration with HyprCandy GTK and Qt theme through its Appearance settings, fast, secure and privacy-focused browser)"
+    echo "2) Firefox (Themed through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
+    echo "3) Zen Browser (Themed through zen mods and slightly through python-pywalfox by running pywalfox update in the terminal, open-source browser with a focus on privacy)"
+    echo "4) Librewolf (Open-source browser with a focus on privacy, highly customizable manually)"
+    echo "5) Other (Please install your own browser post-installation)"
+    read -rp "Enter 1, 2, 3, 4 or 5: " browser_choice
+    case $browser_choice in
+        1) BROWSER_CHOICE="brave" ;;
+        2) BROWSER_CHOICE="firefox" ;;
+        3) BROWSER_CHOICE="zen-browser-bin" ;;
+        4) BROWSER_CHOICE="librewolf" ;;
+        5) BROWSER_CHOICE="Other" ;;
+        *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
+    esac
+    echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
 }
 
 # Function to install yay
@@ -298,12 +298,10 @@ build_package_list() {
         # Qt and GTK theming
         "adw-gtk-theme"
         "qt5ct-kde"
-        "qt5ct-wayland"
         "qt5-imageformats"
         "qt5-graphicaleffects"
         "qt5-quickcontrols2"
         "qt6ct-kde"
-        "qt6ct-wayland"
         "attica"
         "frameworkintegration" 
         "knewstuff" 
@@ -5714,13 +5712,13 @@ main() {
     # Choose a panel
     #choose_panel
     #echo
-
-    # Choose a browser
-    choose_browser
-    echo
     
     # Choose shell
     choose_shell
+    echo
+
+    # Choose a browser
+    choose_browser
     echo
     
     # Check for AUR helper or install one
