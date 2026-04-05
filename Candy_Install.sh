@@ -3675,9 +3675,9 @@ windowrule = size 700 600,match:class (nwg-look)
 windowrule = center on,match:class (nwg-look)
 #windowrule = pin on,match:class (nwg-look)
 # CachyOS Hello
-windowrule = float on,match:class (CachyOSHello)
-windowrule = size 700 600,match:class (CachyOSHello)
-windowrule = center on,match:class (CachyOSHello)
+windowrule = float on,match:title (CachyOS Hello)
+windowrule = size 700 600,match:title (CachyO SHello)
+windowrule = center on,match:title (CachyOS Hello)
 #windowrule = pin on,match:class (CachyOSHello)
 # nwg-displays
 windowrule = float on,match:class (nwg-displays)
@@ -3727,7 +3727,7 @@ windowrule = float on, match:class ^(LibreWolf)$,match:title ^(Picture-in-Pictur
 ##windowrule = float on, match:class ^(blueman-manager)$
 windowrule = float on, match:class ^(xdg-desktop-portal-hyprland|xdg-desktop-portal-gtk|xdg-desktop-portal-kde)(.*)$
 windowrule = float on, match:class ^(hyprpolkitagent|polkit-gnome-authentication-agent-1|org.org.kde.polkit-kde-authentication-agent-1)(.*)$
-windowrule = float on, match:class ^(CachyOSHello)$
+windowrule = float on, match:title ^(CachyOS Hello)$
 windowrule = float on, match:class ^(zenity)$
 windowrule = float on, match:class ^()$,match:title ^(Steam - Self Updater)$
 # Increase the opacity
@@ -3912,6 +3912,8 @@ layerrule = blur on,xray on,no_anim on,match:namespace swaync-control-center
 layerrule = ignore_alpha 0.01,match:namespace swaync-control-center
 layerrule = blur on,no_anim on,match:namespace hyprcandy-dock
 layerrule = ignore_alpha 0.01,match:namespace hyprcandy-dock
+layerrule = blur on,xray on,no_anim on,match:namespace hyprcandy-launcher
+layerrule = ignore_alpha 0.01,match:namespace hyprcandy-launcher
 layerrule = blur on,match:namespace logout_dialog
 layerrule = ignore_alpha 0.01,match:namespace logout_dialog
 layerrule = blur on,match:namespace gtk-layer-shell
@@ -4791,7 +4793,7 @@ bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pi
 #### Rofi Menus ####
 
 bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
-bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
+bind = bind = $mainMod, A, exec, ~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh     #Show/hide rofi application finder
 bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
 bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
 bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
