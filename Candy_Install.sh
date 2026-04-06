@@ -301,7 +301,7 @@ build_package_list() {
         "qt5-imageformats"
         "qt5-graphicaleffects"
         "qt5-quickcontrols2"
-        "qt6ct-kde"
+        "qt6ct"
         "attica"
         "frameworkintegration" 
         "knewstuff" 
