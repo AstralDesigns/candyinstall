@@ -989,6 +989,8 @@ setup_hyprcandy() {
         print_error "Default config folder not found: $PREVIOUS_CONFIG_FOLDER"
         echo -e "${RED}Skipping default config backup${NC}"
     else
+        # Remove any previous backups before creating a new one
+        rm -rf "${PREVIOUS_CONFIG_FOLDER}".backup.*
         cp -r "$PREVIOUS_CONFIG_FOLDER" "${PREVIOUS_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
         echo -e "${GREEN}Previous default config folder backup created${NC}"
     fi
@@ -1001,6 +1003,8 @@ setup_hyprcandy() {
         print_error "Custom config folder not found: $PREVIOUS_CUSTOM_CONFIG_FOLDER"
         echo -e "${RED}Skipping custom config backup${NC}"
     else
+        # Remove any previous backups before creating a new one
+        rm -rf "${PREVIOUS_CUSTOM_CONFIG_FOLDER}".backup.*
         cp -r "$PREVIOUS_CUSTOM_CONFIG_FOLDER" "${PREVIOUS_CUSTOM_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
         echo -e "${GREEN}Previous custom config folder backup created${NC}"
     fi
