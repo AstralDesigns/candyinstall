@@ -1010,6 +1010,7 @@ setup_hyprcandy() {
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         if pacman -Qi sddm &>/dev/null; then
             $AUR_HELPER -R --noconfirm swww
+			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm wlogout
 			$AUR_HELPER -R --noconfirm waybar
 			$AUR_HELPER -R --noconfirm waypaper
@@ -1046,7 +1047,7 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control gnome-software awww-bin
+        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control qt6ct gnome-software awww-bin
     else
         print_status "Ensuring necessary packages are installed"
         echo
