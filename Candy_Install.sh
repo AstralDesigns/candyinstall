@@ -3402,8 +3402,6 @@ env = OZONE_PLATFORM,wayland
 env = ELECTRON_OZONE_PLATFORM_HINT,wayland
 # Extra
 env = WINIT_UNIX_BACKEND,wayland
-env = WLR_DRM_NO_ATOMIC,1
-env = WLR_NO_HARDWARE_CURSORS,1
 # Virtual machine display scaling
 env = QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
 # For better VM performance
@@ -3448,7 +3446,7 @@ general {
     col.inactive_border = $inverse_primary
     layout = scrolling
     resize_on_border = true
-    allow_tearing = true
+    allow_tearing = false
 }
 
 group {
