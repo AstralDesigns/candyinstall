@@ -3326,8 +3326,6 @@ env = OZONE_PLATFORM,wayland
 env = ELECTRON_OZONE_PLATFORM_HINT,wayland
 # Extra
 env = WINIT_UNIX_BACKEND,wayland
-env = WLR_DRM_NO_ATOMIC,1
-env = WLR_NO_HARDWARE_CURSORS,1
 # Virtual machine display scaling
 env = QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
 # For better VM performance
@@ -3364,15 +3362,15 @@ input {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 general {
-    gaps_in = 6
-    gaps_out = 12	
+    gaps_in = 4
+    gaps_out = 9	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $source_color
-    col.inactive_border = $background
+    col.active_border = $primary_fixed_dim
+    col.inactive_border = $inverse_primary
     layout = scrolling
     resize_on_border = true
-    allow_tearing = true
+    allow_tearing = false
 }
 
 group {
@@ -3444,7 +3442,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 20
+    rounding = 15
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
