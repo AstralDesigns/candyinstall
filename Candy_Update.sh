@@ -3274,10 +3274,6 @@ exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
 exec-once = qs -c bar
 # Overview
 exec-once = qs -c overview
-# Notification Center
-exec-once = qs -c notifications
-# Start Menu
-exec-once = qs -c startmenu
 
 # Clipboard
 exec-once = wl-paste --watch cliphist store
