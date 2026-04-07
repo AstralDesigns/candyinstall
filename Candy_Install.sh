@@ -3440,12 +3440,12 @@ input {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 general {
-    gaps_in = 6
-    gaps_out = 12	
+    gaps_in = 4
+    gaps_out = 9	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $source_color
-    col.inactive_border = $background
+    col.active_border = $primary_fixed_dim
+    col.inactive_border = $inverse_primary
     layout = scrolling
     resize_on_border = true
     allow_tearing = true
@@ -3520,7 +3520,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 20
+    rounding = 15
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
