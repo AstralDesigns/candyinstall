@@ -1101,7 +1101,7 @@ rsync -a --delete \
     --exclude='.git/' \
     "$UPDATE_DIR/" "$HYPRCANDY_DIR/"
 
-echo "✅ Update merged — waybar, and hypr preserved"
+echo "✅ Update merged"
 
 # Restore hyprcandy-bar config and remove backup
 if [ -f "$BAR_CONF_BAK" ]; then
