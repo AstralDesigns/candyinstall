@@ -1084,6 +1084,15 @@ for dir in "${SKIP_DIRS[@]}"; do
     EXCLUDES+=(--exclude="**/$dir/")
 done
 
+# Backup hyprcandy-bar config before rsync overwrites it
+BAR_CONF="$HOME/.config/hyprcandy-bar.conf"
+BAR_CONF_BAK="$HOME/.config/hyprcandy-bar.conf.bak"
+
+if [ -f "$BAR_CONF" ]; then
+    cp "$BAR_CONF" "$BAR_CONF_BAK"
+    echo "🔒 Backed up hyprcandy-bar.conf"
+fi
+
 # rsync: copy everything from the update clone into the live dotfiles dir,
 # skipping the protected folders. Stow symlinks already point here so the
 # running environment picks up changes immediately — no re-stow needed.
@@ -1093,6 +1102,13 @@ rsync -a --delete \
     "$UPDATE_DIR/" "$HYPRCANDY_DIR/"
 
 echo "✅ Update merged — waybar, and hypr preserved"
+
+# Restore hyprcandy-bar config and remove backup
+if [ -f "$BAR_CONF_BAK" ]; then
+    cp "$BAR_CONF_BAK" "$BAR_CONF"
+    rm "$BAR_CONF_BAK"
+    echo "🔓 Restored hyprcandy-bar.conf and removed backup"
+fi
 
 # Clean up temp clone
 rm -rf "$UPDATE_DIR"
