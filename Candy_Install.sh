@@ -5672,12 +5672,8 @@ prompt_reboot() {
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
                 bash -c "rm -rf ~/candyinstall"
-				sleep 1
-				reboot
             else
                 bash -c "rm -rf ~/candyinstall"
-				sleep 1
-				reboot
             fi
             ;;
         *)
@@ -5685,7 +5681,7 @@ prompt_reboot() {
             sleep 2
             bash -c "rm -rf ~/candyinstall"
 			sleep 0.5
-			systemctl  && reboot
+			systemctl reboot
             ;;
     esac
 }
