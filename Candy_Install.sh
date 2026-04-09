@@ -2596,7 +2596,7 @@ RELOAD_SO="/usr/local/lib/gtk3-reload.so"
 RELOAD_SRC="/usr/local/share/gtk3-reload/gtk3-reload.c"
 HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 
-get_waypaper_background() {
+get_wallpaper_background() {
     # Prefer quickshell wallpaper picker config, fall back to waypaper config
     for cfg in "$WP_CONFIG" "$WAYPAPER_CONFIG"; do
         if [ -f "$cfg" ]; then
@@ -2629,15 +2629,15 @@ update_config_background() {
 }
 
 main() {
-    echo "🎯 Waypaper integration triggered"
-    current_bg=$(get_waypaper_background)
+    echo "🎯 Wallpaper integration triggered"
+    current_bg=$(get_wallpaper_background)
     if [ $? -eq 0 ]; then
         echo "📸 Current Waypaper background: $current_bg"
         if update_config_background "$current_bg"; then
            echo "✅ Color generation processes complete"
         fi
     else
-        echo "⚠️  Could not determine current Waypaper background"
+        echo "⚠️  Could not determine current wallpaper background"
     fi
 }
 
@@ -5615,16 +5615,18 @@ sudo systemctl enable bluetooth
 echo "✅ Services set..."
 
 if awww query &>/dev/null; then
+  	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
+	sleep 1
     bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 	sleep 0.5
 	qs -c bar >/dev/null 2>&1 &
 else
     echo "Setting background..."
-	awww-daemon &
+	awww-daemon
 	sleep 1
-	awww img "$HOME/.hyprcandy/.config/background"
-	sleep 0.5
+	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
+	sleep 1
 	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 	sleep 0.5
