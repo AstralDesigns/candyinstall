@@ -22,6 +22,7 @@ NC='\033[0m' # No Color
 # Global variables
 DISPLAY_MANAGER="sddm"
 DISPLAY_MANAGER_SERVICE="sddm"
+LIBREOFFICE_CHOICE=""
 SHELL_CHOICE=""
 PANEL_CHOICE="waybar"
 BROWSER_CHOICE=""
@@ -175,6 +176,19 @@ choose_browser() {
         *) print_error "Invalid choice. Please enter 1, 2, 3, 4 or 5." ;;
     esac
     echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
+}
+
+install_libreoffice() {
+    echo -e "${YELLOW}Would you like to install the libreoffice suite? (n/Y)${NC}"
+    read -r response
+    case "$response" in
+        [nN][oO]|[nN])
+            print_status "Installation skipped."
+            ;;
+        *)
+            LIBREOFFICE_CHOICE="Yes"
+            ;;
+    esac
 }
 
 # Function to install yay
@@ -464,6 +478,14 @@ build_package_list() {
         "mako"
         )
         print_status "Added Hyprpanel to package list"
+    fi
+
+    # Add libreoffice based on user choice
+    if [ "$LIBREOFFICE_CHOICE" = "Yes" ]; then
+        packages+=(
+            "libreoffice-fresh"
+        )
+        print_status "Added LibreOffice to package list"
     fi
 
     # Add browser based on user choice
@@ -3104,6 +3126,7 @@ find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
+find "$HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
 chmod +x "$HOME/.config/quickshell/candylock/auth.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
@@ -5702,20 +5725,16 @@ main() {
     echo "  • Your choice of shell (Fish or Zsh) with comprehensive configuration"
     echo
     
-    # Choose display manager first
-    #choose_display_manager
-    #echo
-    
-    # Choose a panel
-    #choose_panel
-    #echo
-    
     # Choose shell
     choose_shell
     echo
 
     # Choose a browser
     choose_browser
+    echo
+
+    # Decide whether to install libroffice-fresh suite
+    install_libreoffice
     echo
     
     # Check for AUR helper or install one
