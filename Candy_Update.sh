@@ -10020,12 +10020,8 @@ prompt_logout() {
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
                 bash -c "rm -rf ~/candyinstall"
-				sleep 0.5
-				systemctl --user stop hyprpanel.service &>/dev/null && systemctl --user restart waybar.service &>/dev/null
             else
                 bash -c "rm -rf ~/candyinstall"
-				sleep 0.5
-				systemctl --user stop waybar.service &>/dev/null && systemctl --user restart hyprpanel.service &>/dev/null
             fi
             ;;
         *)
