@@ -10020,15 +10020,19 @@ prompt_logout() {
             sleep 5
             if [ "$PANEL_CHOICE" = "waybar" ]; then
                 bash -c "rm -rf ~/candyinstall"
+				pkill -f floating-installer
             else
                 bash -c "rm -rf ~/candyinstall"
+				pkill -f floating-installer
             fi
             ;;
         *)
             print_status "Logging out..."
             bash -c "rm -rf ~/candyinstall"
 			sleep 0.5
-			hyprctl dispatch exit
+			terminate_clients
+  			sleep 2
+  			loginctl terminate-user $USER
             ;;
     esac
 }
