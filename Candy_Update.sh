@@ -10030,8 +10030,6 @@ prompt_logout() {
             print_status "Logging out..."
             bash -c "rm -rf ~/candyinstall"
 			sleep 0.5
-			terminate_clients
-  			sleep 2
   			loginctl terminate-user $USER
             ;;
     esac
