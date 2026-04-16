@@ -5710,8 +5710,6 @@ prompt_reboot() {
             sleep 2
             bash -c "rm -rf ~/candyinstall"
 			sleep 0.5
-			terminate_clients
-  			sleep 2
 			systemctl reboot
             ;;
     esac
