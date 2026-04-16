@@ -296,6 +296,8 @@ build_package_list() {
         #"gnome-control-center"
         #"gnome-tweaks"
         "gvfs"
+		"gjs"
+		"gtk4-layer-shell"
         "gnome-disk-utility"
         "gnome-color-manager"
 		"gnome-software"
