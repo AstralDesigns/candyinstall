@@ -1036,27 +1036,6 @@ setup_hyprcandy() {
             echo ""
         fi
     fi
-    
-    # Prevent notification daemon conflicts
-    if [ "$PANEL_CHOICE" = "waybar" ]; then
-        print_status "Removing mako since you chose waybar to avoid conflicts with swaync..."
-        $AUR_HELPER -R --noconfirm mako
-		$AUR_HELPER -R --noconfirm swaync
-    else
-        print_status "Removing swaync since you chose hyprpanel to avoid conflicts with mako..."
-        $AUR_HELPER -R --noconfirm swaync
-    fi
-    
-    #Add panel censtric apps
-    if [ "$PANEL_CHOICE" = "waybar" ]; then
-        print_status "Ensuring necessary packages are installed"
-        echo
-        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control qt6ct gnome-software awww-bin
-    else
-        print_status "Ensuring necessary packages are installed"
-        echo
-        $AUR_HELPER -S --noconfirm ags-hyprpanel-git mako equibop-bin gnome-software awww-bin qt6ct-kde qt5ct-kde archlinux-xdg-menu kservice attica frameworkintegration knewstuff syndication darkly-bin qogir-cursor-theme xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk spotify-launcher flatpak qt5-imageformats qt5-graphicaleffects qt5-quickcontrols2
-    fi
 
     # Add flathub repo
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
