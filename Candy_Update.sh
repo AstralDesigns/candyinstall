@@ -6091,7 +6091,6 @@ setup_hyprcandy() {
 			$AUR_HELPER -R --noconfirm waybar
 			$AUR_HELPER -R --noconfirm waypaper
 			$AUR_HELPER -R --noconfirm waypaper-git
-            $AUR_HELPER -S --noconfirm sddm sddm-sugar-candy-git
             print_status "Installed SDDM packages"
         else
             echo ""
@@ -6123,7 +6122,7 @@ setup_hyprcandy() {
     if [ "$PANEL_CHOICE" = "waybar" ]; then
         print_status "Ensuring necessary packages are installed"
         echo
-        $AUR_HELPER -S --noconfirm quickshell-git switcheroo-control qt6ct gnome-software awww-bin
+        $AUR_HELPER -S --noconfirm python-pywal16 python-haishoku
     else
         print_status "Ensuring necessary packages are installed"
         echo
@@ -7663,7 +7662,9 @@ update_config_background() {
     local bg_path="$1"
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         echo "🎨 Triggering matugen color generation..."
-        matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
+        wal -i "$bg_path" -n --cols16 darken --backend haishoku --contrast -1.5 --saturate 0.0
+    	sleep 1
+		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.25
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
         sleep 1
