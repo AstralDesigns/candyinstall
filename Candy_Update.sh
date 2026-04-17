@@ -1064,7 +1064,7 @@ for dir in "${SKIP_DIRS[@]}"; do
 done
 
 # Backup hyprcandy-bar config before rsync overwrites it
-BAR_CONF="$HOME/.config/hyprcandy-bar.conf"
+BAR_CONF="$HOME/.config/hyprcandy/hyprcandy-bar.conf"
 BAR_CONF_BAK="$HOME/.config/hyprcandy-bar.conf.bak"
 
 if [ -f "$BAR_CONF" ]; then
