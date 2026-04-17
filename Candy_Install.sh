@@ -367,6 +367,8 @@ build_package_list() {
         
         # Customization
         "matugen-bin"
+		"python-pywal16"
+		"python-haishoku"
         "hyprviz-bin"
         
         # Editors
@@ -1080,7 +1082,7 @@ setup_hyprcandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava dolphinrc fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcustom hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct quickshell rofi swaync wallust waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava dolphinrc fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcustom hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct quickshell rofi swaync wal wallust waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
