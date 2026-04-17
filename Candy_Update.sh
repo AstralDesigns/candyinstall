@@ -2570,7 +2570,8 @@ update_config_background() {
     local bg_path="$1"
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         echo "🎨 Triggering matugen color generation..."
-        matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
+        wal -i "$bg_path" -n --cols16 darken --backend haishoku --contrast 1.5 --saturate 0.2
+		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
         sleep 1
