@@ -3367,8 +3367,8 @@ general {
     gaps_out = 9	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
-    col.active_border = $primary_fixed_dim
-    col.inactive_border = $inverse_primary
+    col.active_border = $inverse_primary
+    col.inactive_border = $background
     layout = scrolling
     resize_on_border = true
     allow_tearing = false
