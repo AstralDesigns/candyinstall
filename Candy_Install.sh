@@ -3126,6 +3126,19 @@ awww_transition_fps = 60
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
+
+# ═══════════════════════════════════════════════════════════════
+#               		 POST SETUP CLEANUP
+# ═══════════════════════════════════════════════════════════════
+	cat > "$HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
+#!/bin/bash
+
+bash -c "rm -rf ~/candyinstall"
+pkill -f "floating-installer"
+EOF
+
+chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
+
 find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
@@ -5705,11 +5718,7 @@ prompt_reboot() {
         [nN][oO]|[nN])
             echo "✅ Installation complete (reboot post install is advised)..."
             sleep 4
-            if [ "$PANEL_CHOICE" = "waybar" ]; then
-                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
-            else
-                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
-            fi
+            bash -c "$HOME/.config/hyprcandy/hooks/complete.sh"
             ;;
         *)
             print_status "Restarting system..."
