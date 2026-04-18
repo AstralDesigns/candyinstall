@@ -10033,7 +10033,7 @@ prompt_logout() {
         [nN][oO]|[nN])
             echo "✅ Update complete (re-login post update is advised)..."
             sleep 4
-            bash -c "rm -rf ~/candyinstall && pkill -f kitty" 
+            bash -c "rm -rf ~/candyinstall && killall kitty" 
             ;;
         *)
             print_status "Logging out..."
