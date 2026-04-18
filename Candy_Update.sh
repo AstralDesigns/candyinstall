@@ -159,6 +159,7 @@ choose_shell() {
     echo -e "${CYAN}Choose your shell (you can rerun the script to switch or regenerate HyprCandy's default shell setup):${NC}"
     echo "1) Fish - A modern shell with builtin fzf search, intelligent autosuggestions and syntax highlighting (Fisher plugins + Starship prompt)"
     echo "2) Zsh - Powerful shell with extensive customization (Zsh plugins + Oh My Zsh + Starship prompt)"
+	echo "3) Skip shell selection"
     echo
     
     while true; do
