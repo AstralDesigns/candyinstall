@@ -5704,13 +5704,11 @@ prompt_reboot() {
     case "$reboot_choice" in
         [nN][oO]|[nN])
             echo "✅ Installation complete (reboot post install is advised)..."
-            sleep 5
+            sleep 4
             if [ "$PANEL_CHOICE" = "waybar" ]; then
-                bash -c "rm -rf ~/candyinstall"
-				pkill -f floating-installer
+                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
             else
-                bash -c "rm -rf ~/candyinstall"
-				pkill -f floating-installer
+                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
             fi
             ;;
         *)
