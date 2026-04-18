@@ -1024,7 +1024,7 @@ setup_hyprcandy() {
 			$AUR_HELPER -R --noconfirm waybar
 			$AUR_HELPER -R --noconfirm waypaper
 			$AUR_HELPER -R --noconfirm waypaper-git
-            $AUR_HELPER -S --noconfirm python-pywal16 python-haishoku
+            #$AUR_HELPER -S --noconfirm python-pywal16 python-haishoku
             print_status "Installed SDDM packages"
         else
             echo ""
