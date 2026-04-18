@@ -10043,7 +10043,9 @@ prompt_logout() {
         [nN][oO]|[nN])
             echo "✅ Update complete (re-login post update is advised)..."
             sleep 4
-            bash -c "$HOME/.config/hyprcandy/hooks/complete.sh"
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
+    		disown
+    		exit 0
             ;;
         *)
             print_status "Logging out..."
