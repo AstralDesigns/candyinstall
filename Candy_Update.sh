@@ -10033,11 +10033,9 @@ prompt_logout() {
         [nN][oO]|[nN])
             echo "✅ Update complete (re-login post update is advised)..."
             sleep 4
-            if [ "$PANEL_CHOICE" = "waybar" ]; then
-                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
-            else
-                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
-            fi
+            bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
+            # Kill the kitty window hosting this installer session
+            kill $PPID
             ;;
         *)
             print_status "Logging out..."
