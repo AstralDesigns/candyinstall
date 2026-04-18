@@ -162,7 +162,7 @@ choose_shell() {
     echo
     
     while true; do
-        echo -e "${YELLOW}Enter your choice (1 for Fish, 2 for Zsh):${NC}"
+        echo -e "${YELLOW}Enter your choice (1 for Fish, 2 for Zsh, 3 Skip):${NC}"
         read -r shell_choice
         case $shell_choice in
             1)
@@ -175,8 +175,12 @@ choose_shell() {
                 print_status "Selected Zsh with plugins, Oh My Zsh integration and Starship configuration"
                 break
                 ;;
+			3)
+				print_status "Skipping shell selection..."
+                break
+                ;;
             *)
-                print_error "Invalid choice. Please enter 1 or 2."
+                print_error "Invalid choice. Please enter 1, 2 or 3."
                 ;;
         esac
     done
