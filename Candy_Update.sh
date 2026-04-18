@@ -10033,7 +10033,7 @@ prompt_logout() {
         [nN][oO]|[nN])
             echo "✅ Update complete (re-login post update is advised)..."
             sleep 4
-            bash -c "pkill -f floating-installer && rm -rf ~/candyinstall" 
+            bash -c "rm -rf ~/candyinstall && pkill -f kitty" 
             ;;
         *)
             print_status "Logging out..."
