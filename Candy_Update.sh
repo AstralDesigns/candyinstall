@@ -3009,9 +3009,7 @@ PINNED_FILE="$HOME/.config/pinned"
 if [ ! -f "$PINNED_FILE" ]; then
 	cat > "$PINNED_FILE" << 'EOF'
 org.gnome.Nautilus
-io.github.timasoft.hyprviz
 org.gnome.gedit
-zen
 kitty
 nwg-displays
 nwg-look
@@ -3042,6 +3040,18 @@ fi
 EOF
 
 chmod +x "$HOME/.config/hypr/scripts/xray.sh"
+
+# ═══════════════════════════════════════════════════════════════
+#               		 POST SETUP CLEANUP
+# ═══════════════════════════════════════════════════════════════
+	cat > "$HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
+#!/bin/bash
+
+bash -c "rm -rf ~/candyinstall"
+pkill -f "floating-installer"
+EOF
+
+chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
 find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
@@ -10033,7 +10043,7 @@ prompt_logout() {
         [nN][oO]|[nN])
             echo "✅ Update complete (re-login post update is advised)..."
             sleep 4
-            bash -c "rm -rf ~/candyinstall && killall kitty" 
+            bash -c "$HOME/.config/hyprcandy/hooks/complete.sh"
             ;;
         *)
             print_status "Logging out..."
