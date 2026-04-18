@@ -1052,8 +1052,8 @@ rm -rf "$UPDATE_DIR"
 git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR"
 echo "✅ Clone complete"
 
-# Folders with user-specific changes — never overwritten on update > readd later "hypr" "hyprcandy"
-SKIP_DIRS=("background" "background.png" "fastfetch" "hyprcandy")
+# Folders with user-specific changes — never overwritten on update
+SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "hyprcandydock")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -10027,13 +10027,11 @@ prompt_logout() {
     case "$reboot_choice" in
         [nN][oO]|[nN])
             echo "✅ Update complete (re-login post update is advised)..."
-            sleep 5
+            sleep 4
             if [ "$PANEL_CHOICE" = "waybar" ]; then
-                bash -c "rm -rf ~/candyinstall"
-				pkill -f floating-installer
+                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
             else
-                bash -c "rm -rf ~/candyinstall"
-				pkill -f floating-installer
+                bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
             fi
             ;;
         *)
