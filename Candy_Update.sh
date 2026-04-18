@@ -10018,6 +10018,16 @@ fi
     print_success "HyprCandy updated completed!"  
 }
 
+# Get the kitty pid hosting this session
+get_kitty_pid() {
+    local pid=$$
+    while [ "$pid" -gt 1 ]; do
+        local comm=$(ps -o comm= -p "$pid" 2>/dev/null)
+        [ "$comm" = "kitty" ] && echo "$pid" && return
+        pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+    done
+}
+
 # Function to prompt for session restart
 prompt_logout() {
     echo
@@ -10033,9 +10043,10 @@ prompt_logout() {
         [nN][oO]|[nN])
             echo "✅ Update complete (re-login post update is advised)..."
             sleep 4
-            bash -c "rm -rf ~/candyinstall && pkill -f floating-installer"
+            bash -c "rm -rf ~/candyinstall" # && pkill -f floating-installer
             # Kill the kitty window hosting this installer session
-            kill $PPID
+            local kitty_pid=$(get_kitty_pid)
+    		[ -n "$kitty_pid" ] && kill "$kitty_pid"
             ;;
         *)
             print_status "Logging out..."
