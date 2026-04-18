@@ -1052,8 +1052,8 @@ rm -rf "$UPDATE_DIR"
 git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR"
 echo "✅ Clone complete"
 
-# Folders with user-specific changes — never overwritten on update > readd later "hypr" "hyprcandy" "waybar"
-SKIP_DIRS=("background" "background.png" "fastfetch")
+# Folders with user-specific changes — never overwritten on update > readd later "hypr" "hyprcandy"
+SKIP_DIRS=("background" "background.png" "fastfetch" "hyprcandy")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -1064,13 +1064,13 @@ for dir in "${SKIP_DIRS[@]}"; do
 done
 
 # Backup hyprcandy-bar config before rsync overwrites it
-BAR_CONF="$HOME/.config/hyprcandy/hyprcandy-bar.conf"
-BAR_CONF_BAK="$HOME/.config/hyprcandy-bar.conf.bak"
+#BAR_CONF="$HOME/.config/hyprcandy/hyprcandy-bar.conf"
+#BAR_CONF_BAK="$HOME/.config/hyprcandy-bar.conf.bak"
 
-if [ -f "$BAR_CONF" ]; then
-    cp "$BAR_CONF" "$BAR_CONF_BAK"
-    echo "🔒 Backed up hyprcandy-bar.conf"
-fi
+#if [ -f "$BAR_CONF" ]; then
+#    cp "$BAR_CONF" "$BAR_CONF_BAK"
+#    echo "🔒 Backed up hyprcandy-bar.conf"
+#fi
 
 # rsync: copy everything from the update clone into the live dotfiles dir,
 # skipping the protected folders. Stow symlinks already point here so the
@@ -1083,18 +1083,18 @@ rsync -a --delete \
 echo "✅ Update merged"
 
 # Restore hyprcandy-bar config and remove backup
-if [ -f "$BAR_CONF_BAK" ]; then
-    cp "$BAR_CONF_BAK" "$BAR_CONF"
-    rm "$BAR_CONF_BAK"
-    echo "🔓 Restored hyprcandy-bar.conf and removed backup"
-fi
+#if [ -f "$BAR_CONF_BAK" ]; then
+#    cp "$BAR_CONF_BAK" "$BAR_CONF"
+#    rm "$BAR_CONF_BAK"
+#    echo "🔓 Restored hyprcandy-bar.conf and removed backup"
+#fi
 
 # Clean up temp clone
 rm -rf "$UPDATE_DIR"
 echo "🗑️  Cleaned up temporary update directory"
 
 # Link .hyprcandy/.config/wal to .config
-ln -sf "$HOME/.hyprcandy/.config/wal/" "$HOME/.config/"
+#ln -sf "$HOME/.hyprcandy/.config/wal/" "$HOME/.config/"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
