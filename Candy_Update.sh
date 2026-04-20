@@ -1103,7 +1103,7 @@ echo "🗑️  Cleaned up temporary update directory"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
-mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/mako" "$HOME/.config/pypr" 
+mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/pypr" 
 
 ### 🪧 Setup Hyprland config
 cat > "$HOME/.config/hypr/hyprland.conf" << 'EOF'
