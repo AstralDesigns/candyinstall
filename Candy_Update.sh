@@ -1105,131 +1105,46 @@ echo "🗑️  Cleaned up temporary update directory"
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/mako" "$HOME/.config/pypr" 
 
-### 🪧 Setup mako config
-cat > "$HOME/.config/mako/config" << 'EOF'
-# Mako Configuration with Material You Colors
-# Colors directly embedded (since include might not work)
+### 🪧 Setup Hyprland config
+cat > "$HOME/.config/hypr/hyprland.conf" << 'EOF'
+# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      █████╗ ███╗   ██╗██████╗ 
+# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔══██╗████╗  ██║██╔══██╗
+# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ███████║██╔██╗ ██║██║  ██║
+# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██╔══██║██║╚██╗██║██║  ██║
+# ██║  ██║   ██║   ██║     ██║  ██║███████╗██║  ██║██║ ╚████║██████╔╝
+# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  
 
-# Default notification appearance
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-progress-color=#000000
+#[IMPORTANT]#
+#Any changes made to this file will be overwritten if you rerun the install script for updates or config restoration
+#Make changes to Hyprland in the "custom.conf" file found in "~/.config/hyprcustom/"
+#Make changes to Hyprlock in the "custom_lock.conf" file found in "~/.config/hyprcustom/"
+#Make changes or additions to keybinds in the "custom_keybinds.conf" file found in "~/.config/hyprcustom/"
+#[IMPORTANT]# 
 
-# Notification positioning and layout
-anchor=top-right
-margin=15,15,0,0
-padding=15,20
-border-size=2
-border-radius=16
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                         Keybindings                         ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-# Typography
-font=FantasqueSansM Nerd Font Propo Italic 10
-markup=1
-format=<b>%s</b>\n%b
+source = ~/.config/hyprcustom/custom_keybinds.conf
 
-# Notification dimensions
-width=240
-height=120
-max-visible=1
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Monitors                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-# Behavior
-default-timeout=3000
-ignore-timeout=0
-group-by=app-name
-sort=-time
+#source = ~/.config/hypr/monitors.conf
 
-# Icon settings
-icon-path=/usr/share/icons/Papirus-Dark
-max-icon-size=20
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                        Hyprland-colors                      ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-# Urgency levels with Material You colors
-[urgency=low]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-default-timeout=3000
+source = ~/.config/hypr/colors.conf
+source = ~/.cache/wal/colors-hyprland.conf
 
-[urgency=normal]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-default-timeout=5000
-
-[urgency=critical]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-default-timeout=0
-
-# App-specific styling
-[app-name=Spotify]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-
-[app-name=Discord]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-
-[app-name="Volume Control"]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-progress-color=#000000
-
-[app-name="Brightness Control"]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-progress-color=#000000
-
-# Network notifications
-[app-name="NetworkManager"]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-
-# Battery notifications
-[app-name="Power Management"]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-
-[app-name="Power Management" urgency=critical]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-
-# System notifications
-[app-name="System"]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-
-# Screenshot notifications
-[app-name="Screenshot"]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-
-# Media player notifications
-[category=media]
-background-color=#432a00
-text-color=#ffffff
-border-color=#edbf80
-default-timeout=3000
-
-# Animation and effects
-on-button-left=dismiss
-on-button-middle=none
-on-button-right=dismiss-all
-on-touch=dismiss
-
-# Layer shell settings (for Wayland compositors)
-layer=overlay
-anchor=top-right
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                            Config                           ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+# = Source for hyprviz
+source = ./hyprviz.conf
 EOF
 
 # ═══════════════════════════════════════════════════════════════
