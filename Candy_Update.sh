@@ -9946,11 +9946,7 @@ fi
     print_success "HyprCandy updated completed!"  
 }
 
-# Logout function to prompt for session restart
-signal_qs_rescan() {
-    touch "$HOME/.config/hyprcandy/qs-rescan-updates"
-}
-
+# Function to prompt for session restart
 prompt_logout() {
     echo
     print_success "Installation and configuration completed!"
@@ -9967,9 +9963,10 @@ prompt_logout() {
             sleep 4
             nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
             disown
-            # Signal Quickshell to immediately rescan updates, then close this
-            # kitty floating-installer window (Quickshell will pkill it).
-            signal_qs_rescan
+            # Signal Quickshell to immediately rescan updates and close this
+            # floating-installer kitty window.
+            mkdir -p "$HOME/.config/hyprcandy"
+            touch "$HOME/.config/hyprcandy/qs-rescan-updates"
             exit 0
             ;;
         *)
