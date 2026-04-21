@@ -1048,14 +1048,15 @@ setup_hyprcandy() {
 
     print_status "Updating HyprCandy configuration..."
 
-UPDATE_DIR="$HOME/.hyprcandy-update"
+UPDATE_DIR="$HOME/.HCUpdates"
 HYPRCANDY_DIR="$HOME/.hyprcandy"
 
-# Clone fresh copy into temp dir
-echo "🌐 Cloning latest HyprCandy into temporary directory..."
-rm -rf "$UPDATE_DIR"
-git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR"
-echo "✅ Clone complete"
+if [ ! -d "$UPDATE_DIR" ]; then
+	# Clone fresh copy into store dir
+	echo "🌐 Cloning latest HyprCandy into temporary directory..."
+	git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$UPDATE_DIR"
+	echo "✅ Clone complete"
+fi
 
 # Folders with user-specific changes — never overwritten on update
 SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "hyprcandydock")
@@ -1095,8 +1096,8 @@ echo "✅ Update merged"
 #fi
 
 # Clean up temp clone
-rm -rf "$UPDATE_DIR"
-echo "🗑️  Cleaned up temporary update directory"
+#rm -rf "$UPDATE_DIR"
+#echo "🗑️  Cleaned up temporary update directory"
 
 # Link .hyprcandy/.config/wal to .config
 #ln -sf "$HOME/.hyprcandy/.config/wal/" "$HOME/.config/"
