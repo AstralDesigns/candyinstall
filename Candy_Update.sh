@@ -1147,6 +1147,8 @@ source = ~/.cache/wal/colors-hyprland.conf
 source = ./hyprviz.conf
 EOF
 
+hyprctl reload
+
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Increase Script
 # ═══════════════════════════════════════════════════════════════
