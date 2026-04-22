@@ -9963,13 +9963,7 @@ prompt_logout() {
             sleep 4
             nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
             disown
-            # Signal Quickshell to immediately rescan updates
-            mkdir -p "$HOME/.config/hyprcandy"
-            touch "$HOME/.config/hyprcandy/qs-rescan-updates"
-            # Kill the top-level shell so kitty closes cleanly.
-            # 'exit 0' only exits the subshell; 'kill $$' kills the PID
-            # that kitty is actually waiting on.
-            kill $$
+            pkill -f "floating-installer"
             ;;
         *)
             print_status "Logging out..."
