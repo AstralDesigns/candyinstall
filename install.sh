@@ -5514,7 +5514,7 @@ pgrep -x awww-daemon > /dev/null 2>&1 || awww-daemon &
 sleep 1
 # Wait for awww-daemon socket — it may still be starting up
 RETRIES=10
-until awww query &>/dev/null || [ $RETRIES -eq 0 ]; do
+until timeout 2 awww query &>/dev/null || [ $RETRIES -eq 0 ]; do
     sleep 1
     (( RETRIES-- ))
 done
@@ -5533,7 +5533,7 @@ sudo systemctl enable switcheroo-control
 sudo systemctl enable bluetooth
 echo "✅ Services set..."
 
-if awww query &>/dev/null; then
+if timeout 2 awww query &>/dev/null; then
   	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
     bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
@@ -5566,12 +5566,12 @@ fi
     fi
 
 # Only create sentinel if xray is actually on in the running config
-XRAY_STATE=$(hyprctl getoption decoration:blur:xray -j 2>/dev/null | jq -r '.int // .value // 0')
-if [ "$XRAY_STATE" = "1" ]; then
-    touch "$HOME/.config/hyprcandy/settings/xray-on"
-else
-    rm -f "$HOME/.config/hyprcandy/settings/xray-on"
-fi
+#XRAY_STATE=$(hyprctl getoption decoration:blur:xray -j 2>/dev/null | jq -r '.int // .value // 0')
+#if [ "$XRAY_STATE" = "1" ]; then
+    #touch "$HOME/.config/hyprcandy/settings/xray-on"
+#else
+    #rm -f "$HOME/.config/hyprcandy/settings/xray-on"
+#fi
 
     print_success "HyprCandy configuration setup completed!"  
 }
