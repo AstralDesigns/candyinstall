@@ -1164,7 +1164,27 @@ fi
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
-mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/pypr" 
+mkdir -p "$HOME/.config/custom" "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/pypr"
+
+# ═══════════════════════════════════════════════════════════════
+#                    	User Settings File
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$HOME/.config/custom/custom.conf" << 'EOF'
+#  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
+# ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
+# ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
+# ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
+# ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
+#  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                          User Settings                      ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+# [NOTE!!] Your personal settings added here are sourced in hyprland.conf. 
+# You can also extend the sourcing to more custom folders as well if you 
+# wish to be modular and not stack everythingin this single file e.g
+# create ~/.config/custom/keybinds.conf and source it in this file.
+EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Increase Script
@@ -3222,16 +3242,15 @@ setup_custom_config() {
           if [ "$PANEL_CHOICE" = "waybar" ]; then
  # Add default content to the custom.conf file
             cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
-# ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
-#██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
-#██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
-#██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
-#╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
-# ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
+#  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
+# ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
+# ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
+# ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
+# ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
+#  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
 
 #[IMPORTANT]#
-# Add custom settings at the very end of the file.
-# This "hypr" folder is backed up on updates so you can copy you "userprefs" from the hyprviz.conf backup to the new file
+# Add custom settings to "$HOME/.config/custom/custom.conf".
 #[IMPORTANT]#
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
