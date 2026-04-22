@@ -1872,14 +1872,13 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 
 cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
-set +e
+#set +e
 
 # Update ROFI background 
 ROFI_RASI="$HOME/.config/rofi/colors.rasi"
 
 if command -v sed >/dev/null; then
     sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
-    echo "Rofi color updated"
 fi
 
 # Update local background.png
@@ -1913,14 +1912,14 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
             WP_FILENAME="${WP_FILENAME%.*}.jpg"
             sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
             sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
-            echo "🔄 Converted webp → $WP_FILENAME"
+            #echo "🔄 Converted webp → $WP_FILENAME"
         else
             sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
             sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
         fi
 
         sudo sed -i "s|^Background=.*|Background=\"Backgrounds/$WP_FILENAME\"|" "$SDDM_CONF"
-        echo "🖥️  SDDM background updated → Backgrounds/$WP_FILENAME"
+        #echo "🖥️  SDDM background updated → Backgrounds/$WP_FILENAME"
     fi
 
     # ── BackgroundColor from inverse_primary in colors.css ───────────────────
@@ -1931,7 +1930,7 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
 
         if [[ -n "$FULL_HEX" ]]; then
             sudo sed -i "s|^BackgroundColor=.*|BackgroundColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
-            echo "🎨 SDDM BackgroundColor updated → #$FULL_HEX (from inverse_primary)"
+            #echo "🎨 SDDM BackgroundColor updated → #$FULL_HEX (from inverse_primary)"
         else
             echo "⚠️  Could not parse inverse_primary from $COLORS_CSS"
         fi
@@ -1947,7 +1946,7 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
 
         if [[ -n "$FULL_HEX" ]]; then
             sudo sed -i "s|^AccentColor=.*|AccentColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
-            echo "🎨 SDDM AccentColor updated → #$FULL_HEX (from primary_container)"
+            #echo "🎨 SDDM AccentColor updated → #$FULL_HEX (from primary_container)"
         else
             echo "⚠️  Could not parse primary_container from $COLORS_CSS"
         fi
@@ -2487,6 +2486,7 @@ EOF
 
     cat > "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" << 'EOF'
 #!/bin/bash
+
 CONFIG_BG="$HOME/.config/background"
 WP_CONFIG="$HOME/.config/wallpaper/wallpaper.ini"
 WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
@@ -2514,13 +2514,13 @@ update_config_background() {
     local bg_path="$1"
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         echo "🎨 Triggering matugen color generation..."
-        wal -i "$bg_path" -n --cols16 darken --backend haishoku --contrast 1.5 --saturate 0.2
-		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
+        wal -i "$bg_path" -n --cols16 darken --backend haishoku --contrast 1.5 --saturate 0.2 2>/dev/null
+		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
-        sleep 0.5
+        sleep 1
         "$HOOKS_DIR/update_background.sh"
-        echo "✅ Updated ~/.config/background to point to: $bg_path"
+        #echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
     else
         echo "❌ Background file not found: $bg_path"
@@ -2532,7 +2532,7 @@ main() {
     echo "🎯 Wallpaper integration triggered"
     current_bg=$(get_wallpaper_background)
     if [ $? -eq 0 ]; then
-        echo "📸 Current Waypaper background: $current_bg"
+        echo "📸 Current wallpaper background: $current_bg"
         if update_config_background "$current_bg"; then
            echo "✅ Color generation processes complete"
         fi
