@@ -1106,50 +1106,6 @@ echo "✅ Update merged"
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/pypr" 
 
-### 🪧 Setup Hyprland config
-cat > "$HOME/.config/hypr/hyprland.conf" << 'EOF'
-# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      █████╗ ███╗   ██╗██████╗ 
-# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔══██╗████╗  ██║██╔══██╗
-# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ███████║██╔██╗ ██║██║  ██║
-# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██╔══██║██║╚██╗██║██║  ██║
-# ██║  ██║   ██║   ██║     ██║  ██║███████╗██║  ██║██║ ╚████║██████╔╝
-# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  
-
-#[IMPORTANT]#
-#Any changes made to this file will be overwritten if you rerun the install script for updates or config restoration
-#Make changes to Hyprland in the "custom.conf" file found in "~/.config/hyprcustom/"
-#Make changes to Hyprlock in the "custom_lock.conf" file found in "~/.config/hyprcustom/"
-#Make changes or additions to keybinds in the "custom_keybinds.conf" file found in "~/.config/hyprcustom/"
-#[IMPORTANT]# 
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                         Keybindings                         ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hyprcustom/custom_keybinds.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Monitors                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-#source = ~/.config/hypr/monitors.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                        Hyprland-colors                      ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hypr/colors.conf
-source = ~/.cache/wal/colors-hyprland.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                            Config                           ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-# = Source for hyprviz
-source = ./hyprviz.conf
-EOF
-
-hyprctl reload
-
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Increase Script
 # ═══════════════════════════════════════════════════════════════
