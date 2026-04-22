@@ -1062,11 +1062,17 @@ setup_hyprcandy() {
         sleep 2
     fi
 
-    # Clone HyprCandy repository
-    hyprcandy_dir="$HOME/.hyprcandy"
-    echo "🌐 Cloning HyprCandy repository ..." #into $hyprcandy_dir
-    git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$hyprcandy_dir"
-    echo "✅ Cloninig complete"
+	# Clone HyprCandy repository
+	hyprcandy_dir="$HOME/.hyprcandy"
+	store_dir="$HOME/.HCUpdates"
+
+	echo "🌐 Cloning HyprCandy+ repository ..."
+	git clone --depth 1 https://github.com/AstralDesigns/HyprC-Plus.git "$hyprcandy_dir"
+	echo "✅ Cloning complete"
+
+	echo "📦 Creating update store..."
+	cp -r "$hyprcandy_dir" "$store_dir"
+	echo "✅ Updates store created"
     
     # Clone overview repository
     #overview_dir="$HOME/.config/quickshell/overview"
