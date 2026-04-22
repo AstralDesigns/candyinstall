@@ -1069,19 +1069,10 @@ for dir in "${SKIP_DIRS[@]}"; do
     EXCLUDES+=(--exclude="**/$dir/")
 done
 
-# Backup hyprcandy-bar config before rsync overwrites it
-#BAR_CONF="$HOME/.config/hyprcandy/hyprcandy-bar.conf"
-#BAR_CONF_BAK="$HOME/.config/hyprcandy-bar.conf.bak"
-
-#if [ -f "$BAR_CONF" ]; then
-#    cp "$BAR_CONF" "$BAR_CONF_BAK"
-#    echo "🔒 Backed up hyprcandy-bar.conf"
-#fi
-
 # rsync: copy everything from the update clone into the live dotfiles dir,
 # skipping the protected folders. Stow symlinks already point here so the
 # running environment picks up changes immediately — no re-stow needed.
-rsync -a --delete \
+rsync -a \
     "${EXCLUDES[@]}" \
     --exclude='.git/' \
     "$UPDATE_DIR/" "$HYPRCANDY_DIR/"
