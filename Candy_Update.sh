@@ -3094,16 +3094,15 @@ setup_custom_config() {
 
  # Add default content to the custom.conf file
 		cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
-# ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
-#██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
-#██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
-#██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
-#╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
-# ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
+#  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
+# ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
+# ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
+# ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
+# ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
+#  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
 
 #[IMPORTANT]#
-# Add custom settings at the very end of the file.
-# This "hypr" folder is backed up on updates so you can copy you "userprefs" from the hyprviz.conf backup to the new file
+# Add custom settings to "$HOME/.config/custom/custom.conf".
 #[IMPORTANT]#
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -5921,33 +5920,6 @@ EOF
 setup_hyprcandy() {
 
     print_status "Setting up HyprCandy configuration..."
-    # Backup previous default config folder if it exists
-    PREVIOUS_CONFIG_FOLDER="$HOME/.config/hypr"
-    
-    if [ ! -d "$PREVIOUS_CONFIG_FOLDER" ]; then
-        print_error "Default config folder not found: $PREVIOUS_CONFIG_FOLDER"
-        echo -e "${RED}Skipping default config backup${NC}"
-    else
-        # Remove any previous backups before creating a new one
-        rm -rf "${PREVIOUS_CONFIG_FOLDER}".backup.*
-        cp -r "$PREVIOUS_CONFIG_FOLDER" "${PREVIOUS_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
-        echo -e "${GREEN}Previous default config folder backup created${NC}"
-    fi
-    sleep 1
-    
-    # Backup previous custom config folder if it exists
-    PREVIOUS_CUSTOM_CONFIG_FOLDER="$HOME/.config/hyprcustom"
-    
-    if [ ! -d "$PREVIOUS_CUSTOM_CONFIG_FOLDER" ]; then
-        print_error "Custom config folder not found: $PREVIOUS_CUSTOM_CONFIG_FOLDER"
-        echo -e "${RED}Skipping custom config backup${NC}"
-    else
-        # Remove any previous backups before creating a new one
-        rm -rf "${PREVIOUS_CUSTOM_CONFIG_FOLDER}".backup.*
-        cp -r "$PREVIOUS_CUSTOM_CONFIG_FOLDER" "${PREVIOUS_CUSTOM_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
-        echo -e "${GREEN}Previous custom config folder backup created${NC}"
-    fi
-    sleep 1
 
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
