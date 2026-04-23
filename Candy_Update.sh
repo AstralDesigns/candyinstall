@@ -1018,13 +1018,13 @@ setup_hyprcandy() {
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         if pacman -Qi sddm &>/dev/null; then
-            $AUR_HELPER -R --noconfirm swww
-			$AUR_HELPER -R --noconfirm qt6ct-kde
-			$AUR_HELPER -R --noconfirm wlogout
-			$AUR_HELPER -R --noconfirm waybar
-			$AUR_HELPER -R --noconfirm waypaper
-			$AUR_HELPER -R --noconfirm waypaper-git
-            #$AUR_HELPER -S --noconfirm python-pywal16 python-haishoku
+            #$AUR_HELPER -R --noconfirm swww
+			#$AUR_HELPER -R --noconfirm qt6ct-kde
+			#$AUR_HELPER -R --noconfirm wlogout
+			#$AUR_HELPER -R --noconfirm waybar
+			#$AUR_HELPER -R --noconfirm waypaper
+			#$AUR_HELPER -R --noconfirm waypaper-git
+            $AUR_HELPER -S --noconfirm python-colorthief
             print_status "Installed SDDM packages"
         else
             echo ""
