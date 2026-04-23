@@ -4796,17 +4796,17 @@ prompt_logout() {
     echo -e "${YELLOW}Would you like to logout now? (y/N)${NC}"
     read -r reboot_choice
     case "$reboot_choice" in
-        [nN][oO]|[nN])
-            echo "✅ Update complete (re-login post update is advised)..."
-            sleep 4
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
-            return 0
-            ;;
-        *)
+        [yY][eE][sS]|[yY])
             print_status "Logging out..."
             bash -c "rm -rf ~/candyinstall"
             sleep 0.5
             loginctl terminate-user $USER
+            ;;
+        *)
+            echo "✅ Update complete (re-login post update is advised)..."
+            sleep 4
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
+            return 0
             ;;
     esac
 }
