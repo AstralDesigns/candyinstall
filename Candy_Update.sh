@@ -4803,8 +4803,6 @@ prompt_logout() {
             loginctl terminate-user $USER
             ;;
         *)
-            echo "✅ Update complete (re-login post update is advised)..."
-            sleep 4
             nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
             return 0
             ;;
