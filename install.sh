@@ -329,7 +329,6 @@ build_package_list() {
         
         # System utilities
 		"switcheroo-control"
-        "blueman"
         "nwg-displays"
         "uwsm"
         "quickshell-git"
