@@ -49,7 +49,7 @@ show_ascii_art() {
     echo
     # Decorative line with gradient
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
-    echo -e "${WHITE}                    		HyprCandy Update!${NC}"
+    echo -e "${WHITE}                    HyprCandy Update!${NC}"
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
     echo
 }
@@ -156,7 +156,7 @@ choose_browser() {
 
 # Function to choose shell
 choose_shell() {
-    echo -e "${CYAN}Choose your shell (you can rerun the script to switch or regenerate HyprCandy's default shell setup):${NC}"
+    echo -e "${CYAN}Switch shell or${NC} ${GREEN}Skip${NC} ${CYAN}(This can also regenerate HyprCandy's default shell setup):${NC}"
     echo "1) Fish - A modern shell with builtin fzf search, intelligent autosuggestions and syntax highlighting (Fisher plugins + Starship prompt)"
     echo "2) Zsh - Powerful shell with extensive customization (Zsh plugins + Oh My Zsh + Starship prompt)"
 	echo "3) Skip shell selection"
@@ -4793,9 +4793,7 @@ prompt_logout() {
     print_status "All packages have been installed and Hyprcandy configurations have been deployed."
     print_status "The $DISPLAY_MANAGER display manager has been enabled."
     echo
-    print_warning "To ensure all changes take effect properly session restart is recommended."
-    echo
-    echo -e "${YELLOW}Would you like to logout now? (n/Y)${NC}"
+    echo -e "${YELLOW}Would you like to logout now? (y/N)${NC}"
     read -r reboot_choice
     case "$reboot_choice" in
         [nN][oO]|[nN])
@@ -9877,7 +9875,7 @@ main() {
     # Show multicolored ASCII art
     show_ascii_art
     
-    print_status "This script will backup the current hypr, hyprcustom, and hyprcandy folders then update your dotfiles"
+    #print_status "This script will backup the current hypr, hyprcustom, and hyprcandy folders then update your dotfiles"
     
     # Choose display manager first
     #choose_display_manager
