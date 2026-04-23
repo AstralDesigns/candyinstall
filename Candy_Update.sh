@@ -4816,7 +4816,7 @@ main() {
     # Show multicolored ASCII art
     show_ascii_art
     
-    print_status "This script will backup the current hypr, hyprcustom, and hyprcandy folders then update your dotfiles"
+    #print_status "This script will backup the current hypr, hyprcustom, and hyprcandy folders then update your dotfiles"
     
     # Choose display manager first
     #choose_display_manager
