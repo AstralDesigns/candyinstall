@@ -2932,50 +2932,17 @@ else
 	echo ""
 fi
 
-# ═══════════════════════════════════════════════════════════════
-#               		  	WALLPAPER
-# ═══════════════════════════════════════════════════════════════
-	cat > "$HOME/.config/hypr/scripts/xray.sh" << 'EOF'
-#!/bin/bash
-HYPR="$HOME/.config/hypr/hyprviz.conf"
-XRAY="$HOME/.config/hyprcandy/settings/xray-on"
-if [ ! -f "$XRAY" ]; then
-    sed -i "s/xray = false/xray = true/" "$HYPR"
-    sed -i "s/xray off/xray on/" "$HYPR"
-    hyprctl reload
-    touch "$XRAY"
-else
-    sed -i "s/xray = true/xray = false/" "$HYPR"
-    sed -i "s/xray on/xray off/" "$HYPR"
-    hyprctl reload
-    rm "$XRAY"
-fi
-EOF
-
-chmod +x "$HOME/.config/hypr/scripts/xray.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#               		 POST SETUP CLEANUP
-# ═══════════════════════════════════════════════════════════════
-	cat > "$HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
-#!/bin/bash
-
-bash -c "rm -rf ~/candyinstall"
-pkill -f "floating-installer"
-EOF
-
-chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
-find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
-chmod +x "$HOME/.config/quickshell/candylock/auth.sh"
-chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
-chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
-mkdir -p "$HOME/.cache/quickshell/overview"
-mkdir -p "$HOME/.cache/quickshell/wallpaper"
+#find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
+#find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
+#find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
+#find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
+#find "$HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
+#find "$HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
+#chmod +x "$HOME/.config/quickshell/candylock/auth.sh"
+#chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
+#chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
+#mkdir -p "$HOME/.cache/quickshell/overview"
+#mkdir -p "$HOME/.cache/quickshell/wallpaper"
 
     # 🛠️ GNOME Window Button Layout Adjustment
     echo
