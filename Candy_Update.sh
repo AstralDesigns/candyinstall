@@ -998,7 +998,7 @@ setup_hyprcandy() {
 			#$AUR_HELPER -R --noconfirm waybar
 			#$AUR_HELPER -R --noconfirm waypaper
 			#$AUR_HELPER -R --noconfirm python-haishoku
-            #$AUR_HELPER -S --noconfirm python-colorthief
+            $AUR_HELPER -S --noconfirm qt6-imageformats
             print_status "Dependencies are up to date"
         else
             echo ""
