@@ -997,9 +997,9 @@ setup_hyprcandy() {
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
 			#$AUR_HELPER -R --noconfirm waypaper
-			$AUR_HELPER -R --noconfirm python-haishoku
-            $AUR_HELPER -S --noconfirm python-colorthief
-            print_status "Installed SDDM packages"
+			#$AUR_HELPER -R --noconfirm python-haishoku
+            #$AUR_HELPER -S --noconfirm python-colorthief
+            print_status "Dependencies are up to date"
         else
             echo ""
         fi
