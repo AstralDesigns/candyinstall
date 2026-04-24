@@ -4725,13 +4725,10 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 else
     systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
 fi
-
-echo "Enabling switcheroo service for the HyprCandy-dock gpu detection..."
-sudo systemctl enable --now switcheroo-control &>/dev/null
-echo "✅ Service set"
+echo "✅ Services restarted"
 
 if awww query &>/dev/null; then
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>/dev/null
     echo "✅ Initial background set"
 else
     echo "⚠️  awww-daemon not ready — background not set"
