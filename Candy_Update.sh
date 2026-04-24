@@ -2902,6 +2902,11 @@ mkdir -p "$HOME/.cache/quickshell/wallpaper"
     else
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
+}
+
+# Function to enable display manager and prompt for reboot
+enable_display_manager() {
+    print_status "Enabling $DISPLAY_MANAGER display manager..."
 
 	# 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
@@ -2947,12 +2952,7 @@ printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudo
 sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
-}
-
-# Function to enable display manager and prompt for reboot
-enable_display_manager() {
-    print_status "Enabling $DISPLAY_MANAGER display manager..."
-    
+	
     # Disable other display managers first
     print_status "Disabling other display managers..."
     sudo systemctl disable lightdm 2>/dev/null || true
