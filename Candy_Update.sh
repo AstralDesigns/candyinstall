@@ -4601,7 +4601,7 @@ fi
 echo "✅ Services restarted"
 
 if awww query &>/dev/null; then
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>/dev/null
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>&1
     echo "✅ Initial background set"
 else
     echo "⚠️  awww-daemon not ready — background not set"
@@ -4635,12 +4635,12 @@ prompt_logout() {
     case "$reboot_choice" in
         [yY][eE][sS]|[yY])
             print_status "Logging out..."
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>/dev/null
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>&1
             sleep 0.5
             loginctl terminate-user $USER
             ;;
         *)
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>/dev/null
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>&1
             return 0
             ;;
     esac
