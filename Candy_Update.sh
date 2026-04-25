@@ -49,7 +49,7 @@ show_ascii_art() {
     echo
     # Decorative line with gradient
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
-    echo -e "${WHITE}                    HyprCandy Update!${NC}"
+    echo -e "${WHITE}                                    HyprCandy Update!${NC}"
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
     echo
 }
