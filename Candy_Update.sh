@@ -4884,7 +4884,7 @@ prompt_logout() {
     case "$reboot_choice" in
         [yY][eE][sS]|[yY])
             print_status "Logging out..."
-            bash -c "rm -rf ~/candyinstall"
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
             sleep 0.5
             loginctl terminate-user $USER
             ;;
