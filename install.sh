@@ -5568,26 +5568,26 @@ echo "✅ Services set..."
 if timeout 2 awww query &>/dev/null; then
   	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" > /dev/null 2>&1 &
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>/dev/null
     echo "✅ Initial background set"
 	sleep 0.5
-	qs -c bar > /dev/null 2>&1 &
-	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" > /dev/null 2>&1 &
-	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" > /dev/null 2>&1 &
-	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > /dev/null 2>&1 &
+	qs -c bar > /dev/null 2>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" 2>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" 2>/dev/null
+	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" 2>/dev/null
 else
     echo "Setting background..."
 	awww-daemon
 	sleep 1
 	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
-	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" > /dev/null 2>&1 &
+	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>/dev/null
     echo "✅ Initial background set"
 	sleep 0.5
-	qs -c bar > /dev/null 2>&1 &
-	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" > /dev/null 2>&1 &
-	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" > /dev/null 2>&1 &
-	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > /dev/null 2>&1 &
+	qs -c bar > /dev/null 2>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" 2>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" 2>/dev/null
+	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" 2>/dev/null
 fi
 
     # 🔄 Reload Hyprland
@@ -5629,13 +5629,13 @@ prompt_reboot() {
         [nN][oO]|[nN])
             echo "✅ Installation complete (reboot post install is advised)..."
             sleep 4
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>/dev/null
             return 0
             ;;
         *)
             print_status "Restarting system..."
             sleep 2
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>/dev/null
 			sleep 0.5
 			systemctl reboot
             ;;
