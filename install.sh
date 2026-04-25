@@ -50,7 +50,7 @@ show_ascii_art() {
     echo
     # Decorative line with gradient
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
-    echo -e "${WHITE}                      Welcome to the HyprCandy Installer!${NC}"
+    echo -e "${WHITE}                           Welcome to the HyprCandy Installer!${NC}"
     echo -e "${PURPLE}════════════════════${MAGENTA}════════════════════${CYAN}════════════════════${YELLOW}═════════${NC}"
     echo
 }
