@@ -1141,6 +1141,9 @@ rsync -a \
 
 echo "✅ Update merged"
 
+# Remove legacy waybar folder
+rm -rf "$HOME/.hyprcandy/.config/waybar" "$HOME/.config/waybar"
+
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/hyprcandy/scripts" "$HOME/.config/systemd/user" "$HOME/.config/pypr" 
