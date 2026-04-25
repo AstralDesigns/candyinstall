@@ -3038,6 +3038,7 @@ fi
     #else
         #echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     #fi
+	
 # 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
     sudo rm -f /etc/sudoers.d/hyprcandy-background
@@ -3046,7 +3047,8 @@ USERNAME=$(whoami)
 
 # Create the sudoers entries for background script and required commands
 SUDOERS_ENTRIES=(
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/cp -r /home/$USERNAME/.icons/* /usr/share/icons/"
+	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Background=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BackgroundColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^AccentColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
@@ -3082,6 +3084,11 @@ printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudo
 sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
+	
+# Add custom cursors to /usr/share/icons 
+echo "🔄 Adding custom cursors..."
+sudo cp -r "$HOME"/.icons/* /usr/share/icons/
+echo "✅ Cursors updated."
 }
 
 # Function to enable display manager and prompt for reboot
