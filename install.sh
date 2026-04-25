@@ -5568,20 +5568,26 @@ echo "✅ Services set..."
 if timeout 2 awww query &>/dev/null; then
   	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>&1 &
     echo "✅ Initial background set"
 	sleep 0.5
 	qs -c bar >/dev/null 2>&1 &
+	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" 2>&1 &
+	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" 2>&1 &
+	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" 2>&1 &
 else
     echo "Setting background..."
 	awww-daemon
 	sleep 1
 	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
-	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>&1 &
     echo "✅ Initial background set"
 	sleep 0.5
 	qs -c bar >/dev/null 2>&1 &
+	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" 2>&1 &
+	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" 2>&1 &
+	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" 2>&1 &
 fi
 
     # 🔄 Reload Hyprland
@@ -5624,8 +5630,7 @@ prompt_reboot() {
             echo "✅ Installation complete (reboot post install is advised)..."
             sleep 4
             nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
-    		disown
-    		exit 0
+            return 0
             ;;
         *)
             print_status "Restarting system..."
