@@ -4842,7 +4842,7 @@ fi
 echo "✅ Services restarted"
 
 if awww query &>/dev/null; then
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>/dev/null
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" > /dev/null 2>&1 &
     echo "✅ Initial background set"
 else
     echo "⚠️  awww-daemon not ready — background not set"
