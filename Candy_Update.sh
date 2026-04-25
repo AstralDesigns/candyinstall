@@ -4637,183 +4637,8 @@ chmod +x "$HOME/.hyprcandy/GJS/candy-daemon.js"
 echo "✅ Files and Apps setup complete"
 }
 
-# Function to setup keyboard layout
-setup_keyboard_layout() {
-    # Keyboard layout selection
-    echo
-    print_status "Keyboard Layout Configuration"
-    echo "Select your keyboard layout (this will be applied to Hyprland):"
-    echo "1) us - United States (default)"
-    echo "2) gb - United Kingdom"
-    echo "3) de - Germany"
-    echo "4) fr - France"
-    echo "5) es - Spain"
-    echo "6) it - Italy"
-    echo "7) cn - China"
-    echo "8) ru - Russia"
-    echo "9) jp - Japan"
-    echo "10) kr - South Korea"
-    echo "11) ar - Arabic"
-    echo "12) il - Israel"
-    echo "13) in - India"
-    echo "14) tr - Turkey"
-    echo "15) uz - Uzbekistan"
-    echo "16) br - Brazil"
-    echo "17) no - Norway"
-    echo "18) pl - Poland"
-    echo "19) nl - Netherlands"
-    echo "20) se - Sweden"
-    echo "21) fi - Finland"
-    echo "22) custom - Enter your own layout code"
-    echo
-    echo -e "${CYAN}Note: For other countries not listed above, use option 22 (custom)${NC}"
-    echo -e "${CYAN}Common examples: 'dvorak', 'colemak', 'ca' (Canada), 'au' (Australia), etc.${NC}"
-    echo
-    
-    KEYBOARD_LAYOUT="us"  # Default layout
-    
-    while true; do
-        echo -e "${YELLOW}Enter your choice (1-22, or press Enter for default 'us'):${NC}"
-        read -r layout_choice
-        
-        # If empty input, use default
-        if [ -z "$layout_choice" ]; then
-            layout_choice=1
-        fi
-        
-        case $layout_choice in
-            1)
-                KEYBOARD_LAYOUT="us"
-                print_status "Selected: United States (us)"
-                break
-                ;;
-            2)
-                KEYBOARD_LAYOUT="gb"
-                print_status "Selected: United Kingdom (gb)"
-                break
-                ;;
-            3)
-                KEYBOARD_LAYOUT="de"
-                print_status "Selected: Germany (de)"
-                break
-                ;;
-            4)
-                KEYBOARD_LAYOUT="fr"
-                print_status "Selected: France (fr)"
-                break
-                ;;
-            5)
-                KEYBOARD_LAYOUT="es"
-                print_status "Selected: Spain (es)"
-                break
-                ;;
-            6)
-                KEYBOARD_LAYOUT="it"
-                print_status "Selected: Italy (it)"
-                break
-                ;;
-            7)
-                KEYBOARD_LAYOUT="cn"
-                print_status "Selected: China (cn)"
-                break
-                ;;
-            8)
-                KEYBOARD_LAYOUT="ru"
-                print_status "Selected: Russia (ru)"
-                break
-                ;;
-            9)
-                KEYBOARD_LAYOUT="jp"
-                print_status "Selected: Japan (jp)"
-                break
-                ;;
-            10)
-                KEYBOARD_LAYOUT="kr"
-                print_status "Selected: South Korea (kr)"
-                break
-                ;;
-            11)
-                KEYBOARD_LAYOUT="ar"
-                print_status "Selected: Arabic (ar)"
-                break
-                ;;
-            12)
-                KEYBOARD_LAYOUT="il"
-                print_status "Selected: Israel (il)"
-                break
-                ;;
-            13)
-                KEYBOARD_LAYOUT="in"
-                print_status "Selected: India (in)"
-                break
-                ;;
-            14)
-                KEYBOARD_LAYOUT="tr"
-                print_status "Selected: Turkey (tr)"
-                break
-                ;;
-            15)
-                KEYBOARD_LAYOUT="uz"
-                print_status "Selected: Uzbekistan (uz)"
-                break
-                ;;
-            16)
-                KEYBOARD_LAYOUT="br"
-                print_status "Selected: Brazil (br)"
-                break
-                ;;
-            17)
-                KEYBOARD_LAYOUT="no"
-                print_status "Selected: Norway (no)"
-                break
-                ;;
-            18)
-                KEYBOARD_LAYOUT="pl"
-                print_status "Selected: Poland (pl)"
-                break
-                ;;
-            19)
-                KEYBOARD_LAYOUT="nl"
-                print_status "Selected: Netherlands (nl)"
-                break
-                ;;
-            20)
-                KEYBOARD_LAYOUT="se"
-                print_status "Selected: Sweden (se)"
-                break
-                ;;
-            21)
-                KEYBOARD_LAYOUT="fi"
-                print_status "Selected: Finland (fi)"
-                break
-                ;;
-            22)
-                echo -e "${YELLOW}Enter your custom keyboard layout code (e.g., 'dvorak', 'colemak', 'ca', 'au'):${NC}"
-                read -r custom_layout
-                if [ -n "$custom_layout" ]; then
-                    KEYBOARD_LAYOUT="$custom_layout"
-                    print_status "Selected: Custom layout ($custom_layout)"
-                    break
-                else
-                    print_error "Custom layout cannot be empty. Please try again."
-                fi
-                ;;
-            *)
-                print_error "Invalid choice. Please enter a number between 1-22."
-                ;;
-        esac
-    done
-    
-        # Apply the keyboard layout to the custom.conf file
-    CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-    
-    if [ -f "$CUSTOM_CONFIG_FILE" ]; then
-        sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$CUSTOM_CONFIG_FILE"
-        print_status "Keyboard layout '$KEYBOARD_LAYOUT' has been applied to custom.conf"
-    else
-        print_error "Custom config file not found at $CUSTOM_CONFIG_FILE"
-        print_error "Please run setup_custom_config() first"
-    fi
+# Function to finalize updated setup
+finalize_setup() {
 
 # WAYLAND_DISPLAY is inherited from the Hyprland session when called correctly.
 # If somehow unset, derive it from the running compositor socket.
@@ -4842,7 +4667,7 @@ fi
 echo "✅ Services restarted"
 
 if awww query &>/dev/null; then
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" > /dev/null 2>&1 &
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" 2>/dev/null
     echo "✅ Initial background set"
 else
     echo "⚠️  awww-daemon not ready — background not set"
@@ -4861,14 +4686,6 @@ fi
         echo "⚠️  'hyprctl' not found. Skipping Hyprland reload. Run 'hyprctl reload' on next start and Hyprland login."
     fi
 
-	# Only create sentinel if xray is actually on in the running config
-XRAY_STATE=$(hyprctl getoption decoration:blur:xray -j 2>/dev/null | jq -r '.int // .value // 0')
-if [ "$XRAY_STATE" = "1" ]; then
-    touch "$HOME/.config/hyprcandy/settings/xray-on"
-else
-    rm -f "$HOME/.config/hyprcandy/settings/xray-on"
-fi
-
     print_success "HyprCandy updated completed!"  
 }
 
@@ -4884,12 +4701,12 @@ prompt_logout() {
     case "$reboot_choice" in
         [yY][eE][sS]|[yY])
             print_status "Logging out..."
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>/dev/null
             sleep 0.5
             loginctl terminate-user $USER
             ;;
         *)
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" 2>/dev/null
             return 0
             ;;
     esac
@@ -4945,10 +4762,10 @@ main() {
     update_custom
 
     # Setup GJS
-    setup_gjs
+    #setup_gjs
     
-    # Setup keyboard layout
-    setup_keyboard_layout
+    # Finalize setup requirements
+    finalize_setup
     
     # Configuration management tips
     echo
