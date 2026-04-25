@@ -5635,7 +5635,7 @@ prompt_reboot() {
         *)
             print_status "Restarting system..."
             sleep 2
-            bash -c "rm -rf ~/candyinstall"
+            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh" > /dev/null 2>&1 &
 			sleep 0.5
 			systemctl reboot
             ;;
