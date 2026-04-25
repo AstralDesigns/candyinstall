@@ -3016,6 +3016,18 @@ else
 	echo ""
 fi
 
+# ═══════════════════════════════════════════════════════════════
+#               		 POST SETUP CLEANUP
+# ═══════════════════════════════════════════════════════════════
+	cat > "$HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
+#!/bin/bash
+
+bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
+pkill -f "floating-installer"
+EOF
+
+chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
+
 #find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 #find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 #find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
