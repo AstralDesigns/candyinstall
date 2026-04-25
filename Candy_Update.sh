@@ -4759,7 +4759,7 @@ main() {
     update_custom
 
     # Setup GJS
-    #setup_gjs
+    setup_gjs
     
     # Finalize setup requirements
     finalize_setup
