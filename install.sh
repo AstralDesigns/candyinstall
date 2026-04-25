@@ -3547,7 +3547,7 @@ windowrule = pin on,border_size 0,match:class (com.candy.widgets|gjs|widgets)
 windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.utils)#center
 windowrule = move ((monitor_w*1)-((window_w*1)+10)) 45,match:title (candy.systemmonitor) #top right
 windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.weather) #center
-windowrule = move (monitor_w*0.01) 45,match:title (candy.media) #top left
+windowrule = move (monitor_w*0.01) 50,match:title (candy.media) #top left
 windowrule = opacity 0.85 0.85,match:class ^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
 windowrule = float on, center on,size 800 500,match:class (kitty-scratchpad)
 windowrule = suppress_event maximize, match:class .* #nofocus,match:class ^$,match:title ^$,xwayland:1,floating:1,fullscreen:0,pinned:0
@@ -3556,10 +3556,6 @@ windowrule = float on,match:class (.*org.pulseaudio.pavucontrol.*)
 windowrule = size 700 600,match:class (.*org.pulseaudio.pavucontrol.*)
 windowrule = center on,match:class (.*org.pulseaudio.pavucontrol.*)
 #windowrule = pin on,match:class (.*org.pulseaudio.pavucontrol.*)
-# Browser Picture in Picture
-windowrule = float on, match:title ^(Picture-in-Picture)$
-windowrule = pin on, match:title ^(Picture-in-Picture)$
-windowrule = move 69.5% 4%, match:title ^(Picture-in-Picture)$
 # Waypaper
 windowrule = float on,match:class (.*waypaper.*)
 windowrule = size 800 600,match:class (.*waypaper.*)
@@ -3619,9 +3615,9 @@ windowrule = center on,match:class (nwg-look)
 #windowrule = pin on,match:class (nwg-look)
 # CachyOS Hello
 windowrule = float on,match:title (CachyOS Hello)
-windowrule = size 700 600,match:title (CachyO SHello)
+windowrule = size 700 600,match:title (CachyOS Hello)
 windowrule = center on,match:title (CachyOS Hello)
-#windowrule = pin on,match:class (CachyOSHello)
+#windowrule = pin on,match:class (CachyOS Hello)
 # nwg-displays
 windowrule = float on,match:class (nwg-displays)
 windowrule = size 990 600,match:class (nwg-displays)
@@ -3670,7 +3666,7 @@ windowrule = float on, match:class ^(LibreWolf)$,match:title ^(Picture-in-Pictur
 ##windowrule = float on, match:class ^(blueman-manager)$
 windowrule = float on, match:class ^(xdg-desktop-portal-hyprland|xdg-desktop-portal-gtk|xdg-desktop-portal-kde)(.*)$
 windowrule = float on, match:class ^(hyprpolkitagent|polkit-gnome-authentication-agent-1|org.org.kde.polkit-kde-authentication-agent-1)(.*)$
-windowrule = float on, match:title ^(CachyOS Hello)$
+windowrule = float on, match:title ^(CachyOSHello)$
 windowrule = float on, match:class ^(zenity)$
 windowrule = float on, match:class ^()$,match:title ^(Steam - Self Updater)$
 # Increase the opacity
@@ -3680,8 +3676,9 @@ windowrule = opacity 1.0, match:class ^(zen)$
 # # windowrule = opacity 1.0, match:title ^(NetEase Cloud Music Gtk4)$
 # General window rules
 windowrule = float on, match:title ^(Picture-in-Picture)$
-windowrule = size 460 260, match:title ^(Picture-in-Picture)$
-windowrule = move 65%- 10%-, match:title ^(Picture-in-Picture)$
+windowrule = pin on, match:title ^(Picture-in-Picture)$
+windowrule = size 360 200, match:title ^(Picture-in-Picture)$
+windowrule = move (monitor_w*0.01) 50, match:title ^(Picture-in-Picture)$
 windowrule = float on, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
 windowrule = move 25%-, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
 windowrule = size 960 540, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
