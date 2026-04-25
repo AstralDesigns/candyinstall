@@ -5571,7 +5571,7 @@ if timeout 2 awww query &>/dev/null; then
     bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" > /dev/null 2>&1 &
     echo "✅ Initial background set"
 	sleep 0.5
-	qs -c bar >/dev/null 2>&1 &
+	qs -c bar > /dev/null 2>&1 &
 	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" > /dev/null 2>&1 &
 	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" > /dev/null 2>&1 &
 	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > /dev/null 2>&1 &
@@ -5584,7 +5584,7 @@ else
 	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" > /dev/null 2>&1 &
     echo "✅ Initial background set"
 	sleep 0.5
-	qs -c bar >/dev/null 2>&1 &
+	qs -c bar > /dev/null 2>&1 &
 	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" > /dev/null 2>&1 &
 	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" > /dev/null 2>&1 &
 	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > /dev/null 2>&1 &
