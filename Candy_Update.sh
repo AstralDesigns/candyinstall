@@ -4635,12 +4635,12 @@ prompt_logout() {
     case "$reboot_choice" in
         [yY][eE][sS]|[yY])
             print_status "Logging out..."
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh"
+            bash "$HOME/.config/hyprcandy/hooks/complete.sh"
             sleep 0.5
             loginctl terminate-user $USER
             ;;
         *)
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh"
+            bash "$HOME/.config/hyprcandy/hooks/complete.sh"
             return 0
             ;;
     esac
