@@ -282,7 +282,7 @@ build_package_list() {
         
         # Packages
         "pacman-contrib"
-        "octopi"
+        "shelly"
         "rebuild-detector"
         "equibop-bin"
         
