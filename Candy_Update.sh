@@ -997,7 +997,7 @@ setup_hyprcandy() {
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
 			#$AUR_HELPER -R --noconfirm waypaper
-			#$AUR_HELPER -R --noconfirm python-haishoku
+			$AUR_HELPER -R --noconfirm octopi
             $AUR_HELPER -S --noconfirm qt6-imageformats
             print_status "Dependencies are up to date"
         else
@@ -3546,7 +3546,7 @@ windowrule = opacity 1.0, match:class ^(zen)$
 windowrule = float on, match:title ^(Picture-in-Picture)$
 windowrule = pin on, match:title ^(Picture-in-Picture)$
 windowrule = size 360 200, match:title ^(Picture-in-Picture)$
-windowrule = move (monitor_w*0.01) 50, match:title ^(Picture-in-Picture)$
+windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 50, match:title ^(Picture-in-Picture)$
 windowrule = float on, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
 windowrule = move 25%-, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
 windowrule = size 960 540, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
