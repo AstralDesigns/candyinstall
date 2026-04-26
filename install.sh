@@ -5563,13 +5563,13 @@ prompt_reboot() {
         [nN][oO]|[nN])
             echo "✅ Installation complete (reboot post install is advised)..."
             sleep 4
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh"
+            bash "$HOME/.config/hyprcandy/hooks/complete.sh"
             return 0
             ;;
         *)
             print_status "Restarting system..."
             sleep 2
-            nohup bash "$HOME/.config/hyprcandy/hooks/complete.sh"
+            bash "$HOME/.config/hyprcandy/hooks/complete.sh"
 			sleep 0.5
 			systemctl reboot
             ;;
