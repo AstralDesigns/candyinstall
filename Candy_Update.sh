@@ -4725,7 +4725,7 @@ main() {
     setup_hyprcandy
 
     # Enable display manager
-    #enable_display_manager
+    enable_display_manager
 
     # Setup default "custom.conf" file
     #setup_custom_config
