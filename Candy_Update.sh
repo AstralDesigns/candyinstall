@@ -4692,7 +4692,7 @@ main() {
     # Show multicolored ASCII art
     show_ascii_art
     
-    print_status "NEW CHANGES: added visibility toggles for workspaces, clock and date modules in the Bar:Visibility sub-tab plus minor color changes"
+    print_status "NEW CHANGES: SDDM patch and fixed hyprviz-toggling from the dock's start button right-click popup"
     
     # Choose display manager first
     #choose_display_manager
