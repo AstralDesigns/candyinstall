@@ -3065,6 +3065,92 @@ enable_display_manager() {
         print_error "Failed to enable $DISPLAY_MANAGER. You may need to enable it manually."
         print_status "Run: sudo systemctl enable $DISPLAY_MANAGER_SERVICE"
     fi
+    
+    # Additional SDDM configuration if selected
+    if [ "$DISPLAY_MANAGER" = "sddm" ]; then
+        print_status "Configuring SDDM with Sugar Candy theme..."
+        
+        sudo rm -rf /etc/sddm.conf.d/
+        sleep 1
+        # Create SDDM config directory if it doesn't exist
+        sudo mkdir -p /etc/sddm.conf.d/
+        
+        # Configure SDDM to use Sugar Candy theme
+        if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
+            sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
+[Theme]
+Current=sugar-candy
+CursorTheme=Bibata-Modern-Classic
+CursorSize=18
+EOF
+            # Write full theme config to the sugar-candy theme directory
+            sudo tee /usr/share/sddm/themes/sugar-candy/theme.conf > /dev/null << EOF
+[General]
+Background="Backgrounds/Mountain.png"
+DimBackgroundImage="0.0"
+ScaleImageCropped="true"
+ScreenWidth="1366"
+ScreenHeight="768"
+FullBlur="false"
+PartialBlur="true"
+BlurRadius="55"
+HaveFormBackground="true"
+FormPosition="center"
+BackgroundImageHAlignment="center"
+BackgroundImageVAlignment="center"
+MainColor="white"
+AccentColor="#fb884f"
+BackgroundColor="#243900"
+OverrideLoginButtonTextColor=""
+InterfaceShadowSize="6"
+InterfaceShadowOpacity="0.6"
+RoundCorners="20"
+ScreenPadding="0"
+Font="Noto Sans"
+FontSize=""
+ForceRightToLeft="false"
+ForceLastUser="true"
+ForcePasswordFocus="true"
+ForceHideCompletePassword="false"
+ForceHideVirtualKeyboardButton="false"
+ForceHideSystemButtons="false"
+AllowEmptyPassword="false"
+AllowBadUsernames="false"
+Locale=""
+HourFormat="HH:mm"
+DateFormat="dddd, d of MMMM"
+HeaderText="󰫣 󰫢 󰫣"
+TranslatePlaceholderUsername=""
+TranslatePlaceholderPassword=""
+TranslateShowPassword=""
+TranslateLogin=""
+TranslateLoginFailedWarning=""
+TranslateCapslockWarning=""
+TranslateSession=""
+TranslateSuspend=""
+TranslateHibernate=""
+TranslateReboot=""
+TranslateShutdown=""
+TranslateVirtualKeyboardButton=""
+EOF
+            # ── Patch sugar-candy Main.qml for AnimatedImage gif support (once) ──────────
+            MAIN_QML="/usr/share/sddm/themes/sugar-candy/Main.qml"
+
+            if [[ -f "$MAIN_QML" ]]; then
+                if grep -q "^\s*Image {" "$MAIN_QML"; then
+                    sudo sed -i 's/^\(\s*\)Image {/\1AnimatedImage {/' "$MAIN_QML"
+                    sudo sed -i '/id: backgroundImage/a\            playing: true' "$MAIN_QML"
+                    echo "🎬 Patched Main.qml with AnimatedImage support"
+                else
+                    echo "✅ Main.qml already patched"
+                fi
+            fi
+
+            print_success "SDDM configured to use Sugar Candy theme with custom auto-updating background"
+        else
+            print_warning "Sugar Candy theme not found. SDDM will use default theme."
+        fi
+    fi
 }
 
 # Function to setup default "custom.conf" file
