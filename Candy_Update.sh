@@ -4693,6 +4693,7 @@ main() {
     show_ascii_art
     
     print_status "NEW CHANGES: SDDM patch and fixed hyprviz-toggling from the dock's start button right-click popup"
+	echo
     
     # Choose display manager first
     #choose_display_manager
