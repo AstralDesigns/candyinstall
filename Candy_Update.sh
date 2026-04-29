@@ -2944,9 +2944,25 @@ if [ ! -f "$PINNED_FILE" ]; then
 	cat > "$PINNED_FILE" << 'EOF'
 org.gnome.Nautilus
 org.gnome.gedit
-kitty
+com.shellyorg.shelly
 nwg-displays
 nwg-look
+EOF
+
+else
+	echo ""
+fi
+
+# ═══════════════════════════════════════════════════════════════
+#               	  Desktop Pinned Apps File 
+# ═══════════════════════════════════════════════════════════════
+DESKTOP_FILE="$HOME/.config/desktop-pinned"
+if [ ! -f "$DESKTOP_FILE" ]; then
+	cat > "$DESKTOP_FILE" << 'EOF'
+nwg-displays
+nwg-look
+org.gnome.Nautilus
+kitty
 EOF
 
 else
