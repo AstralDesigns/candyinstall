@@ -2945,8 +2945,6 @@ if [ ! -f "$PINNED_FILE" ]; then
 org.gnome.Nautilus
 org.gnome.gedit
 com.shellyorg.shelly
-nwg-displays
-nwg-look
 EOF
 
 else
@@ -2961,8 +2959,7 @@ if [ ! -f "$DESKTOP_FILE" ]; then
 	cat > "$DESKTOP_FILE" << 'EOF'
 nwg-displays
 nwg-look
-org.gnome.Nautilus
-kitty
+hyprviz
 EOF
 
 else
