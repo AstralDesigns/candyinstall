@@ -4692,8 +4692,10 @@ main() {
     # Show multicolored ASCII art
     show_ascii_art
     
-    print_status "NEW CHANGES: SDDM patch and fixed hyprviz-toggling from the dock's start button right-click popup"
-	echo
+    print_status "NEW CHANGES:" 
+	echo "DESKTOP-ICONS support with drag-and-drop, scaling and visibility toggling from the control-center"
+	echo "SDDM patch and fixed hyprviz-toggling from the dock's start button right-click popup"
+	echo 
     
     # Choose display manager first
     #choose_display_manager
