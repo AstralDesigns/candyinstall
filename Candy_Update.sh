@@ -1120,8 +1120,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update > add back to preservation list later "hyprcandydock"
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy")
+# Folders with user-specific changes — never overwritten on update > add back to preservation list later "hypr" "hyprcandydock"
+SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hyprcandy")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -3778,6 +3778,10 @@ layerrule = blur on,xray on,no_anim on,match:namespace quickshell:weather-popup
 layerrule = ignore_alpha 0.01,match:namespace quickshell:weather-popup
 layerrule = blur on,xray on,no_anim on,match:namespace quickshell:sysmon-popup
 layerrule = ignore_alpha 0.01,match:namespace quickshell:sysmon-popup
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell:systraypopup
+layerrule = ignore_alpha 0.01,match:namespace quickshell:systraypopup
+layerrule = blur on,xray on,no_anim on,match:namespace quickshell:desktop
+layerrule = ignore_alpha 0.01,match:namespace quickshell:desktop
 layerrule = blur on,xray on,no_anim on,match:namespace quickshell:wallpaper
 layerrule = ignore_alpha 0.01,match:namespace quickshell:wallpaper
 layerrule = blur on,xray on,no_anim on,match:namespace quickshell:startmenu
@@ -4731,7 +4735,7 @@ main() {
     enable_display_manager
 
     # Setup default "custom.conf" file
-    #setup_custom_config
+    setup_custom_config
 
     # Update keybinds based on choice
     update_keybinds
