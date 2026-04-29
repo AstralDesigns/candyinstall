@@ -3793,7 +3793,7 @@ layerrule = blur on,xray on,no_anim on,match:namespace quickshell:sysmon-popup
 layerrule = ignore_alpha 0.01,match:namespace quickshell:sysmon-popup
 layerrule = blur on,xray on,no_anim on,match:namespace quickshell:systraypopup
 layerrule = ignore_alpha 0.01,match:namespace quickshell:systraypopup
-layerrule = blur on,match:namespace quickshell:desktop
+layerrule = blur on,no_anim on,match:namespace quickshell:desktop
 layerrule = ignore_alpha 0.01,match:namespace quickshell:desktop
 layerrule = blur on,xray on,no_anim on,match:namespace quickshell:wallpaper
 layerrule = ignore_alpha 0.01,match:namespace quickshell:wallpaper
@@ -4710,7 +4710,7 @@ main() {
     show_ascii_art
     
     print_status "NEW CHANGES:" 
-	echo "DESKTOP-ICONS support with drag-and-drop, scaling and visibility toggling from the control-center"
+	echo "DESKTOP-ICONS support with *NEW:icon-theme reloading*, drag-and-drop, scaling and visibility toggling from the control-center"
 	echo "SDDM patch and fixed hyprviz-toggling from the dock's start button right-click popup"
 	echo 
     
