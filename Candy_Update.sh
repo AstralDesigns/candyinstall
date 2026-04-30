@@ -3006,7 +3006,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
 	
 # 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
-    sudo rm -f /etc/sudoers.d/hyprcandy-background
+	
     # Get the current username
 USERNAME=$(whoami)
 
