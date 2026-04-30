@@ -4884,6 +4884,7 @@ main() {
     show_ascii_art
     
     print_status "NEW CHANGES:" 
+	echo "Dock and app-launcher app-ions live refresh based on current available apps post installation/uninstallation actions"
 	echo "DESKTOP-ICONS support with *NEW:icon-theme reloading*, drag-and-drop, scaling and visibility toggling from the control-center"
 	echo "SDDM patch and fixed hyprviz-toggling from the dock's start button right-click popup"
 	echo 
