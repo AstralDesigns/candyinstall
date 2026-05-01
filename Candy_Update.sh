@@ -1,5 +1,5 @@
 #!/bin/bash
-
+setup_hy
 # HyprCandy Installer Script
 # This script installs Hyprland and related packages across multiple distributions
 
@@ -4940,11 +4940,11 @@ main() {
     # Configuration management tips
     echo
     print_status "Configuration management tips:"
-    print_status "• Your HyprCandy configs are in: ~/.hyprcandy/"
-    print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
-    print_status "• Major updates: rerun the install script for updated apps and configs"
-    print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
-    print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
+    #print_status "• Your HyprCandy configs are in: ~/.hyprcandy/"
+    #print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
+    #print_status "• Major updates: rerun the install script for updated apps and configs"
+    #print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
+    #print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
     
     # Display and wallpaper configuration notes
     echo
