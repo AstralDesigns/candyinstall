@@ -5020,11 +5020,11 @@ main() {
     # Configuration management tips
     echo
     print_status "Configuration management tips:"
-    print_status "• Your HyprCandy configs are in: ~/.hyprcandy/"
-    print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
-    print_status "• Major updates: rerun the install script for updated apps and configs"
-    print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
-    print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
+    #print_status "• Your HyprCandy configs are in: ~/.hyprcandy/"
+    #print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
+    #print_status "• Major updates: rerun the install script for updated apps and configs"
+    #print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
+    #print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
     
     # Display and wallpaper configuration notes
     echo
@@ -5032,51 +5032,37 @@ main() {
     echo -e "${WHITE}                              🖥️  Post-Installation Configuration  🖼️${NC}"
     echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     echo
-    print_status "After rebooting, you may want to configure the following:"
+    print_status "Extra pointers:"
     echo
     echo -e "${PURPLE}📱 Display Configuration:${NC}"
     print_status "• Use ${YELLOW}nwg-displays${NC} to configure monitor scaling, resolution, and positioning"
-    print_status "• Launch it from the application menu or run: ${CYAN}nwg-displays${NC}"
     print_status "• Adjust scaling for HiDPI displays if needed"
     echo
+    echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
+    #print_status "• To personalize Fish, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
+    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Fish shell setup"
+    print_status "• You can also rerun the script to install Zsh shell"
+    print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
+    echo
     echo -e "${PURPLE}🐚 Zsh Configuration:${NC}"
-    print_status "• IMPORTANT: If you chose Zsh-shell then use ${CYAN}SUPER + Q${NC} to toggle Kitty and go through the Zsh setup"
-    print_status "• IMPORTANT: (Remember to type ${YELLOW}n${NC}o at the end when asked to Apply changes to .zshrc since HyprCandy already has them applied)"
-    print_status "• To configure Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
+    #print_status "• To personalize Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
     print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Zsh shell setup"
     print_status "• You can also rerun the script to install Fish shell"
     print_status "• When both are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
-    echo -e "${PURPLE}🖼️ Wallpaper Setup (Hyprpanel):${NC}"
-    print_status "• Through Hyprpanel's configuration interface in the ${CYAN}Theming${NC} section do the following:"
-    print_status "• Under ${YELLOW}General Settings${NC} choose a wallpaper to apply where it says None"
-    print_status "• Find default wallpapers check the ${CYAN}~/Pictures/Candy${NC} or ${CYAN}Candy${NC} folder"
-    print_status "• Under ${YELLOW}Matugen Settings${NC} toggle the button to enable matugen color application"
-    print_status "• If the wallpaper doesn't apply through the configuration interface, then toggle the button to apply wallpapers"
-    print_status "• Ths will quickly reset awww and apply the background"
-    print_status "• Remember to reload the dock with ${CYAN}SHIFT + K${NC} to update its colors"
-    echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
     print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
-    print_status "• Prefered font to set through nwg-look is ${CYAN}JetBrainsMono Nerd Font Propo Regular${NC} at size ${CYAN}10${NC}"
+    print_status "• Prefered font to set through nwg-look is ${CYAN}CaskaydiaCove Nerd Font Mono Regular${NC} at size ${CYAN}10${NC}"
     print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
-    print_status "• Cursor themes take effect after loging out and back in"
-    echo
-    echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
-    print_status "• To configure Fish edit, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Fish shell setup"
-    print_status "• You can also rerun the script to install Zsh shell"
-    print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
     echo
     echo -e "${PURPLE}🔎 Browser Color Theming:${NC}"
     print_status "• If you chose Brave, go to ${YELLOW}Appearance${NC} in Settings and set the 'Theme' to ${CYAN}GTK${NC} and Brave colors to Same as Linux"
     print_status "• If you chose Firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
     print_status "• If you chose Zen Browser, for slight additional theming install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC}"
-    print_status "• If you chose Librewolf, you know what you're doing"
+    print_status "• If you chose Librewolf, I bet you know what you're doing 😄"
     echo
-    echo -e "${PURPLE}🏠 Clean Home Directory:${NC}"
-    print_status "• You can delete any stowed symlinks made in the 'Home' directory"
-    echo
+	echo -e "${PURPLE}🪄 Enjoy the HyprCandyPlus setup 🙂 🪄${NC}"
+	echo
     echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     
     # Prompt for reboot
