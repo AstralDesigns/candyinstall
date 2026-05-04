@@ -987,8 +987,9 @@ EOF
 setup_hyprcandy() {
 
     print_status "Setting up HyprCandy configuration..."
-	# No more need for backups as custom user settings are now set by the user in ~/.config/custom/custom.conf 
-
+	# Legacy desktop entry will be replaced later with a new version
+	rm -rf ~/.local/share/applications/Candy.desktop 
+	
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         if pacman -Qi sddm &>/dev/null; then
@@ -997,8 +998,8 @@ setup_hyprcandy() {
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
 			#$AUR_HELPER -R --noconfirm waypaper
-			$AUR_HELPER -R --noconfirm octopi
-            $AUR_HELPER -S --noconfirm qt6-imageformats
+			#$AUR_HELPER -R --noconfirm octopi
+            #$AUR_HELPER -S --noconfirm qt6-imageformats
             print_status "Dependencies are up to date"
         else
             echo ""
@@ -4884,9 +4885,7 @@ main() {
     show_ascii_art
     
     print_status "NEW CHANGES:" 
-	echo "Dock and app-launcher app-ions live refresh based on current available apps post installation/uninstallation actions"
-	echo "DESKTOP-ICONS support with *NEW:icon-theme reloading*, drag-and-drop, scaling and visibility toggling from the control-center"
-	echo "SDDM patch and fixed hyprviz-toggling from the dock's start button right-click popup"
+	echo "Notifications panel highlight color change and media player daemon cleanup"
 	echo 
     
     # Choose display manager first
