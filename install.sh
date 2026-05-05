@@ -2983,9 +2983,8 @@ chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 # ═══════════════════════════════════════════════════════════════
 	cat > "$HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
 #!/bin/bash
-
+touch "/tmp/hc-update-complete"
 bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
-pkill -f "floating-installer"
 EOF
 
 chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
