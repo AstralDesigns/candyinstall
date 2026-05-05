@@ -2885,9 +2885,8 @@ fi
 # ═══════════════════════════════════════════════════════════════
 	cat > "$USER_HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
 #!/bin/bash
-
+touch "/tmp/hc-update-complete"
 bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
-pkill -f "floating-installer"
 EOF
 
 chmod +x "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
