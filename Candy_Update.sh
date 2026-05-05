@@ -897,7 +897,7 @@ EOF
 # HyprCandy Zsh Configuration with Oh My Zsh and Starship
 
 # Oh My Zsh configuration
-export ZSH="$USER_HOME/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set environment variables
 export HYPRLAND_LOG_WS=1
@@ -906,8 +906,8 @@ export BROWSER=firefox
 export TERMINAL=kitty
 
 # Add local bin to PATH
-if [ -d "$USER_HOME/.local/bin" ]; then
-    export PATH="$USER_HOME/.local/bin:$PATH"
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
 fi
 
 # Initialize Starship prompt
@@ -1080,8 +1080,8 @@ cat > "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh" << 'EOF'
 # Outputs one JSON line:
 #   {"hasUpdates": true|false, "tooltip": "...", "noStore": true|false}
 
-HC_STORE="$USER_HOME/.HCUpdates"
-STATE_FILE="$USER_HOME/.config/hyprcandy/hc-update-state"
+HC_STORE="$HOME/.HCUpdates"
+STATE_FILE="$HOME/.config/hyprcandy/hc-update-state"
 
 emit() {
     local has="$1" tip="$2" nostore="${3:-false}"
@@ -1150,7 +1150,7 @@ chmod +x "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh"
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT + 1))
@@ -1172,7 +1172,7 @@ chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT > 0 ? CURRENT_GAPS_OUT - 1 : 0))
@@ -1191,7 +1191,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN + 1))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -1209,7 +1209,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN > 0 ? CURRENT_GAPS_IN - 1 : 0))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -1227,7 +1227,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER + 1))
 sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
@@ -1245,7 +1245,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER > 0 ? CURRENT_BORDER - 1 : 0))
@@ -1265,7 +1265,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING + 1))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -1284,7 +1284,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING > 0 ? CURRENT_ROUNDING - 1 : 0))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -1303,7 +1303,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 case "$1" in
     "minimal")
@@ -1359,7 +1359,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_status_display.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
 
 GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
@@ -1525,14 +1525,14 @@ cat > "$USER_HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
 
 # Define colors file path
-COLORS_FILE="$USER_HOME/.config/hyprcandy/nwg_dock_colors.conf"
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
 
 # Function to initialize colors file
 initialize_colors_file() {
     echo "🎨 Initializing colors file..."
     
     mkdir -p "$(dirname "$COLORS_FILE")"
-    local css_file="$USER_HOME/.config/nwg-dock-hyprland/colors.css"
+    local css_file="$HOME/.config/nwg-dock-hyprland/colors.css"
     
     if [ -f "$css_file" ]; then
         grep -E "@define-color (blur_background8|primary)" "$css_file" > "$COLORS_FILE"
@@ -1595,9 +1595,9 @@ fi
 cat > "$USER_HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh" << 'EOF'
 #!/bin/bash
 
-GTK3_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
-GTK4_FILE="$USER_HOME/.config/gtk-4.0/settings.ini"
-HYPRCONF="$USER_HOME/.config/hypr/hyprviz.conf"
+GTK3_FILE="$HOME/.config/gtk-3.0/settings.ini"
+GTK4_FILE="$HOME/.config/gtk-4.0/settings.ini"
+HYPRCONF="$HOME/.config/hypr/hyprviz.conf"
 
 get_value() {
     grep -E "^$1=" "$1" 2>/dev/null | cut -d'=' -f2 | tr -d ' '
@@ -1771,7 +1771,7 @@ else
 
 cat > "$USER_HOME/.config/hyprcandy/hooks/clear_awww.sh" << 'EOF'
 #!/bin/bash
-CACHE_DIR="$USER_HOME/.cache/awww"
+CACHE_DIR="$HOME/.cache/awww"
 [ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
 EOF
 chmod +x "$USER_HOME/.config/hyprcandy/hooks/clear_awww.sh"
@@ -1787,32 +1787,32 @@ cat > "$USER_HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #set +e
 
 # Update ROFI background 
-ROFI_RASI="$USER_HOME/.config/rofi/colors.rasi"
+ROFI_RASI="$HOME/.config/rofi/colors.rasi"
 
 if command -v sed >/dev/null; then
     sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
 fi
 
 # Update local background.png
-if command -v magick >/dev/null && [ -f "$USER_HOME/.config/background" ]; then
-    magick "$USER_HOME/.config/background[0]" "$USER_HOME/.config/background.png"
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
 fi
 
 # ── Update SDDM background path and BackgroundColor from waypaper/colors.css ──
-WP_CONFIG="${XDG_CONFIG_HOME:-$USER_HOME/.config}/wallpaper/wallpaper.ini"
-WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$USER_HOME/.config}/waypaper/config.ini"
+WP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/wallpaper/wallpaper.ini"
+WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
 # Prefer quickshell wallpaper picker config; fall back to waypaper
 [[ -f "$WP_CONFIG" ]] && WAYPAPER_CONFIG="$WP_CONFIG"
 SDDM_CONF="/usr/share/sddm/themes/sugar-candy/theme.conf"
 SDDM_BG_DIR="/usr/share/sddm/themes/sugar-candy/Backgrounds"
-COLORS_CSS="${XDG_CONFIG_HOME:-$USER_HOME/.config}/gtk-4.0/colors.css"
+COLORS_CSS="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/colors.css"
 
 if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
     # ── Wallpaper path ────────────────────────────────────────────────────────
     CURRENT_WP=$(grep -E "^\s*wallpaper\s*=" "$WAYPAPER_CONFIG" \
         | head -n1 \
         | sed 's/.*=\s*//' \
-        | sed "s|~|$USER_HOME|g" \
+        | sed "s|~|$HOME|g" \
         | xargs)
 
    if [[ -n "$CURRENT_WP" && -f "$CURRENT_WP" ]]; then
@@ -1879,7 +1879,7 @@ cat > "$USER_HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 set +e
 
 # Update ROFI background 
-ROFI_RASI="$USER_HOME/.config/rofi/colors.rasi"
+ROFI_RASI="$HOME/.config/rofi/colors.rasi"
 
 if command -v sed >/dev/null; then
     sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
@@ -1887,22 +1887,22 @@ if command -v sed >/dev/null; then
 fi
 
 # Update local background.png
-if command -v magick >/dev/null && [ -f "$USER_HOME/.config/background" ]; then
-    magick "$USER_HOME/.config/background[0]" "$USER_HOME/.config/background.png"
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
 fi
 
 # ── Update SDDM background path and BackgroundColor from waypaper/colors.css ──
-WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$USER_HOME/.config}/waypaper/config.ini"
+WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
 SDDM_CONF="/usr/share/sddm/themes/sugar-candy/theme.conf"
 SDDM_BG_DIR="/usr/share/sddm/themes/sugar-candy/Backgrounds"
-COLORS_CSS="${XDG_CONFIG_HOME:-$USER_HOME/.config}/gtk-4.0/colors.css"
+COLORS_CSS="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/colors.css"
 
 if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
     # ── Wallpaper path ────────────────────────────────────────────────────────
     CURRENT_WP=$(grep -E "^\s*wallpaper\s*=" "$WAYPAPER_CONFIG" \
         | head -n1 \
         | sed 's/.*=\s*//' \
-        | sed "s|~|$USER_HOME|g" \
+        | sed "s|~|$HOME|g" \
         | xargs)
 
     if [[ -n "$CURRENT_WP" && -f "$CURRENT_WP" ]]; then
@@ -1960,14 +1960,14 @@ else
 fi
 
 # Create lock.png at 661x661 pixels
-if command -v magick >/dev/null && [ -f "$USER_HOME/.config/background" ]; then
-    magick "$USER_HOME/.config/background[0]" -resize 661x661^ -gravity center -extent 661x661 "$USER_HOME/.config/lock.png"
+if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
+    magick "$HOME/.config/background[0]" -resize 661x661^ -gravity center -extent 661x661 "$HOME/.config/lock.png"
     echo "🔒 Created lock.png at 661x661 pixels"
 fi
 
 # Update mako config colors from nwg-dock-hyprland/colors.css
-MAKO_CONFIG="$USER_HOME/.config/mako/config"
-COLORS_CSS="$USER_HOME/.config/nwg-dock-hyprland/colors.css"
+MAKO_CONFIG="$HOME/.config/mako/config"
+COLORS_CSS="$HOME/.config/nwg-dock-hyprland/colors.css"
 
 if [ -f "$COLORS_CSS" ] && [ -f "$MAKO_CONFIG" ]; then
     # Extract hex values from colors.css, removing trailing semicolons and newlines
@@ -2027,10 +2027,10 @@ chmod +x "$USER_HOME/.config/hyprcandy/scripts/overview.sh"
 
 cat > "$USER_HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 #!/bin/bash
-CONFIG_BG="$USER_HOME/.config/background"
-HOOKS_DIR="$USER_HOME/.config/hyprcandy/hooks"
-COLORS_FILE="$USER_HOME/.config/hyprcandy/nwg_dock_colors.conf"
-AUTO_RELAUNCH_PREF="$USER_HOME/.config/hyprcandy/scripts/.dock-auto-relaunch"
+CONFIG_BG="$HOME/.config/background"
+HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
+COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+AUTO_RELAUNCH_PREF="$HOME/.config/hyprcandy/scripts/.dock-auto-relaunch"
 
 while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
     echo "Waiting for Hyprland to start..."
@@ -2051,7 +2051,7 @@ execute_hooks() {
     # Only proceed with dock relaunch if auto-relaunch is enabled
     if [[ "$AUTO_RELAUNCH_STATE" == "enabled" ]]; then
         # Check if colors have changed and launch dock if different
-        colors_file="$USER_HOME/.config/nwg-dock-hyprland/colors.css"
+        colors_file="$HOME/.config/nwg-dock-hyprland/colors.css"
         
         # Get current colors from CSS file
         get_current_colors() {
@@ -2078,7 +2078,7 @@ execute_hooks() {
                 sleep 0.2
                 gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-dark"
                 sleep 0.5
-                nohup bash -c "$USER_HOME/.config/hyprcandy/scripts/toggle-dock.sh --relaunch" >/dev/null 2>&1 &
+                nohup bash -c "$HOME/.config/hyprcandy/scripts/toggle-dock.sh --relaunch" >/dev/null 2>&1 &
                 mkdir -p "$(dirname "$COLORS_FILE")"
                 echo "$current_colors" > "$COLORS_FILE"
                 echo "🎨 Updated dock colors and launched dock"
@@ -2399,13 +2399,13 @@ EOF
     cat > "$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_BG="$USER_HOME/.config/background"
-WP_CONFIG="$USER_HOME/.config/wallpaper/wallpaper.ini"
-WAYPAPER_CONFIG="$USER_HOME/.config/waypaper/config.ini"
-MATUGEN_CONFIG="$USER_HOME/.config/matugen/config.toml"
+CONFIG_BG="$HOME/.config/background"
+WP_CONFIG="$HOME/.config/wallpaper/wallpaper.ini"
+WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
+MATUGEN_CONFIG="$HOME/.config/matugen/config.toml"
 RELOAD_SO="/usr/local/lib/gtk3-reload.so"
 RELOAD_SRC="/usr/local/share/gtk3-reload/gtk3-reload.c"
-HOOKS_DIR="$USER_HOME/.config/hyprcandy/hooks"
+HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
 
 get_waypaper_background() {
     # Prefer quickshell wallpaper picker config, fall back to waypaper config
@@ -2413,7 +2413,7 @@ get_waypaper_background() {
         if [ -f "$cfg" ]; then
             current_bg=$(grep -E "^wallpaper\s*=" "$cfg" | head -n1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
             if [ -n "$current_bg" ]; then
-                current_bg=$(echo "$current_bg" | sed "s|^~|$USER_HOME|")
+                current_bg=$(echo "$current_bg" | sed "s|^~|$HOME|")
                 echo "$current_bg"
                 return 0
             fi
@@ -2429,7 +2429,7 @@ update_config_background() {
         wal -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
 		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
         sleep 0.5
-        magick "$bg_path" "$USER_HOME/.config/background"
+        magick "$bg_path" "$HOME/.config/background"
         sleep 1
         "$HOOKS_DIR/update_background.sh"
         #echo "✅ Updated ~/.config/background to point to: $bg_path"
@@ -2642,9 +2642,9 @@ if ! pgrep -f "awww-daemon" > /dev/null; then
     echo "🔄 awww-daemon not found, restarting it..."
     awww-daemon &
     sleep 1
-    if [ -f "$USER_HOME/.config/background" ]; then
+    if [ -f "$HOME/.config/background" ]; then
         echo "🖼️  Restoring wallpaper..."
-        awww img "$USER_HOME/.config/background" --transition-type fade --transition-duration 1
+        awww img "$HOME/.config/background" --transition-type fade --transition-duration 1
     fi
 fi
 
@@ -2707,8 +2707,8 @@ fi
 cat > "$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh" << 'EOF'
 #!/bin/bash
 
-GTK_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
-ROFI_RASI="$USER_HOME/.config/hyprcandy/settings/rofi-font.rasi"
+GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
+ROFI_RASI="$HOME/.config/hyprcandy/settings/rofi-font.rasi"
 
 # Get font name from GTK settings
 GTK_FONT=$(grep "^gtk-font-name=" "$GTK_FILE" | cut -d'=' -f2-)
@@ -2734,12 +2734,12 @@ chmod +x "$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
 cat > "$USER_HOME/.config/hyprcandy/hooks/update_icon_theme.sh" << 'EOF'
 #!/bin/bash
 
-GTK_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
-QT6CT_CONF="$USER_HOME/.config/qt6ct/qt6ct.conf"
-QT5CT_CONF="$USER_HOME/.config/qt5ct/qt5ct.conf"
-KDEGLOBALS="$USER_HOME/.config/kdeglobals"
-UC_COLORS="$USER_HOME/.local/share/color-schemes/HyprCandy.colors"
-ROFI_MENU="$USER_HOME/.config/rofi/config.rasi"
+GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
+QT6CT_CONF="$HOME/.config/qt6ct/qt6ct.conf"
+QT5CT_CONF="$HOME/.config/qt5ct/qt5ct.conf"
+KDEGLOBALS="$HOME/.config/kdeglobals"
+UC_COLORS="$HOME/.local/share/color-schemes/HyprCandy.colors"
+ROFI_MENU="$HOME/.config/rofi/config.rasi"
 
 ICON_THEME=$(grep "^gtk-icon-theme-name=" "$GTK_FILE" | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
@@ -2802,9 +2802,9 @@ chmod +x "$USER_HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
 cat > "$USER_HOME/.config/hyprcandy/hooks/watch_gtk_font.sh" << 'EOF'
 #!/bin/bash
 
-GTK_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
-FONT_HOOK="$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
-ICON_HOOK="$USER_HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
+GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
+FONT_HOOK="$HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
+ICON_HOOK="$HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
 
 while [ ! -f "$GTK_FILE" ]; do sleep 1; done
 
@@ -3097,7 +3097,7 @@ setup_custom_config() {
 #  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
 
 #[IMPORTANT]#
-# Add custom settings to "$USER_HOME/.config/custom/custom.conf".
+# Add custom settings to "$HOME/.config/custom/custom.conf".
 #[IMPORTANT]#
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -3952,7 +3952,7 @@ bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprl
 
 # Wf--recorder (simple recorder) + slurp (allows to select a specific region of the monitor)
 # {to list audio devices run "pactl list sources | grep Name"}   
-bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$USER_HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
+bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
 bind = Alt, R, exec, pkill -x wf-recorder #Stop recording
 
 #### Hyprsunset ####
@@ -4175,7 +4175,7 @@ bind = ALT, 5, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprl
 
 # Wf--recorder (simple recorder) + slurp (allows to select a specific region of the monitor)
 # {to list audio devices run "pactl list sources | grep Name"}   
-bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$USER_HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
+bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
 bind = Alt, R, exec, pkill -x wf-recorder #Stop recording
 
 #### Hyprsunset ####
@@ -4634,9 +4634,9 @@ cat > "$USER_HOME/.hyprcandy/GJS/toggle-control-center.sh" << 'EOF'
 # Toggle Candy Utils - Fast launch (daemon stays running)
 # No killing - daemon persists for instant widget launches
 
-PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
+PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4656,9 +4656,9 @@ cat > "$USER_HOME/.hyprcandy/GJS/toggle-system-monitor.sh" << 'EOF'
 
 # Toggle System Monitor - Fast launch (daemon stays running)
 
-PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
+PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4676,9 +4676,9 @@ cat > "$USER_HOME/.hyprcandy/GJS/toggle-media-player.sh" << 'EOF'
 
 # Toggle Media Player - Fast launch (daemon stays running)
 
-PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
+PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4696,9 +4696,9 @@ cat > "$USER_HOME/.hyprcandy/GJS/toggle-weather-widget.sh" << 'EOF'
 
 # Toggle Weather Widget - Fast launch (daemon stays running)
 
-PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
+PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4800,8 +4800,8 @@ main() {
     #print_status "• Your HyprCandy configs are in: ~/.hyprcandy/"
     #print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
     #print_status "• Major updates: rerun the install script for updated apps and configs"
-    #print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $USER_HOME"
-    #print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $USER_HOME"
+    #print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
+    #print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
     
     # Display and wallpaper configuration notes
     echo
