@@ -4727,7 +4727,9 @@ finalize_setup() {
 
 # Function to cleanup post update
 cleanup() {
-    echo
+    notify-send " HC+ Update Complete" "New Features:
+	 Notifications panel: Redirection on click"
+	echo
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
     su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
@@ -4737,11 +4739,7 @@ cleanup() {
 # Main execution
 main() {
     # Show multicolored ASCII art
-    show_ascii_art
-    
-    print_status "NEW CHANGES:" 
-	echo "Notifications panel highlight color change and media player daemon cleanup"
-	echo 
+    show_ascii_art 
     
     # Choose display manager first
     #choose_display_manager
