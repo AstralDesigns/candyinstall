@@ -2886,6 +2886,7 @@ fi
 	cat > "$USER_HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
 #!/bin/bash
 
+touch "/tmp/hc-update-complete"
 bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
 #bash -c "pkill -f 'kitty.*floating-installer' || true"
 EOF
