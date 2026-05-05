@@ -553,7 +553,7 @@ if [[ -z "$FISH_PATH" ]]; then
 fi
 
 if ! grep -qF "$FISH_PATH" /etc/shells; then
-    echo "$FISH_PATH" | sudo tee -a /etc/shells
+    echo "$FISH_PATH" | tee -a /etc/shells
 fi
 
 chsh -s "$FISH_PATH"
@@ -785,7 +785,7 @@ fi
 
 # Ensure zsh is in /etc/shells before chsh
 if ! grep -qF "$ZSH_PATH" /etc/shells; then
-    echo "$ZSH_PATH" | sudo tee -a /etc/shells
+    echo "$ZSH_PATH" | tee -a /etc/shells
 fi
 
 chsh -s "$ZSH_PATH"
@@ -2952,16 +2952,16 @@ SUDOERS_ENTRIES=(
 )
 
 # Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
 # Set proper permissions on the sudoers file
-sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
 	
 # Add custom cursors to /usr/share/icons 
 echo "🔄 Adding custom cursors..."
-sudo cp -r "$HOME"/.icons/* /usr/share/icons/
+cp -r "$HOME"/.icons/* /usr/share/icons/
 echo "✅ Cursors updated."
 }
 
@@ -2971,17 +2971,17 @@ enable_display_manager() {
 	
     # Disable other display managers first
     print_status "Disabling other display managers..."
-    sudo systemctl disable lightdm 2>/dev/null || true
-    sudo systemctl disable lxdm 2>/dev/null || true
+    systemctl disable lightdm 2>/dev/null || true
+    systemctl disable lxdm 2>/dev/null || true
     if [ "$DISPLAY_MANAGER" != "sddm" ]; then
-        sudo systemctl disable sddm 2>/dev/null || true
+        systemctl disable sddm 2>/dev/null || true
     fi
     if [ "$DISPLAY_MANAGER" != "gdm" ]; then
-        sudo systemctl disable gdm 2>/dev/null || true
+        systemctl disable gdm 2>/dev/null || true
     fi
     
     # Enable the selected display manager
-    if sudo systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
+    if systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
         print_success "$DISPLAY_MANAGER has been enabled successfully!"
     else
         print_error "Failed to enable $DISPLAY_MANAGER. You may need to enable it manually."
@@ -2992,21 +2992,21 @@ enable_display_manager() {
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         print_status "Configuring SDDM with Sugar Candy theme..."
         
-        sudo rm -rf /etc/sddm.conf.d/
+        rm -rf /etc/sddm.conf.d/
         sleep 1
         # Create SDDM config directory if it doesn't exist
-        sudo mkdir -p /etc/sddm.conf.d/
+        mkdir -p /etc/sddm.conf.d/
         
         # Configure SDDM to use Sugar Candy theme
         if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
-            sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
+            tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
 [Theme]
 Current=sugar-candy
 CursorTheme=Bibata-Modern-Classic
 CursorSize=18
 EOF
             # Write full theme config to the sugar-candy theme directory
-            sudo tee /usr/share/sddm/themes/sugar-candy/theme.conf > /dev/null << EOF
+            tee /usr/share/sddm/themes/sugar-candy/theme.conf > /dev/null << EOF
 [General]
 Background="Backgrounds/Mountain.png"
 DimBackgroundImage="0.0"
@@ -3060,8 +3060,8 @@ EOF
 
             if [[ -f "$MAIN_QML" ]]; then
                 if grep -q "^\s*Image {" "$MAIN_QML"; then
-                    sudo sed -i 's/^\(\s*\)Image {/\1AnimatedImage {/' "$MAIN_QML"
-                    sudo sed -i '/id: backgroundImage/a\            playing: true' "$MAIN_QML"
+                    sed -i 's/^\(\s*\)Image {/\1AnimatedImage {/' "$MAIN_QML"
+                    sed -i '/id: backgroundImage/a\            playing: true' "$MAIN_QML"
                     echo "🎬 Patched Main.qml with AnimatedImage support"
                 else
                     echo "✅ Main.qml already patched"
@@ -4771,20 +4771,9 @@ prompt_logout() {
     print_status "All packages have been installed and Hyprcandy configurations have been deployed."
     print_status "The $DISPLAY_MANAGER display manager has been enabled."
     echo
-    echo -e "${YELLOW}Would you like to logout now? (y/N)${NC}"
-    read -r reboot_choice
-    case "$reboot_choice" in
-        [yY][eE][sS]|[yY])
-            print_status "Logging out..."
-            bash "$HOME/.config/hyprcandy/hooks/complete.sh"
-            sleep 0.5
-            loginctl terminate-user $USER
-            ;;
-        *)
-            bash "$HOME/.config/hyprcandy/hooks/complete.sh"
-            return 0
-            ;;
-    esac
+	print_status "Cleaning up..."
+    bash "$HOME/.config/hyprcandy/hooks/complete.sh"
+    return 0
 }
 
 # Main execution
