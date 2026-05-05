@@ -4727,8 +4727,6 @@ finalize_setup() {
 
 # Function to cleanup post update
 cleanup() {
-    notify-send " HC+ Update Complete" "New Features:
-	 Notifications panel: Redirection on click"
 	echo
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
