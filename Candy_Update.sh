@@ -4726,15 +4726,12 @@ finalize_setup() {
     print_success "HyprCandy update completed!"
 }
 
-# Function to prompt for session restart
+# Function to cleanup post update
 cleanup() {
     echo
-    print_success "Installation and configuration completed!"
-    print_status "All packages have been installed and Hyprcandy configurations have been deployed."
-    print_status "The $DISPLAY_MANAGER display manager has been enabled."
-    echo
-	print_status "Cleaning up..."
-    bash "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
+    REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
+    
+    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     return 0
 }
 
@@ -4845,7 +4842,7 @@ main() {
 	echo
     echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     
-    # Prompt for session restart
+    # Function to cleanup post update
     cleanup
 }
 
