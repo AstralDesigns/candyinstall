@@ -2887,7 +2887,7 @@ fi
 #!/bin/bash
 
 bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
-bash -c "pkill -f 'kitty.*floating-installer' || true"
+#bash -c "pkill -f 'kitty.*floating-installer' || true"
 EOF
 
 chmod +x "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
