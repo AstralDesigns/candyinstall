@@ -1,5 +1,7 @@
 #!/bin/bash
 
+USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
+cd "$USER_HOME"
 # HyprCandy Installer Script
 # This script installs Hyprland and related packages across multiple distributions
 
@@ -22,7 +24,7 @@ NC='\033[0m' # No Color
 # Global variables
 DISPLAY_MANAGER="sddm"
 DISPLAY_MANAGER_SERVICE="sddm"
-SHELL_CHOICE="3"
+SHELL_CHOICE="skip"
 PANEL_CHOICE="waybar"
 BROWSER_CHOICE=""
 AUR_HELPER=""
@@ -176,8 +178,9 @@ choose_shell() {
                 print_status "Selected Zsh with plugins, Oh My Zsh integration and Starship configuration"
                 break
                 ;;
-			3)
-				print_status "Skipping shell selection..."
+	    3)
+		SHELL_CHOICE="skip"
+		print_status "Skipping shell selection..."
                 break
                 ;;
             *)
@@ -437,6 +440,8 @@ build_package_list() {
             "oh-my-zsh-git"
         )
         print_status "Added Zsh to package list"
+    elif [ "$SHELL_CHOICE" = "skip" ]; then
+        echo
     fi
     
     # Add panel packages (Waybar for all, Hyprpanel only for Arch)
@@ -588,11 +593,11 @@ fi
         print_status "Configuring Starship prompt for Fish..."
         
         # Add Starship to Fish config
-        echo 'starship init fish | source' >> "$HOME/.config/fish/config.fish"
+        echo 'starship init fish | source' >> "$USER_HOME/.config/fish/config.fish"
         
         # Create Starship config
-        mkdir -p "$HOME/.config"
-        cat > "$HOME/.config/starship.toml" << 'EOF'
+        mkdir -p "$USER_HOME/.config"
+        cat > "$USER_HOME/.config/starship.toml" << 'EOF'
 # Starship Configuration for HyprCandy
 format = """
 $username\
@@ -679,7 +684,7 @@ EOF
     fi
     
     # Add useful Fish functions and aliases
-    cat > "$HOME/.config/fish/config.fish" << 'EOF'
+    cat > "$USER_HOME/.config/fish/config.fish" << 'EOF'
 # HyprCandy Fish Configuration
 
 # Set environment variables
@@ -792,7 +797,7 @@ chsh -s "$ZSH_PATH"
 print_success "Zsh set as default shell"
     
     # Install Oh My Zsh if not already installed
-    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    if [ ! -d "$USER_HOME/.oh-my-zsh" ]; then
         print_status "Installing Oh My Zsh..."
         RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
         print_success "Oh My Zsh installed"
@@ -803,8 +808,8 @@ print_success "Zsh set as default shell"
         print_status "Configuring Starship prompt for Zsh..."
         
         # Create Starship config (same as Fish setup)
-        mkdir -p "$HOME/.config"
-        cat > "$HOME/.config/starship.toml" << 'EOF'
+        mkdir -p "$USER_HOME/.config"
+        cat > "$USER_HOME/.config/starship.toml" << 'EOF'
 # Starship Configuration for HyprCandy
 format = """
 $username\
@@ -888,11 +893,11 @@ style = "bold blue"
 EOF
         
         # Create .zshrc with Starship configuration
-        cat > "$HOME/.zshrc" << 'EOF'
+        cat > "$USER_HOME/.zshrc" << 'EOF'
 # HyprCandy Zsh Configuration with Oh My Zsh and Starship
 
 # Oh My Zsh configuration
-export ZSH="$HOME/.oh-my-zsh"
+export ZSH="$USER_HOME/.oh-my-zsh"
 
 # Set environment variables
 export HYPRLAND_LOG_WS=1
@@ -901,8 +906,8 @@ export BROWSER=firefox
 export TERMINAL=kitty
 
 # Add local bin to PATH
-if [ -d "$HOME/.local/bin" ]; then
-    export PATH="$HOME/.local/bin:$PATH"
+if [ -d "$USER_HOME/.local/bin" ]; then
+    export PATH="$USER_HOME/.local/bin:$PATH"
 fi
 
 # Initialize Starship prompt
@@ -1019,8 +1024,8 @@ setup_hyprcandy() {
 
     print_status "Updating HyprCandy configuration..."
 
-UPDATE_DIR="$HOME/.HCUpdates"
-HYPRCANDY_DIR="$HOME/.hyprcandy"
+UPDATE_DIR="$USER_HOME/.HCUpdates"
+HYPRCANDY_DIR="$USER_HOME/.hyprcandy"
 
 if [ ! -d "$UPDATE_DIR" ]; then
 	# Clone fresh copy into store dir
@@ -1051,17 +1056,17 @@ rsync -a \
 echo "✅ Update merged"
 
 # Remove legacy waybar folder
-rm -rf "$HOME/.hyprcandy/.config/waybar" "$HOME/.config/waybar"
+rm -rf "$USER_HOME/.hyprcandy/.config/waybar" "$USER_HOME/.config/waybar"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
-mkdir -p "$HOME/.config/hyprcandy/hooks" "$HOME/.config/hyprcandy/scripts" "$HOME/.config/systemd/user" "$HOME/.config/pypr" 
+mkdir -p "$USER_HOME/.config/hyprcandy/hooks" "$USER_HOME/.config/hyprcandy/scripts" "$USER_HOME/.config/systemd/user" "$USER_HOME/.config/pypr" 
 
 # ═══════════════════════════════════════════════════════════════
 #                   		Update Checker
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/scripts/hc-update-check.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh" << 'EOF'
 #!/usr/bin/env bash
 # hc-update-check.sh
 # Checks for HyprCandy Plus dotfile updates and maintains a persistent state
@@ -1075,8 +1080,8 @@ cat > "$HOME/.config/hyprcandy/scripts/hc-update-check.sh" << 'EOF'
 # Outputs one JSON line:
 #   {"hasUpdates": true|false, "tooltip": "...", "noStore": true|false}
 
-HC_STORE="$HOME/.HCUpdates"
-STATE_FILE="$HOME/.config/hyprcandy/hc-update-state"
+HC_STORE="$USER_HOME/.HCUpdates"
+STATE_FILE="$USER_HOME/.config/hyprcandy/hc-update-state"
 
 emit() {
     local has="$1" tip="$2" nostore="${3:-false}"
@@ -1136,16 +1141,16 @@ else
 fi
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/scripts/hc-update-check.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Increase Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT + 1))
@@ -1158,16 +1163,16 @@ echo "🔼 Gaps OUT increased: gaps_out=$NEW_GAPS_OUT"
 notify-send "Gaps OUT Increased" "gaps_out: $NEW_GAPS_OUT" -t 2000
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Decrease Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_OUT=$((CURRENT_GAPS_OUT > 0 ? CURRENT_GAPS_OUT - 1 : 0))
@@ -1183,10 +1188,10 @@ EOF
 #                    Gaps IN Increase Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN + 1))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -1201,10 +1206,10 @@ EOF
 #                    Gaps IN Decrease Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
 NEW_GAPS_IN=$((CURRENT_GAPS_IN > 0 ? CURRENT_GAPS_IN - 1 : 0))
 sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
@@ -1219,10 +1224,10 @@ EOF
 #                Border Increase Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER + 1))
 sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
@@ -1237,10 +1242,10 @@ EOF
 #                Border Decrease Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 
 CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
 NEW_BORDER=$((CURRENT_BORDER > 0 ? CURRENT_BORDER - 1 : 0))
@@ -1257,10 +1262,10 @@ EOF
 #                Rounding Increase Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING + 1))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -1276,10 +1281,10 @@ EOF
 #                Rounding Decrease Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
 NEW_ROUNDING=$((CURRENT_ROUNDING > 0 ? CURRENT_ROUNDING - 1 : 0))
 sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
@@ -1295,10 +1300,10 @@ EOF
 #                    Gaps + Border Presets Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 
 case "$1" in
     "minimal")
@@ -1351,10 +1356,10 @@ EOF
 #                    Visual Status Display Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_status_display.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
 
 GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
@@ -1377,16 +1382,16 @@ EOF
 #                  Make Hyprland Scripts Executable
 # ═══════════════════════════════════════════════════════════════
 
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh"
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_status_display.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_status_display.sh"
 
 echo "✅ Hyprland adjustment scripts created and made executable!"
 
@@ -1400,7 +1405,7 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 #                      Waybar XDG Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
+cat > "$USER_HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
 #!/bin/bash
 # __  ______   ____
 # \ \/ /  _ \ / ___|
@@ -1440,7 +1445,7 @@ systemctl --user start \
     wireplumber \
 EOF
 
-chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
+chmod +x "$USER_HOME/.config/hypr/scripts/xdg.sh"
 
 else
 
@@ -1448,7 +1453,7 @@ else
 #                      Hyprpanel XDG Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
+cat > "$USER_HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
 #!/bin/bash
 # __  ______   ____
 # \ \/ /  _ \ / ___|
@@ -1494,7 +1499,7 @@ systemctl --user start \
     hyprpanel-idle-monitor
 EOF
 
-chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
+chmod +x "$USER_HOME/.config/hypr/scripts/xdg.sh"
 fi
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -1503,7 +1508,7 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 #                      Startup with Waybar
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
 
 # MAIN EXECUTION
@@ -1516,18 +1521,18 @@ else
 #                      Startup with Hyprpanel
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/startup_services.sh" << 'EOF'
 #!/bin/bash
 
 # Define colors file path
-COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
+COLORS_FILE="$USER_HOME/.config/hyprcandy/nwg_dock_colors.conf"
 
 # Function to initialize colors file
 initialize_colors_file() {
     echo "🎨 Initializing colors file..."
     
     mkdir -p "$(dirname "$COLORS_FILE")"
-    local css_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+    local css_file="$USER_HOME/.config/nwg-dock-hyprland/colors.css"
     
     if [ -f "$css_file" ]; then
         grep -E "@define-color (blur_background8|primary)" "$css_file" > "$COLORS_FILE"
@@ -1580,19 +1585,19 @@ fi
 echo "🎯 All services started successfully"
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/startup_services.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/startup_services.sh"
 fi
 
 # ═══════════════════════════════════════════════════════════════
 #                      Cursor Update Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh" << 'EOF'
 #!/bin/bash
 
-GTK3_FILE="$HOME/.config/gtk-3.0/settings.ini"
-GTK4_FILE="$HOME/.config/gtk-4.0/settings.ini"
-HYPRCONF="$HOME/.config/hypr/hyprviz.conf"
+GTK3_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
+GTK4_FILE="$USER_HOME/.config/gtk-4.0/settings.ini"
+HYPRCONF="$USER_HOME/.config/hypr/hyprviz.conf"
 
 get_value() {
     grep -E "^$1=" "$1" 2>/dev/null | cut -d'=' -f2 | tr -d ' '
@@ -1684,13 +1689,13 @@ watch_gtk_file "$GTK3_FILE" &
 wait
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                    Cursor Update Service
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/cursor-theme-watcher.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/cursor-theme-watcher.service" << 'EOF'
 [Unit]
 Description=Watch GTK cursor theme and size changes
 After=hyprland-session.target
@@ -1715,7 +1720,7 @@ EOF
 #                        Pyprland Config
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/pypr/config.toml" << 'EOF'
+cat > "$USER_HOME/.config/pypr/config.toml" << 'EOF'
 [pyprland]
 plugins = [
     "scratchpads"
@@ -1732,7 +1737,7 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 #                         Waybar Service
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/waybar.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/waybar.service" << 'EOF'
 Unit]
 Description=Waybar - Highly customizable Wayland bar
 Documentation=https://github.com/Alexays/Waybar/wiki
@@ -1764,12 +1769,12 @@ else
 #                  Clear awww Cache Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/clear_awww.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/clear_awww.sh" << 'EOF'
 #!/bin/bash
-CACHE_DIR="$HOME/.cache/awww"
+CACHE_DIR="$USER_HOME/.cache/awww"
 [ -d "$CACHE_DIR" ] && rm -rf "$CACHE_DIR"
 EOF
-chmod +x "$HOME/.config/hyprcandy/hooks/clear_awww.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/clear_awww.sh"
 fi
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
@@ -1777,37 +1782,37 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 #                  Background Update Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 #set +e
 
 # Update ROFI background 
-ROFI_RASI="$HOME/.config/rofi/colors.rasi"
+ROFI_RASI="$USER_HOME/.config/rofi/colors.rasi"
 
 if command -v sed >/dev/null; then
     sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
 fi
 
 # Update local background.png
-if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
-    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
+if command -v magick >/dev/null && [ -f "$USER_HOME/.config/background" ]; then
+    magick "$USER_HOME/.config/background[0]" "$USER_HOME/.config/background.png"
 fi
 
 # ── Update SDDM background path and BackgroundColor from waypaper/colors.css ──
-WP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/wallpaper/wallpaper.ini"
-WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
+WP_CONFIG="${XDG_CONFIG_HOME:-$USER_HOME/.config}/wallpaper/wallpaper.ini"
+WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$USER_HOME/.config}/waypaper/config.ini"
 # Prefer quickshell wallpaper picker config; fall back to waypaper
 [[ -f "$WP_CONFIG" ]] && WAYPAPER_CONFIG="$WP_CONFIG"
 SDDM_CONF="/usr/share/sddm/themes/sugar-candy/theme.conf"
 SDDM_BG_DIR="/usr/share/sddm/themes/sugar-candy/Backgrounds"
-COLORS_CSS="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/colors.css"
+COLORS_CSS="${XDG_CONFIG_HOME:-$USER_HOME/.config}/gtk-4.0/colors.css"
 
 if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
     # ── Wallpaper path ────────────────────────────────────────────────────────
     CURRENT_WP=$(grep -E "^\s*wallpaper\s*=" "$WAYPAPER_CONFIG" \
         | head -n1 \
         | sed 's/.*=\s*//' \
-        | sed "s|~|$HOME|g" \
+        | sed "s|~|$USER_HOME|g" \
         | xargs)
 
    if [[ -n "$CURRENT_WP" && -f "$CURRENT_WP" ]]; then
@@ -1869,12 +1874,12 @@ EOF
 
 else
 
-cat > "$HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 set +e
 
 # Update ROFI background 
-ROFI_RASI="$HOME/.config/rofi/colors.rasi"
+ROFI_RASI="$USER_HOME/.config/rofi/colors.rasi"
 
 if command -v sed >/dev/null; then
     sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
@@ -1882,22 +1887,22 @@ if command -v sed >/dev/null; then
 fi
 
 # Update local background.png
-if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
-    magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
+if command -v magick >/dev/null && [ -f "$USER_HOME/.config/background" ]; then
+    magick "$USER_HOME/.config/background[0]" "$USER_HOME/.config/background.png"
 fi
 
 # ── Update SDDM background path and BackgroundColor from waypaper/colors.css ──
-WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
+WAYPAPER_CONFIG="${XDG_CONFIG_HOME:-$USER_HOME/.config}/waypaper/config.ini"
 SDDM_CONF="/usr/share/sddm/themes/sugar-candy/theme.conf"
 SDDM_BG_DIR="/usr/share/sddm/themes/sugar-candy/Backgrounds"
-COLORS_CSS="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0/colors.css"
+COLORS_CSS="${XDG_CONFIG_HOME:-$USER_HOME/.config}/gtk-4.0/colors.css"
 
 if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
     # ── Wallpaper path ────────────────────────────────────────────────────────
     CURRENT_WP=$(grep -E "^\s*wallpaper\s*=" "$WAYPAPER_CONFIG" \
         | head -n1 \
         | sed 's/.*=\s*//' \
-        | sed "s|~|$HOME|g" \
+        | sed "s|~|$USER_HOME|g" \
         | xargs)
 
     if [[ -n "$CURRENT_WP" && -f "$CURRENT_WP" ]]; then
@@ -1955,14 +1960,14 @@ else
 fi
 
 # Create lock.png at 661x661 pixels
-if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
-    magick "$HOME/.config/background[0]" -resize 661x661^ -gravity center -extent 661x661 "$HOME/.config/lock.png"
+if command -v magick >/dev/null && [ -f "$USER_HOME/.config/background" ]; then
+    magick "$USER_HOME/.config/background[0]" -resize 661x661^ -gravity center -extent 661x661 "$USER_HOME/.config/lock.png"
     echo "🔒 Created lock.png at 661x661 pixels"
 fi
 
 # Update mako config colors from nwg-dock-hyprland/colors.css
-MAKO_CONFIG="$HOME/.config/mako/config"
-COLORS_CSS="$HOME/.config/nwg-dock-hyprland/colors.css"
+MAKO_CONFIG="$USER_HOME/.config/mako/config"
+COLORS_CSS="$USER_HOME/.config/nwg-dock-hyprland/colors.css"
 
 if [ -f "$COLORS_CSS" ] && [ -f "$MAKO_CONFIG" ]; then
     # Extract hex values from colors.css, removing trailing semicolons and newlines
@@ -1989,13 +1994,13 @@ fi
 EOF
 fi
 
-chmod +x "$HOME/.config/hyprcandy/hooks/update_background.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/update_background.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                             Overview
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/scripts/overview.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/scripts/overview.sh" << 'EOF'
 #!/bin/bash
 
 # If the overview instance is already running, just toggle it.
@@ -2014,18 +2019,18 @@ else
 fi
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/scripts/overview.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/scripts/overview.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #              Background File & Matugen Watcher
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/watch_background.sh" << 'EOF'
 #!/bin/bash
-CONFIG_BG="$HOME/.config/background"
-HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
-COLORS_FILE="$HOME/.config/hyprcandy/nwg_dock_colors.conf"
-AUTO_RELAUNCH_PREF="$HOME/.config/hyprcandy/scripts/.dock-auto-relaunch"
+CONFIG_BG="$USER_HOME/.config/background"
+HOOKS_DIR="$USER_HOME/.config/hyprcandy/hooks"
+COLORS_FILE="$USER_HOME/.config/hyprcandy/nwg_dock_colors.conf"
+AUTO_RELAUNCH_PREF="$USER_HOME/.config/hyprcandy/scripts/.dock-auto-relaunch"
 
 while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
     echo "Waiting for Hyprland to start..."
@@ -2046,7 +2051,7 @@ execute_hooks() {
     # Only proceed with dock relaunch if auto-relaunch is enabled
     if [[ "$AUTO_RELAUNCH_STATE" == "enabled" ]]; then
         # Check if colors have changed and launch dock if different
-        colors_file="$HOME/.config/nwg-dock-hyprland/colors.css"
+        colors_file="$USER_HOME/.config/nwg-dock-hyprland/colors.css"
         
         # Get current colors from CSS file
         get_current_colors() {
@@ -2073,7 +2078,7 @@ execute_hooks() {
                 sleep 0.2
                 gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-dark"
                 sleep 0.5
-                nohup bash -c "$HOME/.config/hyprcandy/scripts/toggle-dock.sh --relaunch" >/dev/null 2>&1 &
+                nohup bash -c "$USER_HOME/.config/hyprcandy/scripts/toggle-dock.sh --relaunch" >/dev/null 2>&1 &
                 mkdir -p "$(dirname "$COLORS_FILE")"
                 echo "$current_colors" > "$COLORS_FILE"
                 echo "🎨 Updated dock colors and launched dock"
@@ -2145,13 +2150,13 @@ echo "🚀 Starting background and matugen monitoring..."
 wait
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/watch_background.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/watch_background.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #            Systemd Service: Background Watcher
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/background-watcher.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/background-watcher.service" << 'EOF'
 [Unit]
 Description=Watch ~/.config/background, clear awww cache and update background images
 After=hyprland-session.target
@@ -2178,7 +2183,7 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 #         	Weather script reload on session resume
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hypr/scripts/lock-watcher.sh" << 'EOF'
+cat > "$USER_HOME/.config/hypr/scripts/lock-watcher.sh" << 'EOF'
 #!/bin/bash
 # lock-watcher.sh - Watches for candylock unlock and refreshes the bar
 
@@ -2228,13 +2233,13 @@ while true; do
     sleep 3
 done
 EOF
-chmod +x "$HOME/.config/hypr/scripts/lock-watcher.sh"
+chmod +x "$USER_HOME/.config/hypr/scripts/lock-watcher.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #            			   Hyprlock Service
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/lock-watcher.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/lock-watcher.service" << 'EOF'
 [Unit]
 Description=Candylock Unlock Watcher - Refreshes bar on Resume
 PartOf=graphical-session.target
@@ -2255,7 +2260,7 @@ EOF
 #         waybar_idle_monitor.sh — Auto Toggle Inhibitor
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/waybar_idle_monitor.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/waybar_idle_monitor.sh" << 'EOF'
 #!/usr/bin/env bash
 #
 # waybar_idle_monitor.sh
@@ -2364,13 +2369,13 @@ while true; do
 done
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/waybar_idle_monitor.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/waybar_idle_monitor.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #        Systemd Service: waybar Idle Inhibitor Monitor
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/waybar-idle-monitor.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/waybar-idle-monitor.service" << 'EOF'
 [Unit]
 Description=Waybar Idle Inhibitor Monitor
 After=graphical-session.target
@@ -2391,16 +2396,16 @@ EOF
 #               Wallpaper Integration Scripts
 # ═══════════════════════════════════════════════════════════════
 
-    cat > "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" << 'EOF'
+    cat > "$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_BG="$HOME/.config/background"
-WP_CONFIG="$HOME/.config/wallpaper/wallpaper.ini"
-WAYPAPER_CONFIG="$HOME/.config/waypaper/config.ini"
-MATUGEN_CONFIG="$HOME/.config/matugen/config.toml"
+CONFIG_BG="$USER_HOME/.config/background"
+WP_CONFIG="$USER_HOME/.config/wallpaper/wallpaper.ini"
+WAYPAPER_CONFIG="$USER_HOME/.config/waypaper/config.ini"
+MATUGEN_CONFIG="$USER_HOME/.config/matugen/config.toml"
 RELOAD_SO="/usr/local/lib/gtk3-reload.so"
 RELOAD_SRC="/usr/local/share/gtk3-reload/gtk3-reload.c"
-HOOKS_DIR="$HOME/.config/hyprcandy/hooks"
+HOOKS_DIR="$USER_HOME/.config/hyprcandy/hooks"
 
 get_waypaper_background() {
     # Prefer quickshell wallpaper picker config, fall back to waypaper config
@@ -2408,7 +2413,7 @@ get_waypaper_background() {
         if [ -f "$cfg" ]; then
             current_bg=$(grep -E "^wallpaper\s*=" "$cfg" | head -n1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
             if [ -n "$current_bg" ]; then
-                current_bg=$(echo "$current_bg" | sed "s|^~|$HOME|")
+                current_bg=$(echo "$current_bg" | sed "s|^~|$USER_HOME|")
                 echo "$current_bg"
                 return 0
             fi
@@ -2424,7 +2429,7 @@ update_config_background() {
         wal -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
 		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
         sleep 0.5
-        magick "$bg_path" "$HOME/.config/background"
+        magick "$bg_path" "$USER_HOME/.config/background"
         sleep 1
         "$HOOKS_DIR/update_background.sh"
         #echo "✅ Updated ~/.config/background to point to: $bg_path"
@@ -2450,14 +2455,14 @@ main() {
 
 main
 EOF
-    chmod +x "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+    chmod +x "$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
 else
 
 # ═══════════════════════════════════════════════════════════════
 #         hyprpanel_idle_monitor.sh — Auto Toggle Inhibitor
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh" << 'EOF'
 #!/bin/bash
 
 IDLE_INHIBITOR_PID=""
@@ -2580,13 +2585,13 @@ while true; do
 done
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprpanel_idle_monitor.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #        Systemd Service: hyprpanel Idle Inhibitor Monitor
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/hyprpanel-idle-monitor.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/hyprpanel-idle-monitor.service" << 'EOF'
 [Unit]
 Description=Monitor hyprpanel and manage idle inhibitor
 After=graphical-session.target
@@ -2609,7 +2614,7 @@ EOF
 #             Safe hyprpanel Killer Script (Preserve awww)
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh" << 'EOF'
 #!/bin/bash
 
 echo "🔄 Safely closing hyprpanel while preserving awww-daemon..."
@@ -2637,22 +2642,22 @@ if ! pgrep -f "awww-daemon" > /dev/null; then
     echo "🔄 awww-daemon not found, restarting it..."
     awww-daemon &
     sleep 1
-    if [ -f "$HOME/.config/background" ]; then
+    if [ -f "$USER_HOME/.config/background" ]; then
         echo "🖼️  Restoring wallpaper..."
-        awww img "$HOME/.config/background" --transition-type fade --transition-duration 1
+        awww img "$USER_HOME/.config/background" --transition-type fade --transition-duration 1
     fi
 fi
 
 echo "✅ hyprpanel safely closed, awww-daemon preserved"
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #             Hyprpanel Restart Script (via systemd)
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh" << 'EOF'
 #!/bin/bash
 
 echo "🔄 Restarting hyprpanel via systemd..."
@@ -2664,13 +2669,13 @@ systemctl --user start hyprpanel.service
 echo "✅ Hyprpanel restarted"
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/restart_hyprpanel.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #             Systemd Service: Hyprpanel Launcher
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/hyprpanel.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/hyprpanel.service" << 'EOF'
 [Unit]
 Description=Hyprpanel - Modern Hyprland panel
 After=graphical-session.target hyprland-session.target
@@ -2699,11 +2704,11 @@ fi
 #      Script: Update Rofi Font from GTK Settings Font Name
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/update_rofi_font.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh" << 'EOF'
 #!/bin/bash
 
-GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
-ROFI_RASI="$HOME/.config/hyprcandy/settings/rofi-font.rasi"
+GTK_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
+ROFI_RASI="$USER_HOME/.config/hyprcandy/settings/rofi-font.rasi"
 
 # Get font name from GTK settings
 GTK_FONT=$(grep "^gtk-font-name=" "$GTK_FILE" | cut -d'=' -f2-)
@@ -2720,21 +2725,21 @@ else
 fi
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                Sync GTK, QT and ROFI Icon Themes
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/update_icon_theme.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/update_icon_theme.sh" << 'EOF'
 #!/bin/bash
 
-GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
-QT6CT_CONF="$HOME/.config/qt6ct/qt6ct.conf"
-QT5CT_CONF="$HOME/.config/qt5ct/qt5ct.conf"
-KDEGLOBALS="$HOME/.config/kdeglobals"
-UC_COLORS="$HOME/.local/share/color-schemes/HyprCandy.colors"
-ROFI_MENU="$HOME/.config/rofi/config.rasi"
+GTK_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
+QT6CT_CONF="$USER_HOME/.config/qt6ct/qt6ct.conf"
+QT5CT_CONF="$USER_HOME/.config/qt5ct/qt5ct.conf"
+KDEGLOBALS="$USER_HOME/.config/kdeglobals"
+UC_COLORS="$USER_HOME/.local/share/color-schemes/HyprCandy.colors"
+ROFI_MENU="$USER_HOME/.config/rofi/config.rasi"
 
 ICON_THEME=$(grep "^gtk-icon-theme-name=" "$GTK_FILE" | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
@@ -2788,18 +2793,18 @@ dbus-send --session --type=signal /kdeglobals \
 echo "✅ Icon theme synced to: $ICON_THEME"
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #      Watcher: React to GTK Font Changes via nwg-look
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hyprcandy/hooks/watch_gtk_font.sh" << 'EOF'
+cat > "$USER_HOME/.config/hyprcandy/hooks/watch_gtk_font.sh" << 'EOF'
 #!/bin/bash
 
-GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
-FONT_HOOK="$HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
-ICON_HOOK="$HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
+GTK_FILE="$USER_HOME/.config/gtk-3.0/settings.ini"
+FONT_HOOK="$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
+ICON_HOOK="$USER_HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
 
 while [ ! -f "$GTK_FILE" ]; do sleep 1; done
 
@@ -2826,13 +2831,13 @@ inotifywait -m -e modify "$GTK_FILE" | while read -r path event file; do
 done
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/watch_gtk_font.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/watch_gtk_font.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #      Systemd Service: GTK Font → Rofi Font Syncer
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/systemd/user/rofi-font-watcher.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/rofi-font-watcher.service" << 'EOF'
 [Unit]
 Description=Auto-update Rofi font when GTK font changes via nwg-look
 After=graphical-session.target
@@ -2848,7 +2853,7 @@ EOF
 # ═══════════════════════════════════════════════════════════════
 #               		  Pinned Apps File 
 # ═══════════════════════════════════════════════════════════════
-PINNED_FILE="$HOME/.config/pinned"
+PINNED_FILE="$USER_HOME/.config/pinned"
 if [ ! -f "$PINNED_FILE" ]; then
 	cat > "$PINNED_FILE" << 'EOF'
 org.gnome.Nautilus
@@ -2863,7 +2868,7 @@ fi
 # ═══════════════════════════════════════════════════════════════
 #               	  Desktop Pinned Apps File 
 # ═══════════════════════════════════════════════════════════════
-DESKTOP_FILE="$HOME/.config/desktop-pinned"
+DESKTOP_FILE="$USER_HOME/.config/desktop-pinned"
 if [ ! -f "$DESKTOP_FILE" ]; then
 	cat > "$DESKTOP_FILE" << 'EOF'
 nwg-displays
@@ -2878,26 +2883,26 @@ fi
 # ═══════════════════════════════════════════════════════════════
 #               		 POST SETUP CLEANUP
 # ═══════════════════════════════════════════════════════════════
-	cat > "$HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
+	cat > "$USER_HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
 #!/bin/bash
 
 bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
 pkill -f "floating-installer"
 EOF
 
-chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
+chmod +x "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
 
-#find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
-#find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
-#find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
-#find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
-#find "$HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
-#find "$HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
-#chmod +x "$HOME/.config/quickshell/candylock/auth.sh"
-#chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
-#chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
-#mkdir -p "$HOME/.cache/quickshell/overview"
-#mkdir -p "$HOME/.cache/quickshell/wallpaper"
+#find "$USER_HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
+#find "$USER_HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
+#find "$USER_HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
+#find "$USER_HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
+#find "$USER_HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
+#find "$USER_HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
+#chmod +x "$USER_HOME/.config/quickshell/candylock/auth.sh"
+#chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
+#chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
+#mkdir -p "$USER_HOME/.cache/quickshell/overview"
+#mkdir -p "$USER_HOME/.cache/quickshell/wallpaper"
 
     # 🛠️ GNOME Window Button Layout Adjustment
     #echo
@@ -2961,7 +2966,7 @@ chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 	
 # Add custom cursors to /usr/share/icons 
 echo "🔄 Adding custom cursors..."
-cp -r "$HOME"/.icons/* /usr/share/icons/
+cp -r "$USER_HOME"/.icons/* /usr/share/icons/
 echo "✅ Cursors updated."
 }
 
@@ -3078,12 +3083,12 @@ EOF
 # Function to setup default "custom.conf" file
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
-        if [ -d "$HOME/.config/hyprcustom" ]; then
-            touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
+        if [ -d "$USER_HOME/.config/hyprcustom" ]; then
+            touch "$USER_HOME/.config/hypr/hyprviz.conf" && touch "$USER_HOME/.config/hyprcustom/custom_lock.conf"
             echo "📁 Updating the custom settings directory..."
 
  # Add default content to the custom.conf file
-		cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
+		cat > "$USER_HOME/.config/hypr/hyprviz.conf" << 'EOF'
 #  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 # ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 # ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
@@ -3092,7 +3097,7 @@ setup_custom_config() {
 #  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
 
 #[IMPORTANT]#
-# Add custom settings to "$HOME/.config/custom/custom.conf".
+# Add custom settings to "$USER_HOME/.config/custom/custom.conf".
 #[IMPORTANT]#
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -3757,7 +3762,7 @@ debug {
 EOF
 
             # Add default content to the custom_lock.conf file
-            cat > "$HOME/.config/hyprcustom/custom_lock.conf" << 'EOF'
+            cat > "$USER_HOME/.config/hyprcustom/custom_lock.conf" << 'EOF'
 # ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
 # ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
 # ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ██║   ██║██║     █████╔╝ 
@@ -3884,7 +3889,7 @@ EOF
 if [ "$PANEL_CHOICE" = "waybar" ]; then
 
             # Add default content to the custom_keybinds.conf file
-            cat > "$HOME/.config/hyprcustom/custom_keybinds.conf" << 'EOF'
+            cat > "$USER_HOME/.config/hyprcustom/custom_keybinds.conf" << 'EOF'
 # ██╗  ██╗███████╗██╗   ██╗██████╗ ██╗███╗   ██╗██████╗ ███████╗
 # ██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔══██╗██║████╗  ██║██╔══██╗██╔════╝
 # █████╔╝ █████╗   ╚████╔╝ ██████╔╝██║██╔██╗ ██║██║  ██║███████╗
@@ -3947,7 +3952,7 @@ bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprl
 
 # Wf--recorder (simple recorder) + slurp (allows to select a specific region of the monitor)
 # {to list audio devices run "pactl list sources | grep Name"}   
-bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
+bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$USER_HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
 bind = Alt, R, exec, pkill -x wf-recorder #Stop recording
 
 #### Hyprsunset ####
@@ -4108,7 +4113,7 @@ EOF
 else
 
             # Add default content to the custom_keybinds.conf file
-            cat > "$HOME/.config/hyprcustom/custom_keybinds.conf" << 'EOF'
+            cat > "$USER_HOME/.config/hyprcustom/custom_keybinds.conf" << 'EOF'
 # ██╗  ██╗███████╗██╗   ██╗██████╗ ██╗███╗   ██╗██████╗ ███████╗
 # ██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔══██╗██║████╗  ██║██╔══██╗██╔════╝
 # █████╔╝ █████╗   ╚████╔╝ ██████╔╝██║██╔██╗ ██║██║  ██║███████╗
@@ -4170,7 +4175,7 @@ bind = ALT, 5, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprl
 
 # Wf--recorder (simple recorder) + slurp (allows to select a specific region of the monitor)
 # {to list audio devices run "pactl list sources | grep Name"}   
-bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
+bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$USER_HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
 bind = Alt, R, exec, pkill -x wf-recorder #Stop recording
 
 #### Hyprsunset ####
@@ -4331,7 +4336,7 @@ fi
 
     # 🎨 Update Hyprland custom.conf with current username  
     USERNAME=$(whoami)      
-    HYPRLAND_CUSTOM="$HOME/.config/hypr/hyprviz.conf"
+    HYPRLAND_CUSTOM="$USER_HOME/.config/hypr/hyprviz.conf"
     echo "🎨 Updating Hyprland custom.conf with current username..."		
     
     if [ -f "$HYPRLAND_CUSTOM" ]; then
@@ -4510,7 +4515,7 @@ update_keybinds() {
     done
     
         # Apply the keyboard layout to the custom.conf file
-    CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+    CUSTOM_CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
     
     if [ -f "$CUSTOM_CONFIG_FILE" ]; then
         sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$CUSTOM_CONFIG_FILE"
@@ -4557,7 +4562,7 @@ update_keybinds() {
 }
 
 update_custom() {
-    local CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+    local CUSTOM_CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
     
     # Check if custom config file exists
     if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
@@ -4614,24 +4619,24 @@ update_custom() {
 
 setup_gjs() {
 # Create the GJS directory and files if they don't already exist
-if [ ! -d "$HOME/.hyprcandy/GJS/src" ]; then
-    mkdir -p "$HOME/.hyprcandy/GJS/src"
+if [ ! -d "$USER_HOME/.hyprcandy/GJS/src" ]; then
+    mkdir -p "$USER_HOME/.hyprcandy/GJS/src"
     echo "📁 Created the GJS directory"
 fi
 
-cd "$HOME/.hyprcandy/GJS"
+cd "$USER_HOME/.hyprcandy/GJS"
 rm -f toggle-control-center.sh toggle-media-player.sh toggle-system-monitor.sh toggle-weather-widget.sh
-cd "$HOME"
+cd "$USER_HOME"
 
-cat > "$HOME/.hyprcandy/GJS/toggle-control-center.sh" << 'EOF'
+cat > "$USER_HOME/.hyprcandy/GJS/toggle-control-center.sh" << 'EOF'
 #!/bin/bash
 
 # Toggle Candy Utils - Fast launch (daemon stays running)
 # No killing - daemon persists for instant widget launches
 
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
+PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4644,16 +4649,16 @@ fi
 # Toggle widget
 touch "$TOGGLE_DIR/toggle-utils"
 EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-control-center.sh"
+chmod +x "$USER_HOME/.hyprcandy/GJS/toggle-control-center.sh"
 
-cat > "$HOME/.hyprcandy/GJS/toggle-system-monitor.sh" << 'EOF'
+cat > "$USER_HOME/.hyprcandy/GJS/toggle-system-monitor.sh" << 'EOF'
 #!/bin/bash
 
 # Toggle System Monitor - Fast launch (daemon stays running)
 
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
+PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4664,16 +4669,16 @@ fi
 
 touch "$TOGGLE_DIR/toggle-system"
 EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-system-monitor.sh"
+chmod +x "$USER_HOME/.hyprcandy/GJS/toggle-system-monitor.sh"
 
-cat > "$HOME/.hyprcandy/GJS/toggle-media-player.sh" << 'EOF'
+cat > "$USER_HOME/.hyprcandy/GJS/toggle-media-player.sh" << 'EOF'
 #!/bin/bash
 
 # Toggle Media Player - Fast launch (daemon stays running)
 
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
+PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4684,16 +4689,16 @@ fi
 
 touch "$TOGGLE_DIR/toggle-media"
 EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-media-player.sh"
+chmod +x "$USER_HOME/.hyprcandy/GJS/toggle-media-player.sh"
 
-cat > "$HOME/.hyprcandy/GJS/toggle-weather-widget.sh" << 'EOF'
+cat > "$USER_HOME/.hyprcandy/GJS/toggle-weather-widget.sh" << 'EOF'
 #!/bin/bash
 
 # Toggle Weather Widget - Fast launch (daemon stays running)
 
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
+PID_FILE="$USER_HOME/.cache/hyprcandy/pids/candy-daemon.pid"
+DAEMON_SCRIPT="$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
+TOGGLE_DIR="$USER_HOME/.cache/hyprcandy/toggle"
 
 mkdir -p "$TOGGLE_DIR"
 
@@ -4704,75 +4709,32 @@ fi
 
 touch "$TOGGLE_DIR/toggle-weather"
 EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-weather-widget.sh"
+chmod +x "$USER_HOME/.hyprcandy/GJS/toggle-weather-widget.sh"
 
-find "$HOME/.hyprcandy/GJS" -name "*.sh" -exec chmod +x {} \;
-chmod +x "$HOME/.hyprcandy/GJS/candy-daemon.js"
+find "$USER_HOME/.hyprcandy/GJS" -name "*.sh" -exec chmod +x {} \;
+chmod +x "$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
 
 echo "✅ Files and Apps setup complete"
 }
 
 # Function to finalize updated setup
 finalize_setup() {
+    REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
+    
+    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'"
 
-# WAYLAND_DISPLAY is inherited from the Hyprland session when called correctly.
-# If somehow unset, derive it from the running compositor socket.
-if [ -z "$WAYLAND_DISPLAY" ]; then
-    export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
-fi
-pgrep -x awww-daemon > /dev/null 2>&1 || awww-daemon &
-sleep 1
-# Wait for awww-daemon socket — it may still be starting up
-RETRIES=10
-until awww query &>/dev/null || [ $RETRIES -eq 0 ]; do
-    sleep 1
-    (( RETRIES-- ))
-done
-
-# Start the correct services
-
-echo "🔄 Setting up services..."
-systemctl --user daemon-reload
-
-if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
-else
-    systemctl --user restart hyprpanel.service hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
-fi
-echo "✅ Services restarted"
-
-if awww query &>/dev/null; then
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
-    echo "✅ Initial background set"
-else
-    echo "⚠️  awww-daemon not ready — background not set"
-fi
-
-    # 🔄 Reload Hyprland
-    echo
-    echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
-    if command -v hyprctl > /dev/null 2>&1; then
-        if pgrep -x "Hyprland" > /dev/null; then
-            hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
-        else
-            echo "ℹ️  Hyprland is not currently running. Configuration will be applied on next start and Hyprland login."
-        fi
-    else
-        echo "⚠️  'hyprctl' not found. Skipping Hyprland reload. Run 'hyprctl reload' on next start and Hyprland login."
-    fi
-
-    print_success "HyprCandy updated completed!"  
+    print_success "HyprCandy update completed!"
 }
 
 # Function to prompt for session restart
-prompt_logout() {
+cleanup() {
     echo
     print_success "Installation and configuration completed!"
     print_status "All packages have been installed and Hyprcandy configurations have been deployed."
     print_status "The $DISPLAY_MANAGER display manager has been enabled."
     echo
 	print_status "Cleaning up..."
-    bash "$HOME/.config/hyprcandy/hooks/complete.sh"
+    bash "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
     return 0
 }
 
@@ -4798,8 +4760,8 @@ main() {
     #echo
     
     # Choose shell
-    choose_shell
-    echo
+    #choose_shell
+    #echo
 
     # Check for AUR helper or install one
     check_or_install_package_manager
@@ -4809,6 +4771,8 @@ main() {
         setup_fish
     elif [ "$SHELL_CHOICE" = "zsh" ]; then
         setup_zsh
+    elif [ "$SHELL_CHOICE" = "skip" ]; then
+        echo
     fi
     
     # Automatically setup HyprCandy configuration
@@ -4839,8 +4803,8 @@ main() {
     #print_status "• Your HyprCandy configs are in: ~/.hyprcandy/"
     #print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
     #print_status "• Major updates: rerun the install script for updated apps and configs"
-    #print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
-    #print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
+    #print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $USER_HOME"
+    #print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $USER_HOME"
     
     # Display and wallpaper configuration notes
     echo
@@ -4882,7 +4846,7 @@ main() {
     echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     
     # Prompt for session restart
-    prompt_logout
+    cleanup
 }
 
 # Run main function
