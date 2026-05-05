@@ -73,7 +73,7 @@ print_error() {
 
 # Function to choose display manager
 choose_display_manager() {
-    print_status "For old users remove rofi-wayland through 'sudo pacman -Rnsd rofi-wayland' then clear cache through 'sudo pacman -Scc'"
+    print_status "For old users remove rofi-wayland through 'pacman -Rnsd rofi-wayland' then clear cache through 'pacman -Scc'"
     echo -e "${CYAN}Choose your display manager:${NC}"
     echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
     echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
@@ -232,14 +232,14 @@ check_or_install_package_manager() {
                     case $choice in
                         1|"")
                             print_status "Ensuring base-devel and git are installed..."
-                            sudo pacman -S --needed --noconfirm base-devel git
+                            pacman -S --needed --noconfirm base-devel git
                             install_paru
                             AUR_HELPER="paru"
                             break
                             ;;
                         2)
                             print_status "Ensuring base-devel and git are installed..."
-                            sudo pacman -S --needed --noconfirm base-devel git
+                            pacman -S --needed --noconfirm base-devel git
                             install_yay
                             AUR_HELPER="yay"
                             break
@@ -553,7 +553,7 @@ if [[ -z "$FISH_PATH" ]]; then
 fi
 
 if ! grep -qF "$FISH_PATH" /etc/shells; then
-    echo "$FISH_PATH" | sudo tee -a /etc/shells
+    echo "$FISH_PATH" | tee -a /etc/shells
 fi
 
 chsh -s "$FISH_PATH"
@@ -703,11 +703,11 @@ alias ...="cd ../.."
 alias grep="grep --color=auto"
 alias fgrep="fgrep --color=auto"
 alias egrep="egrep --color=auto"
-alias update="sudo pacman -Syu"
-alias install="sudo pacman -S"
+alias update="pacman -Syu"
+alias install="pacman -S"
 alias search="pacman -Ss"
-alias remove="sudo pacman -R"
-alias autoremove="sudo pacman -Rs (pacman -Qtdq)"
+alias remove="pacman -R"
+alias autoremove="pacman -Rs (pacman -Qtdq)"
 alias cls="clear"
 alias h="history"
 alias j="jobs -l"
@@ -785,7 +785,7 @@ fi
 
 # Ensure zsh is in /etc/shells before chsh
 if ! grep -qF "$ZSH_PATH" /etc/shells; then
-    echo "$ZSH_PATH" | sudo tee -a /etc/shells
+    echo "$ZSH_PATH" | tee -a /etc/shells
 fi
 
 chsh -s "$ZSH_PATH"
@@ -924,11 +924,11 @@ alias ...="cd ../.."
 alias grep="grep --color=auto"
 alias fgrep="fgrep --color=auto"
 alias egrep="egrep --color=auto"
-alias update="sudo pacman -Syu"
-alias install="sudo pacman -S"
+alias update="pacman -Syu"
+alias install="pacman -S"
 alias search="pacman -Ss"
-alias remove="sudo pacman -R"
-alias autoremove="sudo pacman -Rs $(pacman -Qtdq)"
+alias remove="pacman -R"
+alias autoremove="pacman -Rs $(pacman -Qtdq)"
 alias c="clear"
 alias h="history"
 alias j="jobs -l"
@@ -1624,8 +1624,8 @@ update_hypr_cursor_env() {
     sed -i "s|^gtk-cursor-theme-size=.*|gtk-cursor-theme-size=$size|" "$GTK4_FILE" 
 
     # SDDM cursor update
-    sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/sugar-candy.conf"
-    sudo sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/sugar-candy.conf"
+    sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/sugar-candy.conf"
+    sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/sugar-candy.conf"
 
     # Apply changes immediately
     apply_cursor_changes "$theme" "$size"
@@ -1817,15 +1817,15 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
         # webp is not supported by sugar-candy — convert to jpg first
         if [[ "${WP_EXT,,}" == "webp" ]]; then
             WP_FILENAME="${WP_FILENAME%.*}.jpg"
-            sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
-            sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
+            magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
             #echo "🔄 Converted webp → $WP_FILENAME"
         else
-            sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
-            sudo chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
+            magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            chmod 644 "$SDDM_BG_DIR/$WP_FILENAME"
         fi
 
-        sudo sed -i "s|^Background=.*|Background=\"Backgrounds/$WP_FILENAME\"|" "$SDDM_CONF"
+        sed -i "s|^Background=.*|Background=\"Backgrounds/$WP_FILENAME\"|" "$SDDM_CONF"
         #echo "🖥️  SDDM background updated → Backgrounds/$WP_FILENAME"
     fi
 
@@ -1836,7 +1836,7 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
             | grep -oP '(?<=#)[0-9a-fA-F]{6}')
 
         if [[ -n "$FULL_HEX" ]]; then
-            sudo sed -i "s|^BackgroundColor=.*|BackgroundColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
+            sed -i "s|^BackgroundColor=.*|BackgroundColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
             #echo "🎨 SDDM BackgroundColor updated → #$FULL_HEX (from inverse_primary)"
         else
             echo "⚠️  Could not parse inverse_primary from $COLORS_CSS"
@@ -1852,7 +1852,7 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
             | grep -oP '(?<=#)[0-9a-fA-F]{6}')
 
         if [[ -n "$FULL_HEX" ]]; then
-            sudo sed -i "s|^AccentColor=.*|AccentColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
+            sed -i "s|^AccentColor=.*|AccentColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
             #echo "🎨 SDDM AccentColor updated → #$FULL_HEX (from primary_container)"
         else
             echo "⚠️  Could not parse primary_container from $COLORS_CSS"
@@ -1907,13 +1907,13 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
         # webp is not supported by sugar-candy — convert to jpg first
         if [[ "${WP_EXT,,}" == "webp" ]]; then
             WP_FILENAME="${WP_FILENAME%.*}.jpg"
-            sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
             echo "🔄 Converted webp → $WP_FILENAME"
         else
-            sudo magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
+            magick "$CURRENT_WP" "$SDDM_BG_DIR/$WP_FILENAME"
         fi
 
-        sudo sed -i "s|^Background=.*|Background=\"Backgrounds/$WP_FILENAME\"|" "$SDDM_CONF"
+        sed -i "s|^Background=.*|Background=\"Backgrounds/$WP_FILENAME\"|" "$SDDM_CONF"
         echo "🖥️  SDDM background updated → Backgrounds/$WP_FILENAME"
     fi
 
@@ -1924,7 +1924,7 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
             | grep -oP '(?<=#)[0-9a-fA-F]{6}')
 
         if [[ -n "$FULL_HEX" ]]; then
-            sudo sed -i "s|^BackgroundColor=.*|BackgroundColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
+            sed -i "s|^BackgroundColor=.*|BackgroundColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
             echo "🎨 SDDM BackgroundColor updated → #$FULL_HEX (from inverse_primary)"
         else
             echo "⚠️  Could not parse inverse_primary from $COLORS_CSS"
@@ -1940,7 +1940,7 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
             | grep -oP '(?<=#)[0-9a-fA-F]{6}')
 
         if [[ -n "$FULL_HEX" ]]; then
-            sudo sed -i "s|^AccentColor=.*|AccentColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
+            sed -i "s|^AccentColor=.*|AccentColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
             echo "🎨 SDDM AccentColor updated → #$FULL_HEX (from primary_container)"
         else
             echo "⚠️  Could not parse primary_container from $COLORS_CSS"
@@ -2952,16 +2952,16 @@ SUDOERS_ENTRIES=(
 )
 
 # Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
 # Set proper permissions on the sudoers file
-sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
 	
 # Add custom cursors to /usr/share/icons 
 echo "🔄 Adding custom cursors..."
-sudo cp -r "$HOME"/.icons/* /usr/share/icons/
+cp -r "$HOME"/.icons/* /usr/share/icons/
 echo "✅ Cursors updated."
 }
 
@@ -2971,42 +2971,42 @@ enable_display_manager() {
 	
     # Disable other display managers first
     print_status "Disabling other display managers..."
-    sudo systemctl disable lightdm 2>/dev/null || true
-    sudo systemctl disable lxdm 2>/dev/null || true
+    systemctl disable lightdm 2>/dev/null || true
+    systemctl disable lxdm 2>/dev/null || true
     if [ "$DISPLAY_MANAGER" != "sddm" ]; then
-        sudo systemctl disable sddm 2>/dev/null || true
+        systemctl disable sddm 2>/dev/null || true
     fi
     if [ "$DISPLAY_MANAGER" != "gdm" ]; then
-        sudo systemctl disable gdm 2>/dev/null || true
+        systemctl disable gdm 2>/dev/null || true
     fi
     
     # Enable the selected display manager
-    if sudo systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
+    if systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
         print_success "$DISPLAY_MANAGER has been enabled successfully!"
     else
         print_error "Failed to enable $DISPLAY_MANAGER. You may need to enable it manually."
-        print_status "Run: sudo systemctl enable $DISPLAY_MANAGER_SERVICE"
+        print_status "Run: systemctl enable $DISPLAY_MANAGER_SERVICE"
     fi
     
     # Additional SDDM configuration if selected
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         print_status "Configuring SDDM with Sugar Candy theme..."
         
-        sudo rm -rf /etc/sddm.conf.d/
+        rm -rf /etc/sddm.conf.d/
         sleep 1
         # Create SDDM config directory if it doesn't exist
-        sudo mkdir -p /etc/sddm.conf.d/
+        mkdir -p /etc/sddm.conf.d/
         
         # Configure SDDM to use Sugar Candy theme
         if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
-            sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
+            tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
 [Theme]
 Current=sugar-candy
 CursorTheme=Bibata-Modern-Classic
 CursorSize=18
 EOF
             # Write full theme config to the sugar-candy theme directory
-            sudo tee /usr/share/sddm/themes/sugar-candy/theme.conf > /dev/null << EOF
+            tee /usr/share/sddm/themes/sugar-candy/theme.conf > /dev/null << EOF
 [General]
 Background="Backgrounds/Mountain.png"
 DimBackgroundImage="0.0"
@@ -3060,8 +3060,8 @@ EOF
 
             if [[ -f "$MAIN_QML" ]]; then
                 if grep -q "^\s*Image {" "$MAIN_QML"; then
-                    sudo sed -i 's/^\(\s*\)Image {/\1AnimatedImage {/' "$MAIN_QML"
-                    sudo sed -i '/id: backgroundImage/a\            playing: true' "$MAIN_QML"
+                    sed -i 's/^\(\s*\)Image {/\1AnimatedImage {/' "$MAIN_QML"
+                    sed -i '/id: backgroundImage/a\            playing: true' "$MAIN_QML"
                     echo "🎬 Patched Main.qml with AnimatedImage support"
                 else
                     echo "✅ Main.qml already patched"
