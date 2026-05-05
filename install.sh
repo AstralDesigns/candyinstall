@@ -2983,7 +2983,7 @@ chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 # ═══════════════════════════════════════════════════════════════
 	cat > "$HOME/.config/hyprcandy/hooks/complete.sh" << 'EOF'
 #!/bin/bash
-touch "/tmp/hc-update-complete"
+
 bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
 EOF
 
