@@ -2917,7 +2917,17 @@ chmod +x "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
         #echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     #fi
 	
-# 🔐 Add sudoers entry for background script
+# Add custom cursors to /usr/share/icons 
+echo "🔄 Adding custom cursors..."
+cp -r "$USER_HOME"/.icons/* /usr/share/icons/
+echo "✅ Cursors updated."
+}
+
+# Function to enable display manager and prompt for reboot
+enable_display_manager() {
+    print_status "Setting up $DISPLAY_MANAGER display manager..."
+
+	# 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
 	
     # Get the current username
@@ -2962,53 +2972,24 @@ printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d
 chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
-	
-# Add custom cursors to /usr/share/icons 
-echo "🔄 Adding custom cursors..."
-cp -r "$USER_HOME"/.icons/* /usr/share/icons/
-echo "✅ Cursors updated."
-}
-
-# Function to enable display manager and prompt for reboot
-enable_display_manager() {
-    print_status "Enabling $DISPLAY_MANAGER display manager..."
-	
-    # Disable other display managers first
-    print_status "Disabling other display managers..."
-    systemctl disable lightdm 2>/dev/null || true
-    systemctl disable lxdm 2>/dev/null || true
-    if [ "$DISPLAY_MANAGER" != "sddm" ]; then
-        systemctl disable sddm 2>/dev/null || true
-    fi
-    if [ "$DISPLAY_MANAGER" != "gdm" ]; then
-        systemctl disable gdm 2>/dev/null || true
-    fi
-    
-    # Enable the selected display manager
-    if systemctl enable "$DISPLAY_MANAGER_SERVICE"; then
-        print_success "$DISPLAY_MANAGER has been enabled successfully!"
-    else
-        print_error "Failed to enable $DISPLAY_MANAGER. You may need to enable it manually."
-        print_status "Run: sudo systemctl enable $DISPLAY_MANAGER_SERVICE"
-    fi
     
     # Additional SDDM configuration if selected
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         print_status "Configuring SDDM with Sugar Candy theme..."
         
-        rm -rf /etc/sddm.conf.d/
-        sleep 1
+        #rm -rf /etc/sddm.conf.d/
+        #sleep 1
         # Create SDDM config directory if it doesn't exist
         mkdir -p /etc/sddm.conf.d/
         
         # Configure SDDM to use Sugar Candy theme
         if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
-            tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
-[Theme]
-Current=sugar-candy
-CursorTheme=Bibata-Modern-Classic
-CursorSize=18
-EOF
+#            tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
+#[Theme]
+#Current=sugar-candy
+#CursorTheme=Bibata-Modern-Classic
+#CursorSize=18
+#EOF
             # Write full theme config to the sugar-candy theme directory
             tee /usr/share/sddm/themes/sugar-candy/theme.conf > /dev/null << EOF
 [General]
