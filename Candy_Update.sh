@@ -3283,7 +3283,7 @@ binds {
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 decoration {
-    rounding = 15
+    rounding = 20
     rounding_power = 2
     active_opacity = 0.85
     inactive_opacity = 0.85
