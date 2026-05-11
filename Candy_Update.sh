@@ -3292,7 +3292,7 @@ decoration {
     blur {
     enabled = true
     size = 2
-    passes = 4
+    passes = 5
     new_optimizations = on
     ignore_opacity = true
         xray = false
