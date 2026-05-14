@@ -3731,6 +3731,14 @@ misc {
 }
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                             Debug                           ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+debug {
+    suppress_errors = true
+}
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 # ┃                            Keybinds                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
@@ -3943,14 +3951,6 @@ bind = Shift, F7, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-v
 bind = Shift, F4, exec, playerctl play-pause #Toggle play/pause
 bind = Shift, F6, exec, playerctl next #Play next video/song
 bind = Shift, F5, exec, playerctl previous #Play previous video/song
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                             Extra                           ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-debug {
-    suppress_errors = true
-}
 EOF
 
             # Add default content to the custom_lock.conf file
