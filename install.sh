@@ -3862,168 +3862,21 @@ misc {
 }
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Userprefs                         ┃
+# ┃                            Debug                            ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-# [NOTE!!] Add you personal settings from here and incase of an update copy them to the new file once this is changed to a backup
 
 debug {
     suppress_errors = true
 }
 
 # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                            Plugins                          ┃
+# ┃                            Keybinds                         ┃
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-EOF
-
-else
-
-echo
-
-fi
-
-            # Add default content to the custom_lock.conf file
-            cat > "$HOME/.config/hyprcustom/custom_lock.conf" << 'EOF'
-# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
-# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
-# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ██║   ██║██║     █████╔╝ 
-# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██║   ██║██║     ██╔═██╗ 
-# ██║  ██║   ██║   ██║     ██║  ██║███████╗╚██████╔╝╚██████╗██║  ██╗
-# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝
-
-source = ~/.config/hypr/colors.conf
-
-general {
-    ignore_empty_input = true
-    hide_cursor = true
-}
-
-auth {
-    fingerprint {
-        enabled = true
-        ready_message = Scan fingerprint to unlock
-        present_message = Scanning...
-        retry_delay = 250 # in milliseconds
-    }
-}
-
-background {
-    monitor =
-    path = ~/.config/background.png
-    blur_passes = 4
-    blur_sizes = 0
-    vibrancy = 0.1696
-    noise = 0.01
-    contrast = 0.8916
-}
-
-input-field {
-    monitor =
-    size = 200, 50
-    outline_thickness = 3
-    dots_size = 0.25 # Scale of input-field height, 0.2 - 0.8
-    dots_spacing = 0.2 # Scale of dots' absolute size, 0.0 - 1.0
-    dots_center = true
-    dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
-    outer_color = $primary_fixed_dim $on_secondary 90deg
-    inner_color = $on_primary_fixed_variant
-    font_color = $primary_fixed_dim
-    font_family = C059 Bold Italic
-    fade_on_empty = false
-    fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-    placeholder_text = <i><span>       $USER       </span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
-    hide_input = false
-    rounding = 20 # -1 means complete rounding (circle/oval)
-    check_color = $rimary
-    fail_color = $error # if authentication failed, changes outer_color and fail message color
-    fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
-    fail_transition = 300 # transition time in ms between normal outer_color and fail_color
-    capslock_color = $primary_fixed_dim
-    numlock_color = $primary_fixed_dim $on_secondary 90deg
-    #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
-    invert_numlock = false # change color if numlock is off
-    swap_font_color = false # see below
-    position = 0, 150
-    halign = center
-    valign = bottom
-    shadow_passes = 10
-    shadow_size = 20
-    shadow_color = $shadow
-    shadow_boost = 1.6
-}
-
-label {
-    monitor =
-    #date
-    text = cmd[update:60000] date +"%A, %d %B %Y"
-    color = $primary
-    font_size = 20
-    font_family = C059 Bold
-    position = 0, -35
-    halign = center
-    valign = top
-}
-
-label {
-    monitor =
-    #clock
-    text = cmd[update:1000] echo "$TIME"
-    color = $on_primary_fixed_variant
-    font_size = 55
-    font_family = C059 Bold Italic
-    position = 0, -150
-    halign = center
-    valign = top
-    shadow_passes = 5
-    shadow_size = 10
-}
-
-#label {
-    monitor =
-    #text = ✝      $USER    ✝ #  $USER
-    color = $primary_fixed_dim
-    font_size = 20
-    font_family = C059 Bold
-    position = 0, 100
-    halign = center
-    valign = bottom
-    shadow_passes = 5
-    shadow_size = 10
-}
-
-image {
-    monitor =
-    path = ~/.config/lock.png #.face.icon
-    size = 160  lesser side if not 1:1 ratio
-    rounding = -1 # negative values mean circle
-    border_size = 4
-    border_color = $primary_fixed_dim $on_secondary 90deg
-    rotate = 0 # degrees, counter-clockwise
-    reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
-#    reload_cmd =  # command to get new path. if empty, old path will be used. don't run "follow" commands like tail -F
-    position = 0, 0
-    halign = center
-    valign = center
-}
-EOF
-
-if [ "$PANEL_CHOICE" = "waybar" ]; then
-
-            # Add default content to the custom_keybinds.conf file
-            cat > "$HOME/.config/hyprcustom/custom_keybinds.conf" << 'EOF'
-# ██╗  ██╗███████╗██╗   ██╗██████╗ ██╗███╗   ██╗██████╗ ███████╗
-# ██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔══██╗██║████╗  ██║██╔══██╗██╔════╝
-# █████╔╝ █████╗   ╚████╔╝ ██████╔╝██║██╔██╗ ██║██║  ██║███████╗
-# ██╔═██╗ ██╔══╝    ╚██╔╝  ██╔══██╗██║██║╚██╗██║██║  ██║╚════██║
-# ██║  ██╗███████╗   ██║   ██████╔╝██║██║ ╚████║██████╔╝███████║
-# ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝ ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝
 
 #
 $mainMod = SUPER
 $HYPRSCRIPTS = ~/.config/hypr/scripts
 $SCRIPTS = ~/.config/hyprcandy/scripts
-$EDITOR = gedit # Change from the default editor to your prefered editor
-$DISCORD = equibop
 #
 
 #### Kill active window ####
@@ -4048,14 +3901,14 @@ bind = ALT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh -n #Alter
 bind = ALT SHIFT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh -p #Alternate wallpapers backward
 bind = ALT SHIFT, R, exec, ~/.config/hyprcandy/hooks/wallpaper_integration.sh #Reload system colors
 bind = $mainMod, S, exec, spotify-launcher #Spotify
-bind = $mainMod, D, exec, $DISCORD #Discord
-bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
-bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default browser
+bind = $mainMod, D, exec, equibop #Discord
+bind = $mainMod, C, exec, gedit #Editor
+bind = $mainMod, B, exec, xdg-open "http://" #Launch your default browser
 bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
-bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
-bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
-bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #Launch the filemanager 
-bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
+bind = $mainMod, Return, exec, pypr toggle term #Launch a kitty scratchpad through pyprland
+bind = $mainMod, O, exec, /usr/bin/octopi #Launch octopi application finder
+bind = $mainMod, E, exec, nautilus #Launch the filemanager 
+bind = $mainMod CTRL, C, exec, gnome-calculator #Launch the calculator
 
 #### Bar/Panel ####
 
@@ -4233,227 +4086,134 @@ EOF
 
 else
 
-            # Add default content to the custom_keybinds.conf file
-            cat > "$HOME/.config/hyprcustom/custom_keybinds.conf" << 'EOF'
-# ██╗  ██╗███████╗██╗   ██╗██████╗ ██╗███╗   ██╗██████╗ ███████╗
-# ██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔══██╗██║████╗  ██║██╔══██╗██╔════╝
-# █████╔╝ █████╗   ╚████╔╝ ██████╔╝██║██╔██╗ ██║██║  ██║███████╗
-# ██╔═██╗ ██╔══╝    ╚██╔╝  ██╔══██╗██║██║╚██╗██║██║  ██║╚════██║
-# ██║  ██╗███████╗   ██║   ██████╔╝██║██║ ╚████║██████╔╝███████║
-# ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝ ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝
+echo
 
-#
-$mainMod = SUPER
-$HYPRSCRIPTS = ~/.config/hypr/scripts
-$SCRIPTS = ~/.config/hyprcandy/scripts
-$EDITOR = gedit # Change from the default editor to your prefered editor
-$DISCORD = equibop
-#
-
-#### Kill active window ####
-
-bind = $mainMod, Escape, killactive #Kill single active window
-bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
-
-#### Rofi Menus ####
-
-bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
-bind = $mainMod, A, exec, rofi -show drun || pkill rofi      #Launch or kill/hide rofi application finder
-bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
-bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
-bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
-bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
-bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #Open rofi glyph-picker
-
-#### Applications ####
-
-bind = $mainMod, W, exec, waypaper #Waypaper
-bind = $mainMod, S, exec, spotify-launcher #Spotify
-bind = $mainMod, D, exec, $DISCORD #Discord
-bind = $mainMod, C, exec, DRI_PRIME=1 $EDITOR #Editor
-bind = $mainMod, B, exec, DRI_PRIME=1 xdg-open "http://" #Launch your default browser
-bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
-bind = $mainMod, Return, exec, DRI_PRIME=1 pypr toggle term #Launch a kitty scratchpad through pyprland
-bind = $mainMod, O, exec, DRI_PRIME=1 /usr/bin/octopi #Launch octopi application finder
-bind = $mainMod, E, exec, DRI_PRIME=1 nautilus #Launch the filemanager 
-bind = $mainMod CTRL, C, exec, DRI_PRIME=1 gnome-calculator #Launch the calculator
-
-#### Bar/Panel ####
-
-bind = ALT, 1, exec, ~/.config/hyprcandy/hooks/kill_hyprpanel_safe.sh #Hide/kill hyprpanel and start automatic idle-inhibitor
-bind = ALT, 2, exec, ~/.config/hyprcandy/hooks/restart_hyprpanel.sh #Restart or reload hyprpanel and stop automatic idle-inhibitor
-
-#### Dock keybinds ####
-
-bind = ALT, 3, exec, $SCRIPTS/toggle-dock.sh --restore #Hide/kill or launch dock
-bind = ALT, 4, exec, ~/.config/hyprcandy/hooks/nwg_dock_status_display.sh #Dock status display
-
-#### Status display ####
-
-bind = ALT, 5, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprland status display
-
-#### Recorder ####
-
-# Wf--recorder (simple recorder) + slurp (allows to select a specific region of the monitor)
-# {to list audio devices run "pactl list sources | grep Name"}   
-bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
-bind = Alt, R, exec, pkill -x wf-recorder #Stop recording
-
-#### Hyprsunset ####
-
-bind = Shift, H, exec, hyprctl hyprsunset gamma +10 #Increase gamma by 10%
-bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
-
-
-#### Actions ####
-
-bind = ALT, G, exec, $HYPRSCRIPTS/gamemode.sh						  #Toggle game-mode
-#bind = $mainMod, M, exec, ~/.config/hypr/scripts/power.sh exit 				  #Logout
-#bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo-plus workspaces overview
-bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
-bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
-bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
-bind = $mainMod, V, exec, cliphist wipe 						  #Clear cliphist database
-bind = $mainMod CTRL, D, exec, $ cliphist list | dmenu | cliphist delete 		  #Delete an old item
-bind = $mainMod ALT, D, exec, $ cliphist delete-query "secret item"  			  #Delete an old item quering manually
-bind = $mainMod ALT, S, exec, $ cliphist list | dmenu | cliphist decode | wl-copy    	  #Select an old item
-bind = $mainMod ALT, O, exec, $HYPRSCRIPTS/window-opacity.sh                              #Change opacity
-bind = $mainMod, L, exec, ~/.config/hypr/scripts/power.sh lock 				  #Lock
-
-
-#### Workspaces ####
-
-bind = SHIFT, TAB, exec, $SCRIPTS/overview.sh #Workspace overview
-
-bind = $mainMod, 1, workspace, 1  #Open workspace 1
-bind = $mainMod, 2, workspace, 2  #Open workspace 2
-bind = $mainMod, 3, workspace, 3  #Open workspace 3
-bind = $mainMod, 4, workspace, 4  #Open workspace 4
-bind = $mainMod, 5, workspace, 5  #Open workspace 5
-bind = $mainMod, 6, workspace, 6  #Open workspace 6
-bind = $mainMod, 7, workspace, 7  #Open workspace 7
-bind = $mainMod, 8, workspace, 8  #Open workspace 8
-bind = $mainMod, 9, workspace, 9  #Open workspace 9
-bind = $mainMod, 0, workspace, 10 #Open workspace 10
-
-bind = $mainMod SHIFT, 1, movetoworkspace, 1  #Move active window to workspace 1
-bind = $mainMod SHIFT, 2, movetoworkspace, 2  #Move active window to workspace 2
-bind = $mainMod SHIFT, 3, movetoworkspace, 3  #Move active window to workspace 3
-bind = $mainMod SHIFT, 4, movetoworkspace, 4  #Move active window to workspace 4
-bind = $mainMod SHIFT, 5, movetoworkspace, 5  #Move active window to workspace 5
-bind = $mainMod SHIFT, 6, movetoworkspace, 6  #Move active window to workspace 6
-bind = $mainMod SHIFT, 7, movetoworkspace, 7  #Move active window to workspace 7
-bind = $mainMod SHIFT, 8, movetoworkspace, 8  #Move active window to workspace 8
-bind = $mainMod SHIFT, 9, movetoworkspace, 9  #Move active window to workspace 9
-bind = $mainMod SHIFT, 0, movetoworkspace, 10 #Move active window to workspace 10
-
-bind = $mainMod, Tab, workspace, m+1       #Open next workspace
-bind = $mainMod SHIFT, Tab, workspace, m-1 #Open previous workspace
-
-bind = $mainMod CTRL, 1, exec, $HYPRSCRIPTS/moveTo.sh 1  #Move all windows to workspace 1
-bind = $mainMod CTRL, 2, exec, $HYPRSCRIPTS/moveTo.sh 2  #Move all windows to workspace 2
-bind = $mainMod CTRL, 3, exec, $HYPRSCRIPTS/moveTo.sh 3  #Move all windows to workspace 3
-bind = $mainMod CTRL, 4, exec, $HYPRSCRIPTS/moveTo.sh 4  #Move all windows to workspace 4
-bind = $mainMod CTRL, 5, exec, $HYPRSCRIPTS/moveTo.sh 5  #Move all windows to workspace 5
-bind = $mainMod CTRL, 6, exec, $HYPRSCRIPTS/moveTo.sh 6  #Move all windows to workspace 6
-bind = $mainMod CTRL, 7, exec, $HYPRSCRIPTS/moveTo.sh 7  #Move all windows to workspace 7
-bind = $mainMod CTRL, 8, exec, $HYPRSCRIPTS/moveTo.sh 8  #Move all windows to workspace 8
-bind = $mainMod CTRL, 9, exec, $HYPRSCRIPTS/moveTo.sh 9  #Move all windows to workspace 9
-bind = $mainMod CTRL, 0, exec, $HYPRSCRIPTS/moveTo.sh 10  #Move all windows to workspace 10
-
-bind = $mainMod, mouse_down, workspace, e+1  #Open next workspace
-bind = $mainMod, mouse_up, workspace, e-1    #Open previous workspace
-bind = $mainMod CTRL, down, workspace, empty #Open the next empty workspace
-
-#### Minimize windows using special workspaces ####
-
-bind = CTRL SHIFT, 1, togglespecialworkspace, magic #Togle window from special workspace
-bind = CTRL SHIFT, 2, movetoworkspace, +0 #Move window to special workspace 2 (Can be toggled with "$mainMod,1")
-bind = CTRL SHIFT, 3, togglespecialworkspace, magic #Togle window to and from special workspace
-bind = CTRL SHIFT, 4, movetoworkspace, special:magic #Move window to special workspace 4 (Can be toggled with "$mainMod,1")
-bind = CTRL SHIFT, 5, togglespecialworkspace, magic #Togle window to and from special workspace
-
-
-#### Windows ####
-
-bind = $mainMod ALT, 1, movetoworkspacesilent, 1  #Move active window to workspace 1 silently
-bind = $mainMod ALT, 2, movetoworkspacesilent, 2  #Move active window to workspace 2 silently
-bind = $mainMod ALT, 3, movetoworkspacesilent, 3  #Move active window to workspace 3 silently
-bind = $mainMod ALT, 4, movetoworkspacesilent, 4  #Move active window to workspace 4 silently
-bind = $mainMod ALT, 5, movetoworkspacesilent, 5  #Move active window to workspace 5 silently
-bind = $mainMod ALT, 6, movetoworkspacesilent, 6  #Move active window to workspace 6 silently
-bind = $mainMod ALT, 7, movetoworkspacesilent, 7  #Move active window to workspace 7 silently
-bind = $mainMod ALT, 8, movetoworkspacesilent, 8  #Move active window to workspace 8 silently
-bind = $mainMod ALT, 9, movetoworkspacesilent, 9  #Move active window to workspace 9 silently
-bind = $mainMod ALT, 0, movetoworkspacesilent, 10  #Move active window to workspace 10 silently 
-
-bindm = $mainMod, Z, movewindow #Hold to move selected window
-bindm = $mainMod, X, resizewindow #Hold to resize selected window
-
-bind = $mainMod, F, fullscreen, 0                                                           #Set active window to fullscreen
-bind = $mainMod SHIFT, M, fullscreen, 1                                                           #Maximize Window
-bind = $mainMod CTRL, F, togglefloating                                                     #Toggle active windows into floating mode
-bind = $mainMod CTRL, T, exec, $HYPRSCRIPTS/toggleallfloat.sh                               #Toggle all windows into floating mode
-bind = $mainMod, J, togglesplit                                                             #Toggle split
-bind = $mainMod, left, movefocus, l                                                         #Move focus left
-bind = $mainMod, right, movefocus, r                                                        #Move focus right
-bind = $mainMod, up, movefocus, u                                                           #Move focus up
-bind = $mainMod, down, movefocus, d                                                         #Move focus down
-bindm = $mainMod, mouse:272, movewindow                                                     #Move window with the mouse
-bindm = $mainMod, mouse:273, resizewindow                                                   #Resize window with the mouse
-bind = $mainMod SHIFT, right, resizeactive, 100 0                                           #Increase window width with keyboard
-bind = $mainMod SHIFT, left, resizeactive, -100 0                                           #Reduce window width with keyboard
-bind = $mainMod SHIFT, down, resizeactive, 0 100                                            #Increase window height with keyboard
-bind = $mainMod SHIFT, up, resizeactive, 0 -100                                             #Reduce window height with keyboard
-bind = $mainMod, G, togglegroup                                                             #Toggle window group
-bind = $mainMod CTRL, left, changegroupactive, prev				  	    #Switch to the previous window in the group
-bind = $mainMod CTRL, right, changegroupactive, next					    #Switch to the next window in the group
-bind = $mainMod CTRL, K, swapsplit                                                               #Swapsplit
-bind = $mainMod ALT, left, swapwindow, l                                                    #Swap tiled window left
-bind = $mainMod ALT, right, swapwindow, r                                                   #Swap tiled window right
-bind = $mainMod ALT, up, swapwindow, u                                                      #Swap tiled window up
-bind = $mainMod ALT, down, swapwindow, d                                                    #Swap tiled window down
-binde = ALT,Tab,cyclenext                                                                   #Cycle between windows
-binde = ALT,Tab,bringactivetotop                                                            #Bring active window to the top
-bind = ALT, S, layoutmsg, swapwithmaster master 					    #Switch current focused window to master
-bind = $mainMod SHIFT, L, exec, hyprctl keyword general:layout "$(hyprctl getoption general:layout | grep -q 'dwindle' && echo 'master' || echo 'dwindle')" #Toggle between dwindle and master layout
-
-
-#### Fn keys ####
-
-bind = , XF86MonBrightnessUp, exec, brightnessctl -q s +10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000  #Increase brightness by 10% 
-bind = , XF86MonBrightnessDown, exec, brightnessctl -q s 10%- && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000 #Reduce brightness by 10%
-bind = , XF86AudioRaiseVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = , XF86AudioLowerVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = , XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle && if pactl get-sink-mute @DEFAULT_SINK@ | grep -q 'yes'; then notify-send "Volume" "Muted" -t 1000; else notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000; fi
-bind = , XF86AudioPlay, exec, playerctl play-pause #Audio play pause
-bind = , XF86AudioPause, exec, playerctl pause #Audio pause
-bind = , XF86AudioNext, exec, playerctl next #Audio next
-bind = , XF86AudioPrev, exec, playerctl previous #Audio previous
-bind = , XF86AudioMicMute, exec, pactl set-source-mute @DEFAULT_SOURCE@ toggle #Toggle microphone
-bind = , XF86Calculator, exec, ~/.config/hyprcandy/settings/calculator.sh  #Open calculator
-bind = , XF86Lock, exec, hyprlock #Open screenlock
-
-# Keyboard backlight controls with notifications
-bind = , code:236, exec, brightnessctl -d smc::kbd_backlight s +10 && notify-send "Keyboard Backlight" "$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = , code:237, exec, brightnessctl -d smc::kbd_backlight s 10- && notify-send "Keyboard Backlight" "$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)" -t 1000
-
-# Screen brightness controls with notifications
-bind = Shift, F2, exec, brightnessctl -q s +10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = Shift, F1, exec, brightnessctl -q s 10%- && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
-
-# Volume mute toggle with notification
-bind = Shift, F9, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle && if pactl get-sink-mute @DEFAULT_SINK@ | grep -q 'yes'; then notify-send "Volume" "Muted" -t 1000; else notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000; fi
-
-# Volume controls with notifications
-bind = Shift, F8, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = Shift, F7, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-
-bind = Shift, F4, exec, playerctl play-pause #Toggle play/pause
-bind = Shift, F6, exec, playerctl next #Play next video/song
-bind = Shift, F5, exec, playerctl previous #Play previous video/song
-EOF
 fi
+
+            # Add default content to the custom_lock.conf file
+            cat > "$HOME/.config/hyprcustom/custom_lock.conf" << 'EOF'
+# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
+# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
+# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ██║   ██║██║     █████╔╝ 
+# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██║   ██║██║     ██╔═██╗ 
+# ██║  ██║   ██║   ██║     ██║  ██║███████╗╚██████╔╝╚██████╗██║  ██╗
+# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝
+
+source = ~/.config/hypr/colors.conf
+
+general {
+    ignore_empty_input = true
+    hide_cursor = true
+}
+
+auth {
+    fingerprint {
+        enabled = true
+        ready_message = Scan fingerprint to unlock
+        present_message = Scanning...
+        retry_delay = 250 # in milliseconds
+    }
+}
+
+background {
+    monitor =
+    path = ~/.config/background.png
+    blur_passes = 4
+    blur_sizes = 0
+    vibrancy = 0.1696
+    noise = 0.01
+    contrast = 0.8916
+}
+
+input-field {
+    monitor =
+    size = 200, 50
+    outline_thickness = 3
+    dots_size = 0.25 # Scale of input-field height, 0.2 - 0.8
+    dots_spacing = 0.2 # Scale of dots' absolute size, 0.0 - 1.0
+    dots_center = true
+    dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
+    outer_color = $primary_fixed_dim $on_secondary 90deg
+    inner_color = $on_primary_fixed_variant
+    font_color = $primary_fixed_dim
+    font_family = C059 Bold Italic
+    fade_on_empty = false
+    fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
+    placeholder_text = <i><span>       $USER       </span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
+    hide_input = false
+    rounding = 20 # -1 means complete rounding (circle/oval)
+    check_color = $rimary
+    fail_color = $error # if authentication failed, changes outer_color and fail message color
+    fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
+    fail_transition = 300 # transition time in ms between normal outer_color and fail_color
+    capslock_color = $primary_fixed_dim
+    numlock_color = $primary_fixed_dim $on_secondary 90deg
+    #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
+    invert_numlock = false # change color if numlock is off
+    swap_font_color = false # see below
+    position = 0, 150
+    halign = center
+    valign = bottom
+    shadow_passes = 10
+    shadow_size = 20
+    shadow_color = $shadow
+    shadow_boost = 1.6
+}
+
+label {
+    monitor =
+    #date
+    text = cmd[update:60000] date +"%A, %d %B %Y"
+    color = $primary
+    font_size = 20
+    font_family = C059 Bold
+    position = 0, -35
+    halign = center
+    valign = top
+}
+
+label {
+    monitor =
+    #clock
+    text = cmd[update:1000] echo "$TIME"
+    color = $on_primary_fixed_variant
+    font_size = 55
+    font_family = C059 Bold Italic
+    position = 0, -150
+    halign = center
+    valign = top
+    shadow_passes = 5
+    shadow_size = 10
+}
+
+#label {
+    monitor =
+    #text = ✝      $USER    ✝ #  $USER
+    color = $primary_fixed_dim
+    font_size = 20
+    font_family = C059 Bold
+    position = 0, 100
+    halign = center
+    valign = bottom
+    shadow_passes = 5
+    shadow_size = 10
+}
+
+image {
+    monitor =
+    path = ~/.config/lock.png #.face.icon
+    size = 160  lesser side if not 1:1 ratio
+    rounding = -1 # negative values mean circle
+    border_size = 4
+    border_color = $primary_fixed_dim $on_secondary 90deg
+    rotate = 0 # degrees, counter-clockwise
+    reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
+#    reload_cmd =  # command to get new path. if empty, old path will be used. don't run "follow" commands like tail -F
+    position = 0, 0
+    halign = center
+    valign = center
+}
+EOF
 
     # 🎨 Update Hyprland custom.conf with current username  
     USERNAME=$(whoami)      
