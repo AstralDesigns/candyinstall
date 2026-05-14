@@ -3335,7 +3335,7 @@ input {
 
 general {
     gaps_in = 4
-    gaps_out = 9	
+    gaps_out = 12	
     gaps_workspaces = 50    # Gaps between workspaces
     border_size = 3
     col.active_border = $inverse_primary
@@ -3427,44 +3427,6 @@ decoration {
     new_optimizations = on
     ignore_opacity = true
         xray = false
-        vibrancy = 0.24999999999999933
-        noise = 0
-    popups = true
-    popups_ignorealpha = 0.8
-        brightness = 1.0000000000000002
-        contrast = 0.9999999999999997
-        special = false
-        vibrancy_darkness = 0.5000000000000002
-    }
-
-    shadow {
-        enabled = true
-        range = 12
-        render_power = 4
-        color = $scrim
-    }
-    dim_strength = 0.19999999999999973
-    dim_inactive = false
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                          Decorations                        ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-decoration {
-    rounding = 15
-    rounding_power = 2
-    active_opacity = 0.8499999999999999
-    inactive_opacity = 0.8499999999999999
-    fullscreen_opacity = 1.0
-
-    blur {
-    enabled = true
-    size = 2
-    passes = 4
-    new_optimizations = on
-    ignore_opacity = true
-        xray = true
         vibrancy = 0.24999999999999933
         noise = 0
     popups = true
