@@ -2891,31 +2891,31 @@ EOF
 
 chmod +x "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
 
-#find "$USER_HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
-#find "$USER_HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
-#find "$USER_HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
-#find "$USER_HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
-#find "$USER_HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
-#find "$USER_HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
-#chmod +x "$USER_HOME/.config/quickshell/candylock/auth.sh"
-#chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
-#chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
+find "$USER_HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
+find "$USER_HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
+find "$USER_HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
+find "$USER_HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
+find "$USER_HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
+find "$USER_HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
+chmod +x "$USER_HOME/.config/quickshell/candylock/auth.sh"
+chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
+chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
 #mkdir -p "$USER_HOME/.cache/quickshell/overview"
 #mkdir -p "$USER_HOME/.cache/quickshell/wallpaper"
 
     # 🛠️ GNOME Window Button Layout Adjustment
-    #echo
-    #echo "🛠️ Disabling GNOME titlebar buttons..."
+    echo
+    echo "🛠️ Disabling GNOME titlebar buttons..."
 
     # Check if 'gsettings' is available on the system
-    #if command -v gsettings >/dev/null 2>&1; then
+    if command -v gsettings >/dev/null 2>&1; then
         # Run the command to change the window button layout (e.g., remove minimize/maximize buttons)
-        #gsettings set org.gnome.desktop.wm.preferences button-layout ":close" \
-            #&& echo "✅ GNOME button layout updated." \
-            #|| echo "❌ Failed to update GNOME button layout."
-    #else
-        #echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
-    #fi
+        gsettings set org.gnome.desktop.wm.preferences button-layout ":close" \
+            && echo "✅ GNOME button layout updated." \
+            || echo "❌ Failed to update GNOME button layout."
+    else
+        echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
+    fi
 	
 # Add custom cursors to /usr/share/icons 
 echo "🔄 Adding custom cursors..."
