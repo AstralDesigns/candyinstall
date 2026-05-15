@@ -3063,8 +3063,9 @@ EOF
 # Function to setup default "custom.conf" file
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
-        if [ -d "$USER_HOME/.config/hyprcustom" ]; then
+        if [ -d "$USER_HOME/.config/hypr" ]; then
             touch "$USER_HOME/.config/hypr/hyprviz.conf" && touch "$USER_HOME/.config/hyprcustom/custom_lock.conf"
+			rm -f "$USER_HOME/.config/hyprcustom/custom_keybinds.conf"
             echo "📁 Updating the custom settings directory..."
 
  # Add default content to the custom.conf file
