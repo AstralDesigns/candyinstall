@@ -3198,7 +3198,50 @@ setup_custom_config() {
             mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
             echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
           if [ "$PANEL_CHOICE" = "waybar" ]; then
- # Add default content to the custom.conf file
+
+  # Add default content to the hyprland.conf file
+		cat > "$USER_HOME/.config/hypr/hyprland.conf" << 'EOF'
+# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      █████╗ ███╗   ██╗██████╗ 
+# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔══██╗████╗  ██║██╔══██╗
+# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ███████║██╔██╗ ██║██║  ██║
+# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██╔══██║██║╚██╗██║██║  ██║
+# ██║  ██║   ██║   ██║     ██║  ██║███████╗██║  ██║██║ ╚████║██████╔╝
+# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  
+
+#[IMPORTANT]#
+#Any changes made to this file will be overwritten if you rerun the install script for updates or config restoration
+#Make changes to Hyprland in the "custom.conf" file found in "~/.config/hyprcustom/"
+#Make changes to Hyprlock in the "custom_lock.conf" file found in "~/.config/hyprcustom/"
+#Make changes or additions to keybinds in the "custom_keybinds.conf" file found in "~/.config/hyprcustom/"
+#[IMPORTANT]# 
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                     Custom User Settings                    ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/custom/custom.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Monitors                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+#source = ~/.config/hypr/monitors.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                        Hyprland-colors                      ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/colors.conf
+source = ~/.cache/wal/colors-hyprland.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                            Config                           ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+# = Source for hyprviz
+source = ./hyprviz.conf
+EOF
+ 
+ # Add default content to the hyprviz.conf file
             cat > "$HOME/.config/hypr/hyprviz.conf" << 'EOF'
 #  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 # ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
