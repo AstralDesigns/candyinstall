@@ -3068,7 +3068,51 @@ setup_custom_config() {
 			rm -f "$USER_HOME/.config/hyprcustom/custom_keybinds.conf"
             echo "📁 Updating the custom settings directory..."
 
- # Add default content to the custom.conf file
+
+
+ # Add default content to the hyprland.conf file
+		cat > "$USER_HOME/.config/hypr/hyprland.conf" << 'EOF'
+# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      █████╗ ███╗   ██╗██████╗ 
+# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔══██╗████╗  ██║██╔══██╗
+# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ███████║██╔██╗ ██║██║  ██║
+# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██╔══██║██║╚██╗██║██║  ██║
+# ██║  ██║   ██║   ██║     ██║  ██║███████╗██║  ██║██║ ╚████║██████╔╝
+# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  
+
+#[IMPORTANT]#
+#Any changes made to this file will be overwritten if you rerun the install script for updates or config restoration
+#Make changes to Hyprland in the "custom.conf" file found in "~/.config/hyprcustom/"
+#Make changes to Hyprlock in the "custom_lock.conf" file found in "~/.config/hyprcustom/"
+#Make changes or additions to keybinds in the "custom_keybinds.conf" file found in "~/.config/hyprcustom/"
+#[IMPORTANT]# 
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                     Custom User Settings                    ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/custom/custom.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                           Monitors                          ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+#source = ~/.config/hypr/monitors.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                        Hyprland-colors                      ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+source = ~/.config/hypr/colors.conf
+source = ~/.cache/wal/colors-hyprland.conf
+
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃                            Config                           ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+# = Source for hyprviz
+source = ./hyprviz.conf
+EOF
+
+ # Add default content to the hyprviz.conf file
 		cat > "$USER_HOME/.config/hypr/hyprviz.conf" << 'EOF'
 #  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 # ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
