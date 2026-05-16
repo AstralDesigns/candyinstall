@@ -24,6 +24,7 @@ DISPLAY_MANAGER="sddm"
 DISPLAY_MANAGER_SERVICE="sddm"
 LIBREOFFICE_CHOICE=""
 SHELL_CHOICE=""
+HYPR_CHOICE=""
 PANEL_CHOICE="waybar"
 BROWSER_CHOICE=""
 AUR_HELPER=""
@@ -178,6 +179,19 @@ choose_browser() {
     echo -e "${GREEN}Browser selected: $BROWSER_CHOICE${NC}"
 }
 
+choose_hyprland() {
+    echo -e "${CYAN}Choose your Hyprland package variant:${NC}"
+    echo "1) hyprland     — stable release (recommended, well-tested and reliable)"
+    echo "2) hyprland-git — latest development build (bleeding edge, may have occasional instability)"
+    read -rp "Enter 1 or 2: " hypr_choice
+    case $hypr_choice in
+        1) HYPR_CHOICE="1" ;;
+        2) HYPR_CHOICE="2" ;;
+        *) print_error "Invalid choice. Please enter 1 or 2." ;;
+    esac
+    echo -e "${GREEN}Hyprland variant selected: $HYPR_CHOICE${NC}"
+}
+
 install_libreoffice() {
     echo -e "${YELLOW}Would you like to install the libreoffice suite? (n/Y)${NC}"
     read -r response
@@ -260,22 +274,47 @@ check_or_install_aur_helper() {
 
 # Function to build package list based on display manager choice
 build_package_list() {
-    packages=(
-        # Hyprland ecosystem
-        "hyprland"
-        "hyprcursor"
-        "hyprgraphics"
-        "hypridle"
-        "hyprland-protocols"
-        "hyprland-qt-support"
-        "hyprlang"
-        "hyprlock"
-        "hyprpaper"
-        "hyprpicker"
-        "hyprpolkitagent"
-        "hyprsunset"
-        "hyprutils"
-        "hyprwayland-scanner"
+    # Hyprland ecosystem — variant chosen earlier by the user
+    if [ "$HYPR_CHOICE" = "2" ]; then
+        hyprland_packages=(
+            "hyprland-git"
+            "hyprcursor-git"
+            "hyprgraphics-git"
+            "hypridle-git"
+            "hyprland-protocols-git"
+            "hyprland-qt-support-git"
+            "hyprlang-git"
+            "hyprlock-git"
+            "hyprpaper-git"
+            "hyprpicker-git"
+            "hyprpolkitagent-git"
+            "hyprsunset-git"
+            "hyprutils-git"
+            "hyprwayland-scanner-git"
+        )
+    else
+        hyprland_packages=(
+            "hyprland"
+            "hyprcursor"
+            "hyprgraphics"
+            "hypridle"
+            "hyprland-protocols"
+            "hyprland-qt-support"
+            "hyprlang"
+            "hyprlock"
+            "hyprpaper"
+            "hyprpicker"
+            "hyprpolkitagent"
+            "hyprsunset"
+            "hyprutils"
+            "hyprwayland-scanner"
+        )
+    fi
+	
+	packages=(
+        "${hyprland_packages[@]}"
+		
+		# Portal (same for both variants)
         "xdg-desktop-portal"
         "xdg-desktop-portal-hyprland"
         "xdg-desktop-portal-gtk"
@@ -4592,6 +4631,10 @@ main() {
     # Choose a browser
     choose_browser
     echo
+
+	# Choose desired hyprland package group
+	choose_hyprland
+	echo
 
     # Decide whether to install libroffice-fresh suite
     install_libreoffice
