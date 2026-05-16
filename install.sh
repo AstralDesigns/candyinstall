@@ -3157,7 +3157,7 @@ AllowBadUsernames="false"
 Locale=""
 HourFormat="HH:mm"
 DateFormat="dddd, d of MMMM"
-HeaderText="󰫣 󰫣 󰫣"
+HeaderText="󰫣 󰫢 󰫣"
 TranslatePlaceholderUsername=""
 TranslatePlaceholderPassword=""
 TranslateShowPassword=""
@@ -3194,10 +3194,9 @@ EOF
 # Function to setup default "custom.conf" file
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
-        if [ ! -d "$HOME/.config/hyprcustom" ]; then
-            mkdir -p "$HOME/.config/hyprcustom" && touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
+        if [ -d "$HOME/.config/hypr" ]; then
+            touch "$HOME/.config/hypr/hyprviz.conf" && touch "$HOME/.config/hyprcustom/custom_lock.conf"
             echo "📁 Created the custom settings directory with 'custom.conf' and 'custom_lock.conf' files to keep your personal Hyprland and Hyprlock changes safe ..."
-          if [ "$PANEL_CHOICE" = "waybar" ]; then
 
   # Add default content to the hyprland.conf file
 		cat > "$USER_HOME/.config/hypr/hyprland.conf" << 'EOF'
@@ -4087,137 +4086,6 @@ bind = Shift, F7, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-v
 bind = Shift, F4, exec, playerctl play-pause #Toggle play/pause
 bind = Shift, F6, exec, playerctl next #Play next video/song
 bind = Shift, F5, exec, playerctl previous #Play previous video/song
-EOF
-
-else
-
-echo
-
-fi
-
-            # Add default content to the custom_lock.conf file
-            cat > "$HOME/.config/hyprcustom/custom_lock.conf" << 'EOF'
-# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
-# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
-# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ██║   ██║██║     █████╔╝ 
-# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██║   ██║██║     ██╔═██╗ 
-# ██║  ██║   ██║   ██║     ██║  ██║███████╗╚██████╔╝╚██████╗██║  ██╗
-# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝
-
-source = ~/.config/hypr/colors.conf
-
-general {
-    ignore_empty_input = true
-    hide_cursor = true
-}
-
-auth {
-    fingerprint {
-        enabled = true
-        ready_message = Scan fingerprint to unlock
-        present_message = Scanning...
-        retry_delay = 250 # in milliseconds
-    }
-}
-
-background {
-    monitor =
-    path = ~/.config/background.png
-    blur_passes = 4
-    blur_sizes = 0
-    vibrancy = 0.1696
-    noise = 0.01
-    contrast = 0.8916
-}
-
-input-field {
-    monitor =
-    size = 200, 50
-    outline_thickness = 3
-    dots_size = 0.25 # Scale of input-field height, 0.2 - 0.8
-    dots_spacing = 0.2 # Scale of dots' absolute size, 0.0 - 1.0
-    dots_center = true
-    dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
-    outer_color = $primary_fixed_dim $on_secondary 90deg
-    inner_color = $on_primary_fixed_variant
-    font_color = $primary_fixed_dim
-    font_family = C059 Bold Italic
-    fade_on_empty = false
-    fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-    placeholder_text = <i><span>       $USER       </span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
-    hide_input = false
-    rounding = 20 # -1 means complete rounding (circle/oval)
-    check_color = $rimary
-    fail_color = $error # if authentication failed, changes outer_color and fail message color
-    fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
-    fail_transition = 300 # transition time in ms between normal outer_color and fail_color
-    capslock_color = $primary_fixed_dim
-    numlock_color = $primary_fixed_dim $on_secondary 90deg
-    #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
-    invert_numlock = false # change color if numlock is off
-    swap_font_color = false # see below
-    position = 0, 150
-    halign = center
-    valign = bottom
-    shadow_passes = 10
-    shadow_size = 20
-    shadow_color = $shadow
-    shadow_boost = 1.6
-}
-
-label {
-    monitor =
-    #date
-    text = cmd[update:60000] date +"%A, %d %B %Y"
-    color = $primary
-    font_size = 20
-    font_family = C059 Bold
-    position = 0, -35
-    halign = center
-    valign = top
-}
-
-label {
-    monitor =
-    #clock
-    text = cmd[update:1000] echo "$TIME"
-    color = $on_primary_fixed_variant
-    font_size = 55
-    font_family = C059 Bold Italic
-    position = 0, -150
-    halign = center
-    valign = top
-    shadow_passes = 5
-    shadow_size = 10
-}
-
-#label {
-    monitor =
-    #text = ✝      $USER    ✝ #  $USER
-    color = $primary_fixed_dim
-    font_size = 20
-    font_family = C059 Bold
-    position = 0, 100
-    halign = center
-    valign = bottom
-    shadow_passes = 5
-    shadow_size = 10
-}
-
-image {
-    monitor =
-    path = ~/.config/lock.png #.face.icon
-    size = 160  lesser side if not 1:1 ratio
-    rounding = -1 # negative values mean circle
-    border_size = 4
-    border_color = $primary_fixed_dim $on_secondary 90deg
-    rotate = 0 # degrees, counter-clockwise
-    reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
-#    reload_cmd =  # command to get new path. if empty, old path will be used. don't run "follow" commands like tail -F
-    position = 0, 0
-    halign = center
-    valign = center
-}
 EOF
 
     # 🎨 Update Hyprland custom.conf with current username  
