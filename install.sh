@@ -5116,7 +5116,6 @@ local function expand_vars(cmd)
 end
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/rofi-menus.sh"), { description = "Launch utilities rofi-menu" })
 hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh"), { description = "Show/hide rofi application finder" })
-hl.bind("SUPER + K", hl.dsp.exec_cmd("~/.config/hypr/scripts/keybindings.sh"), { description = "Show keybindings" })
 hl.bind("SUPER + CTRL + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/animations.sh"), { description = "Select animations" })
 hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/cliphist.sh"), { description = "Open clipboard manager" })
 hl.bind("SUPER + CTRL + E", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/emojipicker.sh"), { description = "Open rofi emoji-picker" })
