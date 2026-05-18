@@ -1303,7 +1303,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.lua"
 
 case "$1" in
     "minimal")
@@ -1336,17 +1336,15 @@ case "$1" in
         ;;
 esac
 
-# Apply all settings
-sed -i "s/^\(\s*gaps_out\s*=\s*\)[0-9]*/\1$GAPS_OUT/" "$CONFIG_FILE"
-sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$GAPS_IN/" "$CONFIG_FILE"
-sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$BORDER/" "$CONFIG_FILE"
-sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$ROUNDING/" "$CONFIG_FILE"
+# Apply all settings to hyprviz.lua
+# Note: In Lua, these are inside hl.config({ general = { ... }, decoration = { ... } })
+sed -i "s/\(gaps_out\s*=\s*\)[0-9]*/\1$GAPS_OUT/" "$CONFIG_FILE"
+sed -i "s/\(gaps_in\s*=\s*\)[0-9]*/\1$GAPS_IN/" "$CONFIG_FILE"
+sed -i "s/\(border_size\s*=\s*\)[0-9]*/\1$BORDER/" "$CONFIG_FILE"
+sed -i "s/\(rounding\s*=\s*\)[0-9]*/\1$ROUNDING/" "$CONFIG_FILE"
 
-# Apply immediately
-hyprctl keyword general:gaps_out $GAPS_OUT
-hyprctl keyword general:gaps_in $GAPS_IN
-hyprctl keyword general:border_size $BORDER
-hyprctl keyword decoration:rounding $ROUNDING
+# Apply immediately using new Lua dispatch syntax via hyprctl
+hyprctl eval "hl.config({ general = { gaps_out = $GAPS_OUT, gaps_in = $GAPS_IN, border_size = $BORDER }, decoration = { rounding = $ROUNDING } })"
 
 echo "🎨 Applied $1 preset: gaps_out=$GAPS_OUT, gaps_in=$GAPS_IN, border=$BORDER, rounding=$ROUNDING"
 notify-send "Visual Preset Applied" "$1: OUT=$GAPS_OUT IN=$GAPS_IN BORDER=$BORDER ROUND=$ROUNDING" -t 3000
@@ -1359,7 +1357,7 @@ EOF
 cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_status_display.sh" << 'EOF'
 #!/bin/bash
 
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
+CONFIG_FILE="$HOME/.config/hypr/hyprviz.lua"
 
 GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
 GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
@@ -1597,7 +1595,7 @@ cat > "$USER_HOME/.config/hyprcandy/hooks/watch_cursor_theme.sh" << 'EOF'
 
 GTK3_FILE="$HOME/.config/gtk-3.0/settings.ini"
 GTK4_FILE="$HOME/.config/gtk-4.0/settings.ini"
-HYPRCONF="$HOME/.config/hypr/hyprviz.conf"
+HYPRLUA="$HOME/.config/hypr/hyprviz.lua"
 
 get_value() {
     grep -E "^$1=" "$1" 2>/dev/null | cut -d'=' -f2 | tr -d ' '
@@ -1618,11 +1616,11 @@ update_hypr_cursor_env() {
     [ -z "$theme" ] && return
     [ -z "$size" ] && return
 
-    # Replace each env line using sed
-    sed -i "s|^env = XCURSOR_THEME,.*|env = XCURSOR_THEME,$theme|" "$HYPRCONF"
-    sed -i "s|^env = XCURSOR_SIZE,.*|env = XCURSOR_SIZE,$size|" "$HYPRCONF"
-    sed -i "s|^env = HYPRCURSOR_THEME,.*|env = HYPRCURSOR_THEME,$theme|" "$HYPRCONF"
-    sed -i "s|^env = HYPRCURSOR_SIZE,.*|env = HYPRCURSOR_SIZE,$size|" "$HYPRCONF"
+    # Replace each hl.env line in hyprviz.lua
+    sed -i "s|hl.env(\"XCURSOR_THEME\", \".*\")|hl.env(\"XCURSOR_THEME\", \"$theme\")|" "$HYPRLUA"
+    sed -i "s|hl.env(\"XCURSOR_SIZE\", \".*\")|hl.env(\"XCURSOR_SIZE\", \"$size\")|" "$HYPRLUA"
+    sed -i "s|hl.env(\"HYPRCURSOR_THEME\", \".*\")|hl.env(\"HYPRCURSOR_THEME\", \"$theme\")|" "$HYPRLUA"
+    sed -i "s|hl.env(\"HYPRCURSOR_SIZE\", \".*\")|hl.env(\"HYPRCURSOR_SIZE\", \"$size\")|" "$HYPRLUA"
     
     # Sync GTK4 with GTK3
     sed -i "s|^gtk-cursor-theme-name=.*|gtk-cursor-theme-name=$theme|" "$GTK4_FILE"
@@ -1642,8 +1640,6 @@ apply_cursor_changes() {
     local theme="$1"
     local size="$2"
     
-    # Method 1: Reload Hyprland config
-    hyprctl reload 2>/dev/null
     # Apply cursor changes immediately using hyprctl
     hyprctl setcursor "$theme" "$size" 2>/dev/null || {
         echo "⚠️  hyprctl setcursor failed, falling back to reload"
@@ -3064,1030 +3060,2020 @@ EOF
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
         if [ -d "$USER_HOME/.config/hypr" ]; then
-            touch "$USER_HOME/.config/hypr/hyprviz.conf" && touch "$USER_HOME/.config/hyprcustom/custom_lock.conf"
-			rm -f "$USER_HOME/.config/hyprcustom/custom_keybinds.conf"
-            echo "📁 Updating the custom settings directory..."
+            touch "$USER_HOME/.config/hypr/hyprviz.lua"
 
+ # Add default content to the hyprland.lua file
+		cat > "$USER_HOME/.config/hypr/hyprland.lua" << 'EOF'
+-- ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      █████╗ ███╗   ██╗██████╗ 
+-- ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔══██╗████╗  ██║██╔══██╗
+-- ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ███████║██╔██╗ ██║██║  ██║
+-- ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██╔══██║██║╚██╗██║██║  ██║
+-- ██║  ██║   ██║   ██║     ██║  ██║███████╗██║  ██║██║ ╚████║██████╔╝
+-- ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ 
 
+-- HyprCandyPlus Hyprland Lua entry point.
+-- Hyprland 0.55+ loads hyprland.lua directly. Keep hyprland.conf only as a
+-- compatibility fallback while Lua adoption settles.
 
- # Add default content to the hyprland.conf file
-		cat > "$USER_HOME/.config/hypr/hyprland.conf" << 'EOF'
-# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      █████╗ ███╗   ██╗██████╗ 
-# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔══██╗████╗  ██║██╔══██╗
-# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ███████║██╔██╗ ██║██║  ██║
-# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██╔══██║██║╚██╗██║██║  ██║
-# ██║  ██║   ██║   ██║     ██║  ██║███████╗██║  ██║██║ ╚████║██████╔╝
-# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  
+local home = os.getenv("HOME") or ""
 
-#[IMPORTANT]#
-#Any changes made to this file will be overwritten if you rerun the install script for updates or config restoration
-#Make changes to Hyprland in the "custom.conf" file found in "~/.config/hyprcustom/"
-#Make changes to Hyprlock in the "custom_lock.conf" file found in "~/.config/hyprcustom/"
-#Make changes or additions to keybinds in the "custom_keybinds.conf" file found in "~/.config/hyprcustom/"
-#[IMPORTANT]# 
+local function optional_dofile(path, label)
+    local ok, result = pcall(dofile, path)
+    if not ok then
+        -- Missing generated files should not prevent Hyprland from starting.
+        -- Syntax/runtime errors are intentionally reported through Hyprland's Lua error UI.
+        if not tostring(result):match("No such file") and not tostring(result):match("cannot open") then
+            error((label or path) .. ": " .. tostring(result))
+        end
+    end
+    return result
+end
 
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                     Custom User Settings                    ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+-- Generated color bridges. Matugen keeps the existing ~/.config/hypr/colors.conf
+-- output for Quickshell reads and also writes ~/.config/hypr/colors.lua.
+-- Pywal keeps legacy cache outputs and additionally writes ~/.cache/wal/hyprland-colors.lua.
+optional_dofile(home .. "/.config/hypr/colors.lua", "matugen Hyprland Lua colors")
+optional_dofile(home .. "/.cache/wal/hyprland-colors.lua", "pywal Hyprland Lua colors")
 
-source = ~/.config/custom/custom.conf
+-- Static HyprCandyPlus visual configuration migrated from hyprviz.conf.
+dofile(home .. "/.config/hypr/hyprviz.lua")
 
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Monitors                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+-- Mutable overrides written by Quickshell Control Center sliders/buttons.
+optional_dofile(home .. "/.config/hypr/hyprviz-state.lua", "HyprCandyPlus mutable Hyprland state")
 
-#source = ~/.config/hypr/monitors.conf
+-- Animation preset selected by ~/.config/hypr/scripts/animations.sh.
+optional_dofile(home .. "/.config/hypr/animations.lua", "HyprCandyPlus animation preset")
 
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                        Hyprland-colors                      ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+-- Future nwg-displays or conversion output. Current nwg-displays still writes
+-- Hyprlang monitors.conf, so this is only an optional future-safe hook.
+optional_dofile(home .. "/.config/hypr/monitors.lua", "Hyprland Lua monitor output")
 
-source = ~/.config/hypr/colors.conf
-source = ~/.cache/wal/colors-hyprland.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                            Config                           ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-# = Source for hyprviz
-source = ./hyprviz.conf
+return true
 EOF
 
- # Add default content to the hyprviz.conf file
-		cat > "$USER_HOME/.config/hypr/hyprviz.conf" << 'EOF'
-#  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
-# ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
-# ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
-# ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
-# ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
-#  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
-
-#[IMPORTANT]#
-# Add custom settings to "$HOME/.config/custom/custom.conf".
-#[IMPORTANT]#
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Autostart                         ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-# Environment must be first — everything else depends on these
-exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE
-exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY
-
-# Portals next — before any app or service that might need them
-exec-once = bash ~/.config/hypr/scripts/xdg.sh
-
-# Theme
-exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
-exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
-
-# System Services
-exec-once = systemctl --user start hyprpolkitagent
-exec-once = systemctl --user start rofi-font-watcher
-exec-once = systemctl --user start cursor-theme-watcher
-
-# Daemons
-#exec-once = ~/.config/waybar/scripts/manager.sh
-exec-once = gjs ~/.hyprcandy/GJS/candy-daemon.js
-exec-once = gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js
-exec-once = bash ~/.config/hypr/scripts/wallpaper-restore.sh
-exec-once = hypridle
-exec-once = /usr/bin/pypr
-
-# UI — after daemons are up
-# Dock
-exec-once = ~/.hyprcandy/GJS/hyprcandydock/autostart.sh
-# Bar
-exec-once = qs -c bar
-# Overview
-exec-once = qs -c overview
-
-# Clipboard
-exec-once = wl-paste --watch cliphist store
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Animations                        ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hypr/conf/animations/LimeFrenzy.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                        Hypraland-colors                     ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-source = ~/.config/hypr/colors.conf
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                         Env-variables                       ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-# Packages to have full env path access
-env = PATH,$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin
-
-# After using nwg-look, also change the cursor settings here to maintain changes after every reboot
-env = XCURSOR_THEME,Marci-Crystal
-env = XCURSOR_SIZE,18
-env = HYPRCURSOR_THEME,Marci-Crystal
-env = HYPRCURSOR_SIZE,18
-# GTK
-env =  GTK_THEME,adw-gtk3-dark
-# XDG Desktop Portal
-env = XDG_CURRENT_DESKTOP,Hyprland
-env = XDG_SESSION_TYPE,wayland
-env = XDG_SESSION_DESKTOP,Hyprland
-# QT
-env = QT_QPA_PLATFORM,wayland
-env = QT_QPA_PLATFORMTHEME,qt6ct
-env = QT_WAYLAND_DISABLE_WINDOWDECORATION,0
-env = QT_AUTO_SCREEN_SCALE_FACTOR,1
-# GDK
-env = GDK_DEBUG,portals
-env = GDK_SCALE,1
-# Toolkit Backend
-env = GDK_BACKEND,wayland
-env = CLUTTER_BACKEND,wayland
-# Mozilla
-env = MOZ_ENABLE_WAYLAND,1
-# Ozone
-env = OZONE_PLATFORM,wayland
-env = ELECTRON_OZONE_PLATFORM_HINT,wayland
-# Extra
-env = WINIT_UNIX_BACKEND,wayland
-# Virtual machine display scaling
-env = QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough
-# For better VM performance
-env = QEMU_AUDIO_DRV=pa
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                           Keyboard                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-input {
-    kb_layout = us
-    kb_variant = 
-    kb_model =
-    kb_options =
-    numlock_by_default = true
-    mouse_refocus = false
-
-    follow_mouse = 1
-    touchpad {
-        # for desktop
-        natural_scroll = false
-
-        # for laptop
-        # natural_scroll = yes
-        # middle_button_emulation = true
-        # clickfinger_behavior = false
-        scroll_factor = 1.0  # Touchpad scroll factor
-    }
-    sensitivity = 0 # Pointer speed: -1.0 - 1.0, 0 means no modification.
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                             Layout                          ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-general {
-    gaps_in = 4
-    gaps_out = 12	
-    gaps_workspaces = 50    # Gaps between workspaces
-    border_size = 3
-    col.active_border = $inverse_primary
-    col.inactive_border = $background
-    layout = scrolling
-    resize_on_border = true
-    allow_tearing = false
-}
-
-group {
-    col.border_active =  $source_color
-    col.border_inactive = $background
-    col.border_locked_active =  $primary_fixed_dim
-    col.border_locked_inactive = $background
-    
-    groupbar {
-        font_size = 14
-        font_weight_active = heavy
-        font_weight_inactive = heavy
-        text_color = $surface_tint
-        col.active =  $primary_fixed_dim
-        col.inactive = $background
-        col.locked_active =  $primary_fixed_dim
-        col.locked_inactive = $background
-        indicator_height = 4
-        indicator_gap = 6
-    
-        # Additional styling options
-        height = 10          # Height of the groupbar
-        render_titles = true           # Show window titles
-        scrolling = true              # Enable scrolling through titles
-        
-        # Gradients work too (like hyprbars)
-        # col.active = $source_color $primary_fixed_dim 45deg
-    }
-}
-
-dwindle {
-    pseudotile = true
-    preserve_split = true
-}
-
-master {
-    new_status = slave
-    new_on_active = after
-    smart_resizing = true
-    drop_at_cursor = true
-}
-
-scrolling {
-    direction = right
-    focus_fit_method = 0
-    column_width = 0.5
-}
-
-gesture = 3, horizontal, workspace
-gesture = 4, swipe, move,
-gesture = 2, pinch, float
-gestures {
-    workspace_swipe_distance = 700
-    workspace_swipe_cancel_ratio = 0.2
-    workspace_swipe_min_speed_to_force = 5
-    workspace_swipe_direction_lock = true
-    workspace_swipe_direction_lock_threshold = 10
-    workspace_swipe_create_new = true
-}
-
-binds {
-  workspace_back_and_forth = true
-  allow_workspace_cycles = true
-  pass_mouse_when_bound = false
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                          Decorations                        ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-decoration {
-    rounding = 20
-    rounding_power = 2
-    active_opacity = 0.85
-    inactive_opacity = 0.85
-    fullscreen_opacity = 1.0
-
-    blur {
-    enabled = true
-    size = 2
-    passes = 5
-    new_optimizations = on
-    ignore_opacity = true
-        xray = false
-        vibrancy = 0.24999999999999933
-        noise = 0
-    popups = true
-    popups_ignorealpha = 0.8
-        brightness = 1.0000000000000002
-        contrast = 0.9999999999999997
-        special = false
-        vibrancy_darkness = 0.5000000000000002
-    }
-
-    shadow {
-        enabled = true
-        range = 12
-        render_power = 4
-        color = $scrim
-    }
-    dim_strength = 0.19999999999999973
-    dim_inactive = false
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                      Window & layer rules                   ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-windowrule = group barred, match:class .*
-windowrule = pin on,border_size 0,match:class (com.candy.widgets|gjs|widgets)
-windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.utils)#center
-windowrule = move ((monitor_w*1)-((window_w*1)+10)) 45,match:title (candy.systemmonitor) #top right
-windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 45,match:title (candy.weather) #center
-windowrule = move (monitor_w*0.01) 50,match:title (candy.media) #top left
-windowrule = opacity 0.85 0.85,match:class ^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$
-windowrule = float on, center on,size 800 500,match:class (kitty-scratchpad)
-windowrule = suppress_event maximize, match:class .* #nofocus,match:class ^$,match:title ^$,xwayland:1,floating:1,fullscreen:0,pinned:0
-# Pavucontrol floating
-windowrule = float on,match:class (.*org.pulseaudio.pavucontrol.*)
-windowrule = size 700 600,match:class (.*org.pulseaudio.pavucontrol.*)
-windowrule = center on,match:class (.*org.pulseaudio.pavucontrol.*)
-#windowrule = pin on,match:class (.*org.pulseaudio.pavucontrol.*)
-# Waypaper
-windowrule = float on,match:class (.*waypaper.*)
-windowrule = size 800 600,match:class (.*waypaper.*)
-windowrule = center on,match:class (.*waypaper.*)
-#windowrule = pin on,match:class (.*waypaper.*)
-# Blueman Manager
-windowrule = float on,match:class (blueman-manager)
-windowrule = size 800 600,match:class (blueman-manager)
-windowrule = center on,match:class (blueman-manager)
-# Weather
-windowrule = float on,match:class (org.gnome.Weather)
-windowrule = size 700 600,match:class (org.gnome.Weather)
-windowrule = center on,match:class (org.gnome.Weather)
-#windowrule = pin on,match:class (org.gnome.Weather)
-# Calendar
-windowrule = float on,match:class (org.gnome.Calendar)
-windowrule = size 820 600,match:class (org.gnome.Calendar)
-windowrule = center on,match:class (org.gnome.Calendar)
-#windowrule = pin on,match:class (org.gnome.Calendar)
-# System Monitor
-windowrule = float on,match:class (org.gnome.SystemMonitor)
-windowrule = size 820 625,match:class (org.gnome.SystemMonitor)
-windowrule = center on,match:class (org.gnome.SystemMonitor)
-#windowrule = pin on,match:class (org.gnome.SystemMonitor)
-# Files
-windowrule = float on,match:title (Open Files)
-windowrule = size 700 600,match:title (Open Files)
-windowrule = center on,match:title (Open Files)
-#windowrule = pin on,match:title (Open Files)
-
-windowrule = float on,match:title (Select Copy Destination)
-windowrule = size 700 600,match:title (Select Copy Destination)
-windowrule = center on,match:title (Select Copy Destination)
-#windowrule = pin on,match:title (Select Copy Destination)
-
-windowrule = float on,match:title (Select Move Destination)
-windowrule = size 700 600,match:title (Select Move Destination)
-windowrule = center on,match:title (Select Move Destination)
-#windowrule = pin on,match:title (Select Move Destination)
-
-windowrule = float on,match:title (Save As)
-windowrule = size 700 600,match:title (Save As)
-windowrule = center on,match:title (Save As)
-#windowrule = pin on,match:title (Save As)
-
-windowrule = float on,match:title (Select files to send)
-windowrule = size 700 600,match:title (Select files to send)
-windowrule = center on,match:title (Select files to send)
-#windowrule = pin on,match:title (Select files to send)
-
-windowrule = float on,match:title (Bluetooth File Transfer)
-#windowrule = pin on,match:title (Bluetooth File Transfer)
-# nwg-look
-windowrule = float on,match:class (nwg-look)
-windowrule = size 700 600,match:class (nwg-look)
-windowrule = center on,match:class (nwg-look)
-#windowrule = pin on,match:class (nwg-look)
-# CachyOS Hello
-windowrule = float on,match:title (CachyOS Hello)
-windowrule = size 700 600,match:title (CachyOS Hello)
-windowrule = center on,match:title (CachyOS Hello)
-#windowrule = pin on,match:class (CachyOS Hello)
-# nwg-displays
-windowrule = float on,match:class (nwg-displays)
-windowrule = size 990 600,match:class (nwg-displays)
-windowrule = center on,match:class (nwg-displays)
-#windowrule = pin on,match:class (nwg-displays)
-# System Mission Center
-windowrule = float on, match:class (io.missioncenter.MissionCenter)
-#windowrule = pin on, match:class (io.missioncenter.MissionCenter)
-windowrule = center on, match:class (io.missioncenter.MissionCenter)
-windowrule = size 900 600, match:class (io.missioncenter.MissionCenter)
-# System Mission Center Preference Window
-windowrule = float on, match:class (missioncenter), match:title ^(Preferences)$
-#windowrule = pin on, match:class (missioncenter), match:title ^(Preferences)$
-windowrule = center on, match:class (missioncenter), match:title ^(Preferences)$
-# Gnome Calculator
-windowrule = float on,match:class (org.gnome.Calculator)
-windowrule = size 700 600,match:class (org.gnome.Calculator)
-windowrule = center on,match:class (org.gnome.Calculator)
-# Emoji Picker Smile
-windowrule = float on,match:class (it.mijorus.smile)
-#windowrule = pin on, match:class (it.mijorus.smile)
-windowrule = move 100%-w-40 90,match:class (it.mijorus.smile)
-# Hyprland Share Picker
-windowrule = float on, match:class (hyprland-share-picker)
-#windowrule = pin on, match:class (hyprland-share-picker)
-windowrule = center on, match:title match:class (hyprland-share-picker)
-windowrule = size 600 400,match:class (hyprland-share-picker)
-# Hyprland Settings App
-windowrule = float on,match:title (hyprviz)
-windowrule = size 1000 625,match:title (hyprviz)
-windowrule = center on,match:title (hyprviz)
-# General floating
-windowrule = float on,match:class (dotfiles-floating)
-windowrule = size 1000 700,match:class (dotfiles-floating)
-windowrule = center on,match:class (dotfiles-floating)
-# Satty
-windowrule = float on,match:title (satty)
-windowrule = size 1000 565,match:title (satty)
-windowrule = center on,match:title (satty)
-# Float Necessary Windows
-windowrule = float on, match:class ^(org.pulseaudio.pavucontrol)
-windowrule = float on, match:class ^()$,match:title ^(Picture in picture)$
-windowrule = float on, match:class ^()$,match:title ^(Save File)$
-windowrule = float on, match:class ^()$,match:title ^(Open File)$
-windowrule = float on, match:class ^(LibreWolf)$,match:title ^(Picture-in-Picture)$
-##windowrule = float on, match:class ^(blueman-manager)$
-windowrule = float on, match:class ^(xdg-desktop-portal-hyprland|xdg-desktop-portal-gtk|xdg-desktop-portal-kde)(.*)$
-windowrule = float on, match:class ^(hyprpolkitagent|polkit-gnome-authentication-agent-1|org.org.kde.polkit-kde-authentication-agent-1)(.*)$
-windowrule = float on, match:title ^(CachyOSHello)$
-windowrule = float on, match:class ^(zenity)$
-windowrule = float on, match:class ^()$,match:title ^(Steam - Self Updater)$
-# Increase the opacity
-windowrule = opacity 1.0, match:class ^(zen)$
-# # windowrule = opacity 1.0, match:class ^(discord|armcord|webcord)$
-# # windowrule = opacity 1.0, match:title ^(QQ|Telegram)$
-# # windowrule = opacity 1.0, match:title ^(NetEase Cloud Music Gtk4)$
-# General window rules
-windowrule = float on, match:title ^(Picture-in-Picture)$
-windowrule = pin on, match:title ^(Picture-in-Picture)$
-windowrule = size 360 200, match:title ^(Picture-in-Picture)$
-windowrule = move ((monitor_w*0.5)-(window_w*0.5)) 50, match:title ^(Picture-in-Picture)$
-windowrule = float on, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
-windowrule = move 25%-, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
-windowrule = size 960 540, match:title ^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$
-#windowrule = pin on, match:title ^(danmufloat)$
-windowrule = rounding 5, match:title ^(danmufloat|termfloat)$
-windowrule = animation slide right, match:class ^(kitty|Alacritty)$
-#windowrule = no_blur on, match:class ^(org.mozilla.firefox)$
-# Decorations related to floating windows on workspaces 1 to 10
-##windowrule = bordersize 2, floating:1, onworkspace:w[fv1-10]
-workspace = w[fv1-10], border_color c $source_color, float on #$on_primary_fixed_variant 90deg
-##windowrule = rounding 8, floating:1, onworkspace:w[fv1-10]
-# Decorations related to tiling windows on workspaces 1 to 10
-##windowrule = bordersize 3, floating:0, onworkspace:f[1-10]
-##windowrule = rounding 4, floating:0, onworkspace:f[1-10]
-#windowrule = tile, match:title ^(Microsoft-edge)$
-vwindowrule = tile, match:title ^(Brave-browser)$
-#windowrule = tile, match:title ^(Chromium)$
-windowrule = float on, match:title ^(pavucontrol)$
-windowrule = float on, match:title ^(blueman-manager)$
-windowrule = float on, match:title ^(nm-connection-editor)$
-windowrule = float on, match:title ^(qalculate-gtk)$
-# idleinhibit
-windowrule = idle_inhibit fullscreen,match:class ([window]) # Available modes: none, always, focus, fullscreen
-### no blur for specific classes
-##windowrule = noblur,match:class ^(?!(nautilus|nwg-look|nwg-displays|zen))
-## Windows Rules End #
-
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(nautilus)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(zen)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(Brave-browser)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(code-oss)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^([Cc]ode)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(code-url-handler)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(code-insiders-url-handler)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(org.kde.dolphin)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(org.kde.ark)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(nwg-look)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(qt5ct)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(qt6ct)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(kvantummanager)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(org.pulseaudio.pavucontrol)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(blueman-manager)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(nm-applet)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(nm-connection-editor)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(org.kde.polkit-kde-authentication-agent-1)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(polkit-gnome-authentication-agent-1)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(org.freedesktop.impl.portal.desktop.gtk)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(org.freedesktop.impl.portal.desktop.hyprland)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^([Ss]team)$
-# # windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^(steamwebhelper)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:class ^([Ss]potify)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:title ^(Spotify Free)$
-windowrule = opacity 1.0 $& 1.0 $& 1,match:title ^(Spotify Premium)$
-# # 
-# # windowrule = opacity 1.0 1.0,match:class ^(com.github.rafostar.Clapper)$ # Clapper-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(com.github.tchx84.Flatseal)$ # Flatseal-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(hu.kramo.Cartridges)$ # Cartridges-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(com.obsproject.Studio)$ # Obs-Qt
-# # windowrule = opacity 1.0 1.0,match:class ^(gnome-boxes)$ # Boxes-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(vesktop)$ # Vesktop
-# # windowrule = opacity 1.0 1.0,match:class ^(discord)$ # Discord-Electron
-# # windowrule = opacity 1.0 1.0,match:class ^(WebCord)$ # WebCord-Electron
-# # windowrule = opacity 1.0 1.0,match:class ^(ArmCord)$ # ArmCord-Electron
-# # windowrule = opacity 1.0 1.0,match:class ^(app.drey.Warp)$ # Warp-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(net.davidotek.pupgui2)$ # ProtonUp-Qt
-# # windowrule = opacity 1.0 1.0,match:class ^(yad)$ # Protontricks-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(Signal)$ # Signal-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(io.github.alainm23.planify)$ # planify-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(io.gitlab.theevilskeleton.Upscaler)$ # Upscaler-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(com.github.unrud.VideoDownloader)$ # VideoDownloader-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(io.gitlab.adhami3310.Impression)$ # Impression-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(io.missioncenter.MissionCenter)$ # MissionCenter-Gtk
-# # windowrule = opacity 1.0 1.0,match:class ^(io.github.flattool.Warehouse)$ # Warehouse-Gtk
-windowrule = float on,match:class ^(org.kde.dolphin)$,match:title ^(Progress Dialog — Dolphin)$
-windowrule = float on,match:class ^(org.kde.dolphin)$,match:title ^(Copying — Dolphin)$
-windowrule = float on,match:title ^(About Mozilla Firefox)$
-windowrule = float on,match:class ^(firefox)$,match:title ^(Picture-in-Picture)$
-windowrule = float on,match:class ^(firefox)$,match:title ^(Library)$
-windowrule = float on,match:class ^(kitty)$,match:title ^(top)$
-windowrule = float on,match:class ^(kitty)$,match:title ^(btop)$
-windowrule = float on,match:class ^(kitty)$,match:title ^(htop)$
-windowrule = float on,match:class ^(eww-main-window)$
-windowrule = float on,match:class ^(eww-notifications)$
-windowrule = float on,match:class ^(kvantummanager)$
-windowrule = float on,match:class ^(qt5ct)$
-windowrule = float on,match:class ^(qt6ct)$
-windowrule = float on,match:class ^(nwg-look)$
-windowrule = float on,match:class ^(org.kde.ark)$
-windowrule = float on,match:class ^(org.pulseaudio.pavucontrol)$
-windowrule = float on,match:class ^(blueman-manager)$
-windowrule = float on,match:class ^(nm-applet)$
-windowrule = float on,match:class ^(nm-connection-editor)$
-windowrule = float on,match:class ^(org.kde.polkit-kde-authentication-agent-1)$
-
-windowrule = float on,match:class ^(Signal)$ # Signal-Gtk
-windowrule = float on,match:class ^(com.github.rafostar.Clapper)$ # Clapper-Gtk
-windowrule = float on,match:class ^(app.drey.Warp)$ # Warp-Gtk
-windowrule = float on,match:class ^(net.davidotek.pupgui2)$ # ProtonUp-Qt
-windowrule = float on,match:class ^(yad)$ # Protontricks-Gtk
-windowrule = float on,match:class ^(eog)$ # Imageviewer-Gtk
-windowrule = float on,match:class ^(io.github.alainm23.planify)$ # planify-Gtk
-windowrule = float on,match:class ^(io.gitlab.theevilskeleton.Upscaler)$ # Upscaler-Gtk
-windowrule = float on,match:class ^(com.github.unrud.VideoDownloader)$ # VideoDownloader-Gkk
-windowrule = float on,match:class ^(io.gitlab.adhami3310.Impression)$ # Impression-Gtk
-windowrule = float on,match:class ^(io.missioncenter.MissionCenter)$ # MissionCenter-Gtk
-windowrule = float on,match:class (clipse) # ensure you have a floating window class set if you want this behavior
-windowrule = size 622 652,match:class (clipse) # set the size of the window as necessary
-#windowrule = noborder, fullscreen:1
-
-# common modals
-#windowrule = float on,match:title ^(Open File)$
-#windowrule = layer:top,match:class hyprpolkitagent
-windowrule = float on,match:title ^(Choose Files)$
-windowrule = float on,match:title ^(Save As)$
-windowrule = float on,match:title ^(Confirm to replace files)$
-windowrule = float on,match:title ^(File Operation Progress)$
-windowrule = float on,match:class ^(xdg-desktop-portal-gtk)$
-
-# installer
-windowrule = float on, match:class (floating-installer)
-windowrule = center on, match:class (floating-installer)
-
-# clock
-windowrule = float on, center on, size 400 200, match:class (clock)
-
-# Extra workspace & window rules 
-# Workspaces Rules https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/ #
-# workspace = 1, default:true, monitor:$priMon
-# workspace = 6, default:true, monitor:$secMon
-# Workspace selectors https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/#workspace-selectors
-# workspace = r[1-5], monitor:$priMon
-# workspace = r[6-10], monitor:$secMon
-# workspace = special:scratchpad, on-created-empty:$applauncher
-# no_gaps_when_only deprecated instead workspaces rules with selectors can do the same
-# Smart gaps from 0.45.0 https://wiki.hyprland.org/0.45.0/Configuring/Workspace-Rules/#smart-gaps
-#workspace = w[t1], gapsout:0, gapsin:0
-#workspace = w[tg1], gapsout:0, gapsin:0
-workspace = f[1], gapsout:0, gapsin:0
-#windowrule = bordersize 2, floating:0, onworkspace:w[t1]
-#windowrule = rounding 10, floating:0, onworkspace:w[t1]
-#windowrule = bordersize 2, floating:0, onworkspace:w[tg1]
-#windowrule = rounding 10, floating:0, onworkspace:w[tg1]
-#windowrule = bordersize 2, floating:0, onworkspace:f[1]
-#windowrule = rounding 10, floating:0, onworkspace:f[1]
-windowrule = rounding 0, fullscreen true, border_size 0
-#workspace = w[tv1-10], gapsout:6, gapsin:2
-#workspace = f[1], gapsout:6, gapsin:2
-
-workspace = 1, layoutopt:orientation:left
-workspace = 2, layoutopt:orientation:right
-workspace = 3, layoutopt:orientation:left
-workspace = 4, layoutopt:orientation:right
-workspace = 5, layoutopt:orientation:left
-workspace = 6, layoutopt:orientation:right
-workspace = 7, layoutopt:orientation:left
-workspace = 8, layoutopt:orientation:right
-workspace = 9, layoutopt:orientation:left
-workspace = 10, layoutopt:orientation:right
-# Workspaces Rules End #
-
-# Layers Rules #
-layerrule = animation slide top, match:namespace logout_dialog
-layerrule = blur on,xray on,no_anim on,match:namespace rofi
-layerrule = ignore_alpha 0.01,match:namespace rofi
-layerrule = blur on,match:namespace notifications
-layerrule = ignore_alpha 0.01,match:namespace notifications
-layerrule = blur on,match:namespace swaync-notification-window
-layerrule = ignore_alpha 0.01,match:namespace swaync-notification-window
-layerrule = blur on,xray on,no_anim on,match:namespace swaync-control-center
-layerrule = ignore_alpha 0.01,match:namespace swaync-control-center
-layerrule = blur on,xray on,no_anim on,match:namespace hyprcandy-dock
-layerrule = ignore_alpha 0.01,match:namespace hyprcandy-dock
-layerrule = blur on,xray on,no_anim on,match:namespace hyprcandy-launcher
-layerrule = ignore_alpha 0.01,match:namespace hyprcandy-launcher
-layerrule = blur on,match:namespace logout_dialog
-layerrule = ignore_alpha 0.01,match:namespace logout_dialog
-layerrule = blur on,match:namespace gtk-layer-shell
-layerrule = ignore_alpha 0.01,match:namespace gtk-layer-shell
-layerrule = blur on,no_anim on,match:namespace waybar
-layerrule = ignore_alpha 0.01,match:namespace waybar
-layerrule = blur on,match:namespace dashboardmenu
-layerrule = ignore_alpha 0.01,match:namespace dashboardmenu
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell
-layerrule = ignore_alpha 0.01,match:namespace quickshell
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:overview
-layerrule = ignore_alpha 0.01,match:namespace quickshell:overview
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:weather-popup
-layerrule = ignore_alpha 0.01,match:namespace quickshell:weather-popup
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:sysmon-popup
-layerrule = ignore_alpha 0.01,match:namespace quickshell:sysmon-popup
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:clock-popup
-layerrule = ignore_alpha 0.01,match:namespace quickshell:clock-popup
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:calendar-popup
-layerrule = ignore_alpha 0.01,match:namespace quickshell:calendar-popup
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:systraypopup
-layerrule = ignore_alpha 0.01,match:namespace quickshell:systraypopup
-layerrule = blur on,no_anim on,match:namespace quickshell:desktop
-layerrule = ignore_alpha 0.01,match:namespace quickshell:desktop
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:wallpaper
-layerrule = ignore_alpha 0.01,match:namespace quickshell:wallpaper
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:startmenu
-layerrule = ignore_alpha 0.01,match:namespace quickshell:startmenu
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell-controlcenter
-layerrule = ignore_alpha 0.01,match:namespace quickshell-controlcenter
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:notifications:toasts
-layerrule = ignore_alpha 0.01,match:namespace quickshell:notifications:toasts
-layerrule = blur on,xray on,no_anim on,match:namespace quickshell:notifications:history
-layerrule = ignore_alpha 0.01,match:namespace quickshell:notifications:history
-layerrule = blur on,match:namespace notificationsmenu
-layerrule = ignore_alpha 0.01,match:namespace notificationsmenu
-layerrule = blur on,match:namespace networkmenu
-layerrule = ignore_alpha 0.01,match:namespace networkmenu
-layerrule = blur on,match:namespace mediamenu
-layerrule = ignore_alpha 0.01,match:namespace mediamenu
-layerrule = blur on,match:namespace energymenu
-layerrule = ignore_alpha 0.01,match:namespace energymenu
-layerrule = blur on,match:namespace bluetoothmenu
-layerrule = ignore_alpha 0.01,match:namespace bluetoothmenu
-layerrule = blur on,match:namespace audiomenu
-layerrule = ignore_alpha 0.01,match:namespace audiomenu
-layerrule = blur on,match:namespace hyprmenu
-layerrule = ignore_alpha 0.01,match:namespace hyprmenu
-# layerrule = animation popin 50%, waybar
-# Layers Rules End #
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                         Misc-settings                       ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-misc {
-    disable_hyprland_logo = true
-    disable_splash_rendering = false
-    initial_workspace_tracking = 1
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                             Debug                           ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-debug {
-    suppress_errors = true
-}
-
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                            Keybinds                         ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-#
-$mainMod = SUPER
-$HYPRSCRIPTS = ~/.config/hypr/scripts
-$SCRIPTS = ~/.config/hyprcandy/scripts
-#
-
-#### Kill active window ####
-
-bind = $mainMod, Escape, killactive #Kill single active window
-bind = $mainMod SHIFT, Escape, exec, hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill #Quit active window and all similar open instances
-
-#### Rofi Menus ####
-
-bind = $mainMod CTRL, R, exec, $HYPRSCRIPTS/rofi-menus.sh     #Launch utilities rofi-menu
-bind = bind = $mainMod, A, exec, ~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh     #Show/hide rofi application finder
-bind = $mainMod, K, exec, $HYPRSCRIPTS/keybindings.sh     #Show keybindings
-bind = $mainMod CTRL, A, exec, $HYPRSCRIPTS/animations.sh     #Select animations
-bind = $mainMod CTRL, V, exec, $SCRIPTS/cliphist.sh     #Open clipboard manager
-bind = $mainMod CTRL, E, exec, ~/.config/hyprcandy/settings/emojipicker.sh 		  #Open rofi emoji-picker
-bind = $mainMod CTRL, G, exec, ~/.config/hyprcandy/settings/glyphpicker.sh 		  #Open rofi glyph-picker
-
-#### Applications ####
-
-bind = $mainMod, W, exec, $SCRIPTS/wallpaper.sh #Wallpaper picker
-bind = ALT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh -n #Alternate wallpapers forward
-bind = ALT SHIFT, W, exec, ~/.config/quickshell/wallpaper/wallpaper-cycle.sh -p #Alternate wallpapers backward
-bind = ALT SHIFT, R, exec, ~/.config/hyprcandy/hooks/wallpaper_integration.sh #Reload system colors
-bind = $mainMod, S, exec, spotify-launcher #Spotify
-bind = $mainMod, D, exec, equibop #Discord
-bind = $mainMod, C, exec, gedit #Editor
-bind = $mainMod, B, exec, xdg-open "http://" #Launch your default browser
-bind = $mainMod, Q, exec, kitty #Launch normal kitty instances
-bind = $mainMod, Return, exec, pypr toggle term #Launch a kitty scratchpad through pyprland
-bind = $mainMod, O, exec, /usr/bin/octopi #Launch octopi application finder
-bind = $mainMod, E, exec, nautilus #Launch the filemanager 
-bind = $mainMod CTRL, C, exec, gnome-calculator #Launch the calculator
-
-#### Bar/Panel ####
-
-bind = ALT, 1, exec, ~/.config/hyprcandy/scripts/bar.sh #Hide/Show bar
-
-#### Dock keybinds ####
-
-bind = ALT, 2, exec, ~/.hyprcandy/GJS/hyprcandydock/toggle.sh #Hide/Show dock
-
-#### Status display ####
-
-bind = ALT, 3, exec, ~/.config/hyprcandy/hooks/hyprland_status_display.sh #Hyprland status display
-
-#### Recorder ####
-
-# Wf--recorder (simple recorder) + slurp (allows to select a specific region of the monitor)
-# {to list audio devices run "pactl list sources | grep Name"}   
-bind = $mainMod, R, exec, bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f "$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4" $(slurp)' # Start recording
-bind = Alt, R, exec, pkill -x wf-recorder #Stop recording
-
-#### Hyprsunset ####
-
-bind = Shift, H, exec, hyprctl hyprsunset gamma +10 #Increase gamma by 10%
-bind = Alt, H, exec, hyprctl hyprsunset gamma -10 #Reduce gamma by 10%
-
-
-#### Actions ####
-
-bind = ALT, G, exec, $HYPRSCRIPTS/gamemode.sh						  #Toggle game-mode
-#bind = $mainMod, M, exec, ~/.config/hypr/scripts/power.sh exit 				  #Logout
-#bind = $mainMod,SPACE, hyprexpo:expo, toggle						  #Hyprexpo-plus workspaces overview
-bind = $mainMod SHIFT, R, exec, $HYPRSCRIPTS/loadconfig.sh                                 #Reload Hyprland configuration
-bind = $mainMod SHIFT, A, exec, $HYPRSCRIPTS/toggle-animations.sh                         #Toggle animations
-bind = $mainMod, PRINT, exec, $HYPRSCRIPTS/screenshot.sh                                  #Take a screenshot
-bind = $mainMod, V, exec, cliphist wipe 						  #Clear cliphist database
-bind = $mainMod CTRL, D, exec, $ cliphist list | dmenu | cliphist delete 		  #Delete an old item
-bind = $mainMod ALT, D, exec, $ cliphist delete-query "secret item"  			  #Delete an old item quering manually
-bind = $mainMod ALT, S, exec, $ cliphist list | dmenu | cliphist decode | wl-copy    	  #Select an old item
-bind = $mainMod ALT, O, exec, $HYPRSCRIPTS/window-opacity.sh                              #Change opacity
-bind = $mainMod, L, exec, ~/.config/hypr/scripts/power.sh lock 				  #Lock
-
-
-#### Workspaces ####
-
-bind = SHIFT, TAB, exec, $SCRIPTS/overview.sh #Workspace overview
-
-bind = $mainMod, 1, workspace, 1  #Open workspace 1
-bind = $mainMod, 2, workspace, 2  #Open workspace 2
-bind = $mainMod, 3, workspace, 3  #Open workspace 3
-bind = $mainMod, 4, workspace, 4  #Open workspace 4
-bind = $mainMod, 5, workspace, 5  #Open workspace 5
-bind = $mainMod, 6, workspace, 6  #Open workspace 6
-bind = $mainMod, 7, workspace, 7  #Open workspace 7
-bind = $mainMod, 8, workspace, 8  #Open workspace 8
-bind = $mainMod, 9, workspace, 9  #Open workspace 9
-bind = $mainMod, 0, workspace, 10 #Open workspace 10
-
-bind = $mainMod SHIFT, 1, movetoworkspace, 1  #Move active window to workspace 1
-bind = $mainMod SHIFT, 2, movetoworkspace, 2  #Move active window to workspace 2
-bind = $mainMod SHIFT, 3, movetoworkspace, 3  #Move active window to workspace 3
-bind = $mainMod SHIFT, 4, movetoworkspace, 4  #Move active window to workspace 4
-bind = $mainMod SHIFT, 5, movetoworkspace, 5  #Move active window to workspace 5
-bind = $mainMod SHIFT, 6, movetoworkspace, 6  #Move active window to workspace 6
-bind = $mainMod SHIFT, 7, movetoworkspace, 7  #Move active window to workspace 7
-bind = $mainMod SHIFT, 8, movetoworkspace, 8  #Move active window to workspace 8
-bind = $mainMod SHIFT, 9, movetoworkspace, 9  #Move active window to workspace 9
-bind = $mainMod SHIFT, 0, movetoworkspace, 10 #Move active window to workspace 10
-
-bind = $mainMod, Tab, workspace, m+1       #Open next workspace
-bind = $mainMod SHIFT, Tab, workspace, m-1 #Open previous workspace
-
-bind = $mainMod CTRL, 1, exec, $HYPRSCRIPTS/moveTo.sh 1  #Move all windows to workspace 1
-bind = $mainMod CTRL, 2, exec, $HYPRSCRIPTS/moveTo.sh 2  #Move all windows to workspace 2
-bind = $mainMod CTRL, 3, exec, $HYPRSCRIPTS/moveTo.sh 3  #Move all windows to workspace 3
-bind = $mainMod CTRL, 4, exec, $HYPRSCRIPTS/moveTo.sh 4  #Move all windows to workspace 4
-bind = $mainMod CTRL, 5, exec, $HYPRSCRIPTS/moveTo.sh 5  #Move all windows to workspace 5
-bind = $mainMod CTRL, 6, exec, $HYPRSCRIPTS/moveTo.sh 6  #Move all windows to workspace 6
-bind = $mainMod CTRL, 7, exec, $HYPRSCRIPTS/moveTo.sh 7  #Move all windows to workspace 7
-bind = $mainMod CTRL, 8, exec, $HYPRSCRIPTS/moveTo.sh 8  #Move all windows to workspace 8
-bind = $mainMod CTRL, 9, exec, $HYPRSCRIPTS/moveTo.sh 9  #Move all windows to workspace 9
-bind = $mainMod CTRL, 0, exec, $HYPRSCRIPTS/moveTo.sh 10  #Move all windows to workspace 10
-
-bind = $mainMod, mouse_down, workspace, e+1  #Open next workspace
-bind = $mainMod, mouse_up, workspace, e-1    #Open previous workspace
-bind = $mainMod CTRL, down, workspace, empty #Open the next empty workspace
-
-#### Minimize windows using special workspaces ####
-
-bind = CTRL SHIFT, 1, togglespecialworkspace, magic #Togle window from special workspace
-bind = CTRL SHIFT, 2, movetoworkspace, +0 #Move window to special workspace 2 (Can be toggled with "$mainMod,1")
-bind = CTRL SHIFT, 3, togglespecialworkspace, magic #Togle window to and from special workspace
-bind = CTRL SHIFT, 4, movetoworkspace, special:magic #Move window to special workspace 4 (Can be toggled with "$mainMod,1")
-bind = CTRL SHIFT, 5, togglespecialworkspace, magic #Togle window to and from special workspace
-
-
-#### Windows ####
-
-bind = $mainMod ALT, 1, movetoworkspacesilent, 1  #Move active window to workspace 1 silently
-bind = $mainMod ALT, 2, movetoworkspacesilent, 2  #Move active window to workspace 2 silently
-bind = $mainMod ALT, 3, movetoworkspacesilent, 3  #Move active window to workspace 3 silently
-bind = $mainMod ALT, 4, movetoworkspacesilent, 4  #Move active window to workspace 4 silently
-bind = $mainMod ALT, 5, movetoworkspacesilent, 5  #Move active window to workspace 5 silently
-bind = $mainMod ALT, 6, movetoworkspacesilent, 6  #Move active window to workspace 6 silently
-bind = $mainMod ALT, 7, movetoworkspacesilent, 7  #Move active window to workspace 7 silently
-bind = $mainMod ALT, 8, movetoworkspacesilent, 8  #Move active window to workspace 8 silently
-bind = $mainMod ALT, 9, movetoworkspacesilent, 9  #Move active window to workspace 9 silently
-bind = $mainMod ALT, 0, movetoworkspacesilent, 10  #Move active window to workspace 10 silently 
-
-bindm = $mainMod, Z, movewindow #Hold to move selected window
-bindm = $mainMod, X, resizewindow #Hold to resize selected window
-
-bind = $mainMod, F, fullscreen, 0                                                           #Set active window to fullscreen
-bind = $mainMod SHIFT, M, fullscreen, 1                                                           #Maximize Window
-bind = $mainMod CTRL, F, togglefloating                                                     #Toggle active windows into floating mode
-bind = $mainMod CTRL, T, exec, $HYPRSCRIPTS/toggleallfloat.sh                               #Toggle all windows into floating mode
-bind = $mainMod, J, togglesplit                                                             #Toggle split
-bind = $mainMod, left, movefocus, l                                                         #Move focus left
-bind = $mainMod, right, movefocus, r                                                        #Move focus right
-bind = $mainMod, up, movefocus, u                                                           #Move focus up
-bind = $mainMod, down, movefocus, d                                                         #Move focus down
-bindm = $mainMod, mouse:272, movewindow                                                     #Move window with the mouse
-bindm = $mainMod, mouse:273, resizewindow                                                   #Resize window with the mouse
-bind = $mainMod SHIFT, right, resizeactive, 100 0                                           #Increase window width with keyboard
-bind = $mainMod SHIFT, left, resizeactive, -100 0                                           #Reduce window width with keyboard
-bind = $mainMod SHIFT, down, resizeactive, 0 100                                            #Increase window height with keyboard
-bind = $mainMod SHIFT, up, resizeactive, 0 -100                                             #Reduce window height with keyboard
-bind = $mainMod, G, togglegroup                                                             #Toggle window group
-bind = $mainMod CTRL, left, changegroupactive, prev				  	    #Switch to the previous window in the group
-bind = $mainMod CTRL, right, changegroupactive, next					    #Switch to the next window in the group
-bind = $mainMod CTRL, K, swapsplit                                                               #Swapsplit
-bind = $mainMod ALT, left, swapwindow, l                                                    #Swap tiled window left
-bind = $mainMod ALT, right, swapwindow, r                                                   #Swap tiled window right
-bind = $mainMod ALT, up, swapwindow, u                                                      #Swap tiled window up
-bind = $mainMod ALT, down, swapwindow, d                                                    #Swap tiled window down
-binde = ALT,Tab,cyclenext                                                                   #Cycle between windows
-binde = ALT,Tab,bringactivetotop                                                            #Bring active window to the top
-bind = ALT, S, layoutmsg, swapwithmaster master 					    #Switch current focused window to master
-bind = $mainMod SHIFT, L, exec, hyprctl keyword general:layout "$(hyprctl getoption general:layout | grep -q 'dwindle' && echo 'master' || echo 'dwindle')" #Toggle between dwindle and master layout
-
-
-#### Fn keys ####
-
-bind = , XF86MonBrightnessUp, exec, brightnessctl -q s +10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000  #Increase brightness by 10% 
-bind = , XF86MonBrightnessDown, exec, brightnessctl -q s 10%- && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000 #Reduce brightness by 10%
-bind = , XF86AudioRaiseVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = , XF86AudioLowerVolume, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = , XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle && if pactl get-sink-mute @DEFAULT_SINK@ | grep -q 'yes'; then notify-send "Volume" "Muted" -t 1000; else notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000; fi
-bind = , XF86AudioPlay, exec, playerctl play-pause #Audio play pause
-bind = , XF86AudioPause, exec, playerctl pause #Audio pause
-bind = , XF86AudioNext, exec, playerctl next #Audio next
-bind = , XF86AudioPrev, exec, playerctl previous #Audio previous
-bind = , XF86AudioMicMute, exec, pactl set-source-mute @DEFAULT_SOURCE@ toggle #Toggle microphone
-bind = , XF86Calculator, exec, ~/.config/hyprcandy/settings/calculator.sh  #Open calculator
-bind = , XF86Lock, exec, hyprlock #Open screenlock
-
-# Keyboard backlight controls with notifications
-bind = , code:236, exec, brightnessctl -d smc::kbd_backlight s +10 && notify-send "Keyboard Backlight" "$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = , code:237, exec, brightnessctl -d smc::kbd_backlight s 10- && notify-send "Keyboard Backlight" "$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)" -t 1000
-
-# Screen brightness controls with notifications
-bind = Shift, F2, exec, brightnessctl -q s +10% && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = Shift, F1, exec, brightnessctl -q s 10%- && notify-send "Screen Brightness" "$(brightnessctl | grep -o '[0-9]*%' | head -1)" -t 1000
-
-# Volume mute toggle with notification
-bind = Shift, F9, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle && if pactl get-sink-mute @DEFAULT_SINK@ | grep -q 'yes'; then notify-send "Volume" "Muted" -t 1000; else notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000; fi
-
-# Volume controls with notifications
-bind = Shift, F8, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-bind = Shift, F7, exec, pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send "Volume" "$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)" -t 1000
-
-bind = Shift, F4, exec, playerctl play-pause #Toggle play/pause
-bind = Shift, F6, exec, playerctl next #Play next video/song
-bind = Shift, F5, exec, playerctl previous #Play previous video/song
+ # Add default content to the hyprviz.lua file
+		cat > "$USER_HOME/.config/hypr/hyprviz.lua" << 'EOF'
+--  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
+-- ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
+-- ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
+-- ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
+-- ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
+--  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝
+
+-- HyprCandyPlus visual configuration migrated from hyprviz.conf
+-- Generated from the complete original file; comments below preserve original section context where useful.
+-- Runtime-generated overrides should live in ~/.config/hypr/hyprviz-state.lua, loaded after this file.
+
+local mainMod = "SUPER"
+local HYPRSCRIPTS = os.getenv("HOME") .. "/.config/hypr/scripts"
+local SCRIPTS = os.getenv("HOME") .. "/.config/hyprcandy/scripts"
+local function home(path) return (os.getenv("HOME") or "") .. path end
+
+-- Autostart
+hl.on("hyprland.start", function()
+    hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP HYPRLAND_INSTANCE_SIGNATURE")
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY")
+    hl.exec_cmd("bash ~/.config/hypr/scripts/xdg.sh")
+    hl.exec_cmd("gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'")
+    hl.exec_cmd("gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'")
+    hl.exec_cmd("systemctl --user start hyprpolkitagent")
+    hl.exec_cmd("systemctl --user start rofi-font-watcher")
+    hl.exec_cmd("systemctl --user start cursor-theme-watcher")
+    hl.exec_cmd("gjs ~/.hyprcandy/GJS/candy-daemon.js")
+    hl.exec_cmd("gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js")
+    hl.exec_cmd("bash ~/.config/hypr/scripts/wallpaper-restore.sh")
+    hl.exec_cmd("hypridle")
+    hl.exec_cmd("/usr/bin/pypr")
+    hl.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/autostart.sh")
+    hl.exec_cmd("qs -c bar")
+    hl.exec_cmd("qs -c overview")
+    hl.exec_cmd("wl-paste --watch cliphist store")
+end)
+
+-- Environment variables
+hl.env("PATH", "$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin")
+hl.env("XCURSOR_THEME", "Marci-Crystal")
+hl.env("XCURSOR_SIZE", "18")
+hl.env("HYPRCURSOR_THEME", "Marci-Crystal")
+hl.env("HYPRCURSOR_SIZE", "18")
+hl.env("GTK_THEME", "adw-gtk3-dark")
+hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
+hl.env("XDG_SESSION_TYPE", "wayland")
+hl.env("XDG_SESSION_DESKTOP", "Hyprland")
+hl.env("QT_QPA_PLATFORM", "wayland")
+hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
+hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "0")
+hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
+hl.env("GDK_DEBUG", "portals")
+hl.env("GDK_SCALE", "1")
+hl.env("GDK_BACKEND", "wayland")
+hl.env("CLUTTER_BACKEND", "wayland")
+hl.env("MOZ_ENABLE_WAYLAND", "1")
+hl.env("OZONE_PLATFORM", "wayland")
+hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
+hl.env("WINIT_UNIX_BACKEND", "wayland")
+hl.env("QT_SCALE_FACTOR_ROUNDING_POLICY", "PassThrough")
+hl.env("QEMU_AUDIO_DRV", "pa")
+
+-- Core Hyprland config blocks
+hl.config({
+    input = {
+        kb_layout = "us",
+        kb_variant = "",
+        kb_model = "",
+        kb_options = "",
+        numlock_by_default = true,
+        mouse_refocus = false,
+        follow_mouse = 1,
+        touchpad = {
+            natural_scroll = false,
+            scroll_factor = 1.0,
+        },
+        sensitivity = 0,
+    },
+    general = {
+        gaps_in = 4,
+        gaps_out = 6,
+        gaps_workspaces = 50,
+        border_size = 3,
+        col = {
+            active_border = inverse_primary,
+            inactive_border = background,
+        },
+        layout = "scrolling",
+        resize_on_border = true,
+        allow_tearing = false,
+    },
+    group = {
+        col = {
+            border_active = source_color,
+            border_inactive = background,
+            border_locked_active = primary_fixed_dim,
+            border_locked_inactive = background,
+        },
+        groupbar = {
+            font_size = 14,
+            font_weight_active = "heavy",
+            font_weight_inactive = "heavy",
+            text_color = surface_tint,
+            col = {
+                active = primary_fixed_dim,
+                inactive = background,
+                locked_active = primary_fixed_dim,
+                locked_inactive = background,
+            },
+            indicator_height = 4,
+            indicator_gap = 6,
+            height = 10,
+            render_titles = true,
+            scrolling = true,
+        },
+    },
+    dwindle = {
+        pseudotile = true,
+        preserve_split = true,
+    },
+    master = {
+        new_status = "slave",
+        new_on_active = "after",
+        smart_resizing = true,
+        drop_at_cursor = true,
+    },
+    scrolling = {
+        direction = "right",
+        focus_fit_method = 0,
+        column_width = 0.5,
+    },
+    gestures = {
+        workspace_swipe_distance = 700,
+        workspace_swipe_cancel_ratio = 0.2,
+        workspace_swipe_min_speed_to_force = 5,
+        workspace_swipe_direction_lock = true,
+        workspace_swipe_direction_lock_threshold = 10,
+        workspace_swipe_create_new = true,
+    },
+    binds = {
+        workspace_back_and_forth = true,
+        allow_workspace_cycles = true,
+        pass_mouse_when_bound = false,
+    },
+    decoration = {
+        rounding = 10,
+        rounding_power = 2,
+        active_opacity = 0.85,
+        inactive_opacity = 0.85,
+        fullscreen_opacity = 1.0,
+        blur = {
+            enabled = true,
+            size = 2,
+            passes = 5,
+            new_optimizations = true,
+            ignore_opacity = true,
+            xray = true,
+            vibrancy = 0.24999999999999933,
+            noise = 0,
+            popups = true,
+            popups_ignorealpha = 0.8,
+            brightness = 1.0000000000000002,
+            contrast = 0.9999999999999997,
+            special = false,
+            vibrancy_darkness = 0.5000000000000002,
+        },
+        shadow = {
+            enabled = true,
+            range = 12,
+            render_power = 4,
+            color = scrim,
+        },
+        dim_strength = 0.19999999999999973,
+        dim_inactive = false,
+    },
+    misc = {
+        disable_hyprland_logo = true,
+        disable_splash_rendering = false,
+        initial_workspace_tracking = 1,
+    },
+    debug = {
+        suppress_errors = true,
+    },
+})
+
+-- Gestures
+hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+hl.gesture({ fingers = 4, direction = "swipe", action = "move," })
+hl.gesture({ fingers = 2, direction = "pinch", action = "float" })
+
+-- Window rules
+hl.window_rule({
+    name = "windowrule-1",
+    match = {
+        class = ".*",
+    },
+    group = "barred",
+})
+hl.window_rule({
+    name = "windowrule-2",
+    match = {
+        class = "(com.candy.widgets|gjs|widgets)",
+    },
+    pin = true,
+    border_size = 3,
+})
+hl.window_rule({
+    name = "windowrule-3",
+    match = {
+        title = "(candy.utils)#center",
+    },
+    move = "((monitor_w*0.5)-(window_w*0.5)) 45",
+})
+hl.window_rule({
+    name = "windowrule-4",
+    match = {
+        title = "(candy.systemmonitor)",
+    },
+    move = "((monitor_w*1)-((window_w*1)+10)) 45",
+})
+hl.window_rule({
+    name = "windowrule-5",
+    match = {
+        title = "(candy.weather)",
+    },
+    move = "((monitor_w*0.5)-(window_w*0.5)) 45",
+})
+hl.window_rule({
+    name = "windowrule-6",
+    match = {
+        title = "(candy.media)",
+    },
+    move = "(monitor_w*0.01) 50",
+})
+hl.window_rule({
+    name = "windowrule-7",
+    match = {
+        class = "^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$",
+    },
+    opacity = "0.85 0.85",
+})
+hl.window_rule({
+    name = "windowrule-8",
+    match = {
+        class = "(kitty-scratchpad)",
+    },
+    float = true,
+    center = true,
+    size = "800 500",
+})
+hl.window_rule({
+    name = "windowrule-9",
+    match = {
+        class = "^$",
+        title = "^$",
+        xwayland = "True",
+        float = "True",
+        fullscreen = "False",
+        pinned = "False",
+    },
+    suppress_event = "maximize",
+})
+hl.window_rule({
+    name = "windowrule-10",
+    match = {
+        class = "(.*org.pulseaudio.pavucontrol.*)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-11",
+    match = {
+        class = "(.*org.pulseaudio.pavucontrol.*)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-12",
+    match = {
+        class = "(.*org.pulseaudio.pavucontrol.*)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-13",
+    match = {
+        class = "(.*waypaper.*)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-14",
+    match = {
+        class = "(.*waypaper.*)",
+    },
+    size = "800 600",
+})
+hl.window_rule({
+    name = "windowrule-15",
+    match = {
+        class = "(.*waypaper.*)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-16",
+    match = {
+        class = "(blueman-manager)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-17",
+    match = {
+        class = "(blueman-manager)",
+    },
+    size = "800 600",
+})
+hl.window_rule({
+    name = "windowrule-18",
+    match = {
+        class = "(blueman-manager)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-19",
+    match = {
+        class = "(org.gnome.Weather)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-20",
+    match = {
+        class = "(org.gnome.Weather)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-21",
+    match = {
+        class = "(org.gnome.Weather)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-22",
+    match = {
+        class = "(org.gnome.Calendar)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-23",
+    match = {
+        class = "(org.gnome.Calendar)",
+    },
+    size = "820 600",
+})
+hl.window_rule({
+    name = "windowrule-24",
+    match = {
+        class = "(org.gnome.Calendar)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-25",
+    match = {
+        class = "(org.gnome.SystemMonitor)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-26",
+    match = {
+        class = "(org.gnome.SystemMonitor)",
+    },
+    size = "820 625",
+})
+hl.window_rule({
+    name = "windowrule-27",
+    match = {
+        class = "(org.gnome.SystemMonitor)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-28",
+    match = {
+        title = "(Open Files)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-29",
+    match = {
+        title = "(Open Files)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-30",
+    match = {
+        title = "(Open Files)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-31",
+    match = {
+        title = "(Select Copy Destination)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-32",
+    match = {
+        title = "(Select Copy Destination)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-33",
+    match = {
+        title = "(Select Copy Destination)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-34",
+    match = {
+        title = "(Select Move Destination)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-35",
+    match = {
+        title = "(Select Move Destination)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-36",
+    match = {
+        title = "(Select Move Destination)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-37",
+    match = {
+        title = "(Save As)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-38",
+    match = {
+        title = "(Save As)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-39",
+    match = {
+        title = "(Save As)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-40",
+    match = {
+        title = "(Select files to send)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-41",
+    match = {
+        title = "(Select files to send)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-42",
+    match = {
+        title = "(Select files to send)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-43",
+    match = {
+        title = "(Bluetooth File Transfer)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-44",
+    match = {
+        class = "(nwg-look)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-45",
+    match = {
+        class = "(nwg-look)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-46",
+    match = {
+        class = "(nwg-look)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-47",
+    match = {
+        title = "(CachyOS Hello)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-48",
+    match = {
+        title = "(CachyOS Hello)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-49",
+    match = {
+        title = "(CachyOS Hello)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-50",
+    match = {
+        class = "(nwg-displays)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-51",
+    match = {
+        class = "(nwg-displays)",
+    },
+    size = "990 600",
+})
+hl.window_rule({
+    name = "windowrule-52",
+    match = {
+        class = "(nwg-displays)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-53",
+    match = {
+        class = "(io.missioncenter.MissionCenter)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-54",
+    match = {
+        class = "(io.missioncenter.MissionCenter)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-55",
+    match = {
+        class = "(io.missioncenter.MissionCenter)",
+    },
+    size = "900 600",
+})
+hl.window_rule({
+    name = "windowrule-56",
+    match = {
+        class = "(missioncenter)",
+        title = "^(Preferences)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-57",
+    match = {
+        class = "(missioncenter)",
+        title = "^(Preferences)$",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-58",
+    match = {
+        class = "(org.gnome.Calculator)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-59",
+    match = {
+        class = "(org.gnome.Calculator)",
+    },
+    size = "700 600",
+})
+hl.window_rule({
+    name = "windowrule-60",
+    match = {
+        class = "(org.gnome.Calculator)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-61",
+    match = {
+        class = "(it.mijorus.smile)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-62",
+    match = {
+        class = "(it.mijorus.smile)",
+    },
+    move = "100%-w-40 90",
+})
+hl.window_rule({
+    name = "windowrule-63",
+    match = {
+        class = "(hyprland-share-picker)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-64",
+    match = {
+        title = "match:class (hyprland-share-picker)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-65",
+    match = {
+        class = "(hyprland-share-picker)",
+    },
+    size = "600 400",
+})
+hl.window_rule({
+    name = "windowrule-66",
+    match = {
+        title = "(hyprviz)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-67",
+    match = {
+        title = "(hyprviz)",
+    },
+    size = "1000 625",
+})
+hl.window_rule({
+    name = "windowrule-68",
+    match = {
+        title = "(hyprviz)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-69",
+    match = {
+        class = "(dotfiles-floating)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-70",
+    match = {
+        class = "(dotfiles-floating)",
+    },
+    size = "1000 700",
+})
+hl.window_rule({
+    name = "windowrule-71",
+    match = {
+        class = "(dotfiles-floating)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-72",
+    match = {
+        title = "(satty)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-73",
+    match = {
+        title = "(satty)",
+    },
+    size = "1000 565",
+})
+hl.window_rule({
+    name = "windowrule-74",
+    match = {
+        title = "(satty)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-75",
+    match = {
+        class = "^(org.pulseaudio.pavucontrol)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-76",
+    match = {
+        class = "^()$",
+        title = "^(Picture in picture)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-77",
+    match = {
+        class = "^()$",
+        title = "^(Save File)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-78",
+    match = {
+        class = "^()$",
+        title = "^(Open File)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-79",
+    match = {
+        class = "^(LibreWolf)$",
+        title = "^(Picture-in-Picture)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-80",
+    match = {
+        class = "^(xdg-desktop-portal-hyprland|xdg-desktop-portal-gtk|xdg-desktop-portal-kde)(.*)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-81",
+    match = {
+        class = "^(hyprpolkitagent|polkit-gnome-authentication-agent-1|org.org.kde.polkit-kde-authentication-agent-1)(.*)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-82",
+    match = {
+        title = "^(CachyOSHello)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-83",
+    match = {
+        class = "^(zenity)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-84",
+    match = {
+        class = "^()$",
+        title = "^(Steam - Self Updater)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-85",
+    match = {
+        class = "^(zen)$",
+    },
+    opacity = "1.0",
+})
+hl.window_rule({
+    name = "windowrule-86",
+    match = {
+        title = "^(Picture-in-Picture)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-87",
+    match = {
+        title = "^(Picture-in-Picture)$",
+    },
+    pin = true,
+})
+hl.window_rule({
+    name = "windowrule-88",
+    match = {
+        title = "^(Picture-in-Picture)$",
+    },
+    size = "360 200",
+})
+hl.window_rule({
+    name = "windowrule-89",
+    match = {
+        title = "^(Picture-in-Picture)$",
+    },
+    move = "((monitor_w*0.5)-(window_w*0.5)) 50",
+})
+hl.window_rule({
+    name = "windowrule-90",
+    match = {
+        title = "^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-91",
+    match = {
+        title = "^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$",
+    },
+    move = "25%-",
+})
+hl.window_rule({
+    name = "windowrule-92",
+    match = {
+        title = "^(imv|mpv|danmufloat|termfloat|nemo|ncmpcpp)$",
+    },
+    size = "960 540",
+})
+hl.window_rule({
+    name = "windowrule-93",
+    match = {
+        title = "^(danmufloat|termfloat)$",
+    },
+    rounding = 10,
+})
+hl.window_rule({
+    name = "windowrule-94",
+    match = {
+        class = "^(kitty|Alacritty)$",
+    },
+    animation = "slide right",
+})
+hl.window_rule({
+    name = "vwindowrule-95",
+    match = {
+        title = "^(Brave-browser)$",
+    },
+    float = false,
+})
+hl.window_rule({
+    name = "windowrule-96",
+    match = {
+        title = "^(pavucontrol)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-97",
+    match = {
+        title = "^(blueman-manager)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-98",
+    match = {
+        title = "^(nm-connection-editor)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-99",
+    match = {
+        title = "^(qalculate-gtk)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-100",
+    match = {
+        class = "([window])",
+    },
+    idle_inhibit = "fullscreen",
+    -- TODO verify direct Lua equivalent for legacy effect: always
+    -- TODO verify direct Lua equivalent for legacy effect: focus
+    -- TODO verify direct Lua equivalent for legacy effect: fullscreen
+})
+hl.window_rule({
+    name = "windowrule-101",
+    match = {
+        class = "^(nautilus)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-102",
+    match = {
+        class = "^(zen)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-103",
+    match = {
+        class = "^(code-oss)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-104",
+    match = {
+        class = "^([Cc]ode)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-105",
+    match = {
+        class = "^(nwg-look)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-106",
+    match = {
+        class = "^(qt5ct)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-107",
+    match = {
+        class = "^(qt6ct)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-108",
+    match = {
+        class = "^(kvantummanager)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-109",
+    match = {
+        class = "^([Ss]potify)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-110",
+    match = {
+        title = "^(Spotify Free)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-111",
+    match = {
+        title = "^(Spotify Premium)$",
+    },
+    opacity = "1.0 $& 1.0 $& 1",
+})
+hl.window_rule({
+    name = "windowrule-112",
+    match = {
+        class = "^(org.kde.dolphin)$",
+        title = "^(Progress Dialog — Dolphin)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-113",
+    match = {
+        class = "^(org.kde.dolphin)$",
+        title = "^(Copying — Dolphin)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-114",
+    match = {
+        title = "^(About Mozilla Firefox)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-115",
+    match = {
+        class = "^(firefox)$",
+        title = "^(Picture-in-Picture)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-116",
+    match = {
+        class = "^(firefox)$",
+        title = "^(Library)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-117",
+    match = {
+        class = "^(kitty)$",
+        title = "^(top)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-118",
+    match = {
+        class = "^(kitty)$",
+        title = "^(btop)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-119",
+    match = {
+        class = "^(kitty)$",
+        title = "^(htop)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-120",
+    match = {
+        class = "^(eww-main-window)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-121",
+    match = {
+        class = "^(eww-notifications)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-122",
+    match = {
+        class = "^(kvantummanager)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-123",
+    match = {
+        class = "^(qt5ct)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-124",
+    match = {
+        class = "^(qt6ct)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-125",
+    match = {
+        class = "^(nwg-look)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-126",
+    match = {
+        class = "^(org.kde.ark)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-127",
+    match = {
+        class = "^(org.pulseaudio.pavucontrol)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-128",
+    match = {
+        class = "^(blueman-manager)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-129",
+    match = {
+        class = "^(nm-applet)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-130",
+    match = {
+        class = "^(nm-connection-editor)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-131",
+    match = {
+        class = "^(org.kde.polkit-kde-authentication-agent-1)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-132",
+    match = {
+        class = "^(Signal)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-133",
+    match = {
+        class = "^(com.github.rafostar.Clapper)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-134",
+    match = {
+        class = "^(app.drey.Warp)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-135",
+    match = {
+        class = "^(net.davidotek.pupgui2)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-136",
+    match = {
+        class = "^(yad)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-137",
+    match = {
+        class = "^(eog)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-138",
+    match = {
+        class = "^(io.github.alainm23.planify)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-139",
+    match = {
+        class = "^(io.gitlab.theevilskeleton.Upscaler)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-140",
+    match = {
+        class = "^(com.github.unrud.VideoDownloader)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-141",
+    match = {
+        class = "^(io.gitlab.adhami3310.Impression)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-142",
+    match = {
+        class = "^(io.missioncenter.MissionCenter)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-143",
+    match = {
+        class = "(clipse)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-144",
+    match = {
+        class = "(clipse)",
+    },
+    size = "622 652",
+})
+hl.window_rule({
+    name = "windowrule-145",
+    match = {
+        title = "^(Choose Files)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-146",
+    match = {
+        title = "^(Save As)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-147",
+    match = {
+        title = "^(Confirm to replace files)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-148",
+    match = {
+        title = "^(File Operation Progress)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-149",
+    match = {
+        class = "^(xdg-desktop-portal-gtk)$",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-150",
+    match = {
+        class = "(floating-installer)",
+    },
+    float = true,
+})
+hl.window_rule({
+    name = "windowrule-151",
+    match = {
+        class = "(floating-installer)",
+    },
+    center = true,
+})
+hl.window_rule({
+    name = "windowrule-152",
+    match = {
+        class = "(clock)",
+    },
+    float = true,
+    center = true,
+    size = "400 200",
+})
+hl.window_rule({
+    name = "windowrule-153",
+    rounding = 10,
+    -- TODO verify direct Lua equivalent for legacy effect: fullscreen true
+    border_size = 3,
+})
+
+-- Workspace rules
+hl.workspace_rule({
+    workspace = "hidden",
+})
+hl.workspace_rule({
+    workspace = "w[fv1-10]",
+    -- TODO verify direct Lua equivalent for legacy workspace option: border_color c $source_color
+    -- TODO verify direct Lua equivalent for legacy workspace option: float on #$on_primary_fixed_variant 90deg
+})
+hl.workspace_rule({
+    workspace = "f[1]",
+    gaps_out = 6,
+    gaps_in = 4,
+})
+hl.workspace_rule({
+    workspace = "1",
+    layoutopt = "orientation:left",
+})
+hl.workspace_rule({
+    workspace = "2",
+    layoutopt = "orientation:right",
+})
+hl.workspace_rule({
+    workspace = "3",
+    layoutopt = "orientation:left",
+})
+hl.workspace_rule({
+    workspace = "4",
+    layoutopt = "orientation:right",
+})
+hl.workspace_rule({
+    workspace = "5",
+    layoutopt = "orientation:left",
+})
+hl.workspace_rule({
+    workspace = "6",
+    layoutopt = "orientation:right",
+})
+hl.workspace_rule({
+    workspace = "7",
+    layoutopt = "orientation:left",
+})
+hl.workspace_rule({
+    workspace = "8",
+    layoutopt = "orientation:right",
+})
+hl.workspace_rule({
+    workspace = "9",
+    layoutopt = "orientation:left",
+})
+hl.workspace_rule({
+    workspace = "10",
+    layoutopt = "orientation:right",
+})
+
+-- Layer rules
+hl.layer_rule({
+    name = "layer-rule-1",
+    match = {
+        namespace = "logout_dialog",
+    },
+    animation = "slide top",
+})
+hl.layer_rule({
+    name = "layer-rule-2",
+    match = {
+        namespace = "rofi",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-3",
+    match = {
+        namespace = "rofi",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-4",
+    match = {
+        namespace = "notifications",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-5",
+    match = {
+        namespace = "notifications",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-6",
+    match = {
+        namespace = "swaync-notification-window",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-7",
+    match = {
+        namespace = "swaync-notification-window",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-8",
+    match = {
+        namespace = "swaync-control-center",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-9",
+    match = {
+        namespace = "swaync-control-center",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-10",
+    match = {
+        namespace = "hyprcandy-dock",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-11",
+    match = {
+        namespace = "hyprcandy-dock",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-12",
+    match = {
+        namespace = "hyprcandy-launcher",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-13",
+    match = {
+        namespace = "hyprcandy-launcher",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-14",
+    match = {
+        namespace = "logout_dialog",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-15",
+    match = {
+        namespace = "logout_dialog",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-16",
+    match = {
+        namespace = "gtk-layer-shell",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-17",
+    match = {
+        namespace = "gtk-layer-shell",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-18",
+    match = {
+        namespace = "waybar",
+    },
+    blur = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-19",
+    match = {
+        namespace = "waybar",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-20",
+    match = {
+        namespace = "dashboardmenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-21",
+    match = {
+        namespace = "dashboardmenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-22",
+    match = {
+        namespace = "quickshell",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-23",
+    match = {
+        namespace = "quickshell",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-24",
+    match = {
+        namespace = "quickshell:overview",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-25",
+    match = {
+        namespace = "quickshell:overview",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-26",
+    match = {
+        namespace = "quickshell:weather-popup",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-27",
+    match = {
+        namespace = "quickshell:weather-popup",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-28",
+    match = {
+        namespace = "quickshell:sysmon-popup",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-29",
+    match = {
+        namespace = "quickshell:sysmon-popup",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-30",
+    match = {
+        namespace = "quickshell:clock-popup",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-31",
+    match = {
+        namespace = "quickshell:clock-popup",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-32",
+    match = {
+        namespace = "quickshell:calendar-popup",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-33",
+    match = {
+        namespace = "quickshell:calendar-popup",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-34",
+    match = {
+        namespace = "quickshell:systraypopup",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-35",
+    match = {
+        namespace = "quickshell:systraypopup",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-36",
+    match = {
+        namespace = "quickshell:desktop",
+    },
+    blur = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-37",
+    match = {
+        namespace = "quickshell:desktop",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-38",
+    match = {
+        namespace = "quickshell:wallpaper",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-39",
+    match = {
+        namespace = "quickshell:wallpaper",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-40",
+    match = {
+        namespace = "quickshell:startmenu",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-41",
+    match = {
+        namespace = "quickshell:startmenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-42",
+    match = {
+        namespace = "quickshell-controlcenter",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-43",
+    match = {
+        namespace = "quickshell-controlcenter",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-44",
+    match = {
+        namespace = "quickshell:notifications:toasts",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-45",
+    match = {
+        namespace = "quickshell:notifications:toasts",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-46",
+    match = {
+        namespace = "quickshell:notifications:history",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-47",
+    match = {
+        namespace = "quickshell:notifications:history",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-48",
+    match = {
+        namespace = "notificationsmenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-49",
+    match = {
+        namespace = "notificationsmenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-50",
+    match = {
+        namespace = "networkmenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-51",
+    match = {
+        namespace = "networkmenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-52",
+    match = {
+        namespace = "mediamenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-53",
+    match = {
+        namespace = "mediamenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-54",
+    match = {
+        namespace = "energymenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-55",
+    match = {
+        namespace = "energymenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-56",
+    match = {
+        namespace = "bluetoothmenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-57",
+    match = {
+        namespace = "bluetoothmenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-58",
+    match = {
+        namespace = "audiomenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-59",
+    match = {
+        namespace = "audiomenu",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-60",
+    match = {
+        namespace = "hyprmenu",
+    },
+    blur = true,
+})
+hl.layer_rule({
+    name = "layer-rule-61",
+    match = {
+        namespace = "hyprmenu",
+    },
+    ignore_alpha = 0.01,
+})
+
+-- Keybindings
+-- Legacy variables retained as Lua locals for scripts used by keybinds.
+local function expand_vars(cmd)
+    cmd = cmd:gsub("%$HYPRSCRIPTS", HYPRSCRIPTS):gsub("%$SCRIPTS", SCRIPTS):gsub("%$mainMod", mainMod)
+    return cmd
+end
+hl.bind("SUPER + Escape", hl.dsp.window.close(), { description = "Kill single active window" })
+hl.bind("SUPER + SHIFT + Escape", hl.dsp.exec_cmd("hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill"), { description = "Quit active window and all similar open instances" })
+hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/rofi-menus.sh"), { description = "Launch utilities rofi-menu" })
+hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh"), { description = "Show/hide rofi application finder" })
+hl.bind("SUPER + K", hl.dsp.exec_cmd("~/.config/hypr/scripts/keybindings.sh"), { description = "Show keybindings" })
+hl.bind("SUPER + CTRL + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/animations.sh"), { description = "Select animations" })
+hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/cliphist.sh"), { description = "Open clipboard manager" })
+hl.bind("SUPER + CTRL + E", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/emojipicker.sh"), { description = "Open rofi emoji-picker" })
+hl.bind("SUPER + CTRL + G", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/glyphpicker.sh"), { description = "Open rofi glyph-picker" })
+hl.bind("SUPER + W", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/wallpaper.sh"), { description = "Wallpaper picker" })
+hl.bind("ALT + W", hl.dsp.exec_cmd("~/.config/quickshell/wallpaper/wallpaper-cycle.sh -n"), { description = "Alternate wallpapers forward" })
+hl.bind("ALT + SHIFT + W", hl.dsp.exec_cmd("~/.config/quickshell/wallpaper/wallpaper-cycle.sh -p"), { description = "Alternate wallpapers backward" })
+hl.bind("ALT + SHIFT + R", hl.dsp.exec_cmd("~/.config/hyprcandy/hooks/wallpaper_integration.sh"), { description = "Reload system colors" })
+hl.bind("SUPER + S", hl.dsp.exec_cmd("spotify-launcher"), { description = "Spotify" })
+hl.bind("SUPER + D", hl.dsp.exec_cmd("equibop"), { description = "Discord" })
+hl.bind("SUPER + C", hl.dsp.exec_cmd("gedit"), { description = "Editor" })
+hl.bind("SUPER + B", hl.dsp.exec_cmd("xdg-open \"http://\""), { description = "Launch your default browser" })
+hl.bind("SUPER + Q", hl.dsp.exec_cmd("kitty"), { description = "Launch normal kitty instances" })
+hl.bind("SUPER + Return", hl.dsp.exec_cmd("pypr toggle term"), { description = "Launch a kitty scratchpad through pyprland" })
+hl.bind("SUPER + O", hl.dsp.exec_cmd("/usr/bin/octopi"), { description = "Launch octopi application finder" })
+hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus"), { description = "Launch the filemanager" })
+hl.bind("SUPER + CTRL + C", hl.dsp.exec_cmd("gnome-calculator"), { description = "Launch the calculator" })
+hl.bind("ALT + 1", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/bar.sh"), { description = "Hide/Show bar" })
+hl.bind("ALT + 2", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle.sh"), { description = "Hide/Show dock" })
+hl.bind("ALT + 3", hl.dsp.exec_cmd("~/.config/hyprcandy/hooks/hyprland_status_display.sh"), { description = "Hyprland status display" })
+hl.bind("SUPER + R", hl.dsp.exec_cmd("bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f \"$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4\" $(slurp)'"), { description = "Start recording" })
+hl.bind("Alt + R", hl.dsp.exec_cmd("pkill -x wf-recorder"), { description = "Stop recording" })
+hl.bind("Shift + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma +10"), { description = "Increase gamma by 10%" })
+hl.bind("Alt + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma -10"), { description = "Reduce gamma by 10%" })
+hl.bind("ALT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/gamemode.sh"), { description = "Toggle game-mode" })
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/loadconfig.sh"), { description = "Reload Hyprland configuration" })
+hl.bind("SUPER + SHIFT + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggle-animations.sh"), { description = "Toggle animations" })
+hl.bind("SUPER + PRINT", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot.sh"), { description = "Take a screenshot" })
+hl.bind("SUPER + V", hl.dsp.exec_cmd("cliphist wipe"), { description = "Clear cliphist database" })
+hl.bind("SUPER + CTRL + D", hl.dsp.exec_cmd("$ cliphist list | dmenu | cliphist delete"), { description = "Delete an old item" })
+hl.bind("SUPER + ALT + D", hl.dsp.exec_cmd("$ cliphist delete-query \"secret item\""), { description = "Delete an old item quering manually" })
+hl.bind("SUPER + ALT + S", hl.dsp.exec_cmd("$ cliphist list | dmenu | cliphist decode | wl-copy"), { description = "Select an old item" })
+hl.bind("SUPER + ALT + O", hl.dsp.exec_cmd("~/.config/hypr/scripts/window-opacity.sh"), { description = "Change opacity" })
+hl.bind("SUPER + L", hl.dsp.exec_cmd("~/.config/hypr/scripts/power.sh lock"), { description = "Lock" })
+hl.bind("SHIFT + TAB", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/overview.sh"), { description = "Workspace overview" })
+hl.bind("SUPER + 1", hl.dsp.focus({ workspace = "1" }), { description = "Open workspace 1" })
+hl.bind("SUPER + 2", hl.dsp.focus({ workspace = "2" }), { description = "Open workspace 2" })
+hl.bind("SUPER + 3", hl.dsp.focus({ workspace = "3" }), { description = "Open workspace 3" })
+hl.bind("SUPER + 4", hl.dsp.focus({ workspace = "4" }), { description = "Open workspace 4" })
+hl.bind("SUPER + 5", hl.dsp.focus({ workspace = "5" }), { description = "Open workspace 5" })
+hl.bind("SUPER + 6", hl.dsp.focus({ workspace = "6" }), { description = "Open workspace 6" })
+hl.bind("SUPER + 7", hl.dsp.focus({ workspace = "7" }), { description = "Open workspace 7" })
+hl.bind("SUPER + 8", hl.dsp.focus({ workspace = "8" }), { description = "Open workspace 8" })
+hl.bind("SUPER + 9", hl.dsp.focus({ workspace = "9" }), { description = "Open workspace 9" })
+hl.bind("SUPER + 0", hl.dsp.focus({ workspace = "10" }), { description = "Open workspace 10" })
+hl.bind("SUPER + SHIFT + 1", hl.dsp.window.move({ workspace = "1", follow = true }), { description = "Move active window to workspace 1" })
+hl.bind("SUPER + SHIFT + 2", hl.dsp.window.move({ workspace = "2", follow = true }), { description = "Move active window to workspace 2" })
+hl.bind("SUPER + SHIFT + 3", hl.dsp.window.move({ workspace = "3", follow = true }), { description = "Move active window to workspace 3" })
+hl.bind("SUPER + SHIFT + 4", hl.dsp.window.move({ workspace = "4", follow = true }), { description = "Move active window to workspace 4" })
+hl.bind("SUPER + SHIFT + 5", hl.dsp.window.move({ workspace = "5", follow = true }), { description = "Move active window to workspace 5" })
+hl.bind("SUPER + SHIFT + 6", hl.dsp.window.move({ workspace = "6", follow = true }), { description = "Move active window to workspace 6" })
+hl.bind("SUPER + SHIFT + 7", hl.dsp.window.move({ workspace = "7", follow = true }), { description = "Move active window to workspace 7" })
+hl.bind("SUPER + SHIFT + 8", hl.dsp.window.move({ workspace = "8", follow = true }), { description = "Move active window to workspace 8" })
+hl.bind("SUPER + SHIFT + 9", hl.dsp.window.move({ workspace = "9", follow = true }), { description = "Move active window to workspace 9" })
+hl.bind("SUPER + SHIFT + 0", hl.dsp.window.move({ workspace = "10", follow = true }), { description = "Move active window to workspace 10" })
+hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "m+1" }), { description = "Open next workspace" })
+hl.bind("SUPER + SHIFT + Tab", hl.dsp.focus({ workspace = "m-1" }), { description = "Open previous workspace" })
+hl.bind("SUPER + CTRL + 1", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 1"), { description = "Move all windows to workspace 1" })
+hl.bind("SUPER + CTRL + 2", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 2"), { description = "Move all windows to workspace 2" })
+hl.bind("SUPER + CTRL + 3", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 3"), { description = "Move all windows to workspace 3" })
+hl.bind("SUPER + CTRL + 4", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 4"), { description = "Move all windows to workspace 4" })
+hl.bind("SUPER + CTRL + 5", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 5"), { description = "Move all windows to workspace 5" })
+hl.bind("SUPER + CTRL + 6", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 6"), { description = "Move all windows to workspace 6" })
+hl.bind("SUPER + CTRL + 7", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 7"), { description = "Move all windows to workspace 7" })
+hl.bind("SUPER + CTRL + 8", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 8"), { description = "Move all windows to workspace 8" })
+hl.bind("SUPER + CTRL + 9", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 9"), { description = "Move all windows to workspace 9" })
+hl.bind("SUPER + CTRL + 0", hl.dsp.exec_cmd("~/.config/hypr/scripts/moveTo.sh 10"), { description = "Move all windows to workspace 10" })
+hl.bind("SUPER + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Open next workspace" })
+hl.bind("SUPER + mouse_up", hl.dsp.focus({ workspace = "e-1" }), { description = "Open previous workspace" })
+hl.bind("SUPER + CTRL + down", hl.dsp.focus({ workspace = "empty" }), { description = "Open the next empty workspace" })
+hl.bind("CTRL + SHIFT + 1", hl.dsp.workspace.toggle_special("magic"), { description = "Togle window from special workspace" })
+hl.bind("CTRL + SHIFT + 2", hl.dsp.window.move({ workspace = "+0", follow = true }), { description = "Move window to special workspace 2 (Can be toggled with \"SUPER,1\")" })
+hl.bind("CTRL + SHIFT + 3", hl.dsp.workspace.toggle_special("magic"), { description = "Togle window to and from special workspace" })
+hl.bind("CTRL + SHIFT + 4", hl.dsp.window.move({ workspace = "special:magic", follow = true }), { description = "Move window to special workspace 4 (Can be toggled with \"SUPER,1\")" })
+hl.bind("CTRL + SHIFT + 5", hl.dsp.workspace.toggle_special("magic"), { description = "Togle window to and from special workspace" })
+hl.bind("SUPER + ALT + 1", hl.dsp.window.move({ workspace = "1", follow = false }), { description = "Move active window to workspace 1 silently" })
+hl.bind("SUPER + ALT + 2", hl.dsp.window.move({ workspace = "2", follow = false }), { description = "Move active window to workspace 2 silently" })
+hl.bind("SUPER + ALT + 3", hl.dsp.window.move({ workspace = "3", follow = false }), { description = "Move active window to workspace 3 silently" })
+hl.bind("SUPER + ALT + 4", hl.dsp.window.move({ workspace = "4", follow = false }), { description = "Move active window to workspace 4 silently" })
+hl.bind("SUPER + ALT + 5", hl.dsp.window.move({ workspace = "5", follow = false }), { description = "Move active window to workspace 5 silently" })
+hl.bind("SUPER + ALT + 6", hl.dsp.window.move({ workspace = "6", follow = false }), { description = "Move active window to workspace 6 silently" })
+hl.bind("SUPER + ALT + 7", hl.dsp.window.move({ workspace = "7", follow = false }), { description = "Move active window to workspace 7 silently" })
+hl.bind("SUPER + ALT + 8", hl.dsp.window.move({ workspace = "8", follow = false }), { description = "Move active window to workspace 8 silently" })
+hl.bind("SUPER + ALT + 9", hl.dsp.window.move({ workspace = "9", follow = false }), { description = "Move active window to workspace 9 silently" })
+hl.bind("SUPER + ALT + 0", hl.dsp.window.move({ workspace = "10", follow = false }), { description = "Move active window to workspace 10 silently" })
+hl.bind("SUPER + Z", hl.dsp.window.drag(), { mouse = true, description = "Hold to move selected window" })
+hl.bind("SUPER + X", hl.dsp.window.resize(), { mouse = true, description = "Hold to resize selected window" })
+hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }), { description = "Set active window to fullscreen" })
+hl.bind("SUPER + SHIFT + M", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }), { description = "Maximize Window" })
+hl.bind("SUPER + CTRL + F", hl.dsp.window.float({ action = "toggle" }), { description = "Toggle active windows into floating mode" })
+hl.bind("SUPER + CTRL + T", hl.dsp.exec_cmd("~/.config/hypr/scripts/toggleallfloat.sh"), { description = "Toggle all windows into floating mode" })
+hl.bind("SUPER + J", hl.dsp.exec_cmd("hyprctl dispatch togglesplit"), { description = "Toggle split" })
+hl.bind("SUPER + left", hl.dsp.focus({ direction = "l" }), { description = "Move focus left" })
+hl.bind("SUPER + right", hl.dsp.focus({ direction = "r" }), { description = "Move focus right" })
+hl.bind("SUPER + up", hl.dsp.focus({ direction = "u" }), { description = "Move focus up" })
+hl.bind("SUPER + down", hl.dsp.focus({ direction = "d" }), { description = "Move focus down" })
+hl.bind("SUPER + mouse:272", hl.dsp.window.drag(), { mouse = true, description = "Move window with the mouse" })
+hl.bind("SUPER + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window with the mouse" })
+hl.bind("SUPER + SHIFT + right", hl.dsp.window.resize({ x = 100, y = 0, relative = true }), { description = "Increase window width with keyboard" })
+hl.bind("SUPER + SHIFT + left", hl.dsp.window.resize({ x = -100, y = 0, relative = true }), { description = "Reduce window width with keyboard" })
+hl.bind("SUPER + SHIFT + down", hl.dsp.window.resize({ x = 0, y = 100, relative = true }), { description = "Increase window height with keyboard" })
+hl.bind("SUPER + SHIFT + up", hl.dsp.window.resize({ x = 0, y = -100, relative = true }), { description = "Reduce window height with keyboard" })
+hl.bind("SUPER + G", hl.dsp.group.toggle(), { description = "Toggle window group" })
+hl.bind("SUPER + CTRL + left", hl.dsp.group.prev(), { description = "Switch to the previous window in the group" })
+hl.bind("SUPER + CTRL + right", hl.dsp.group.next(), { description = "Switch to the next window in the group" })
+hl.bind("SUPER + CTRL + K", hl.dsp.layout("swapsplit"), { description = "Swapsplit" })
+hl.bind("SUPER + ALT + left", hl.dsp.window.swap({ direction = "l" }), { description = "Swap tiled window left" })
+hl.bind("SUPER + ALT + right", hl.dsp.window.swap({ direction = "r" }), { description = "Swap tiled window right" })
+hl.bind("SUPER + ALT + up", hl.dsp.window.swap({ direction = "u" }), { description = "Swap tiled window up" })
+hl.bind("SUPER + ALT + down", hl.dsp.window.swap({ direction = "d" }), { description = "Swap tiled window down" })
+hl.bind("ALT + Tab", hl.dsp.window.cycle_next({ next = true }), { repeating = true, description = "Cycle between windows" })
+hl.bind("ALT + Tab", hl.dsp.window.alter_zorder({ mode = "top" }), { repeating = true, description = "Bring active window to the top" })
+hl.bind("ALT + S", hl.dsp.layout("swapwithmaster master"), { description = "Switch current focused window to master" })
+hl.bind("SUPER + SHIFT + L", hl.dsp.exec_cmd("hyprctl keyword general:layout \"$(hyprctl getoption general:layout | grep -q 'dwindle' && echo 'master' || echo 'dwindle')\""), { description = "Toggle between dwindle and master layout" })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -q s +10% && notify-send \"Screen Brightness\" \"$(brightnessctl | grep -o '[0-9]*%' | head -1)\" -t 1000"), { description = "Increase brightness by 10%" })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -q s 10%- && notify-send \"Screen Brightness\" \"$(brightnessctl | grep -o '[0-9]*%' | head -1)\" -t 1000"), { description = "Reduce brightness by 10%" })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send \"Volume\" \"$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send \"Volume\" \"$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle && if pactl get-sink-mute @DEFAULT_SINK@ | grep -q 'yes'; then notify-send \"Volume\" \"Muted\" -t 1000; else notify-send \"Volume\" \"$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)\" -t 1000; fi"))
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { description = "Audio play pause" })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl pause"), { description = "Audio pause" })
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { description = "Audio next" })
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { description = "Audio previous" })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("pactl set-source-mute @DEFAULT_SOURCE@ toggle"), { description = "Toggle microphone" })
+hl.bind("XF86Calculator", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/calculator.sh"), { description = "Open calculator" })
+hl.bind("XF86Lock", hl.dsp.exec_cmd("hyprlock"), { description = "Open screenlock" })
+hl.bind("code:236", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s +10 && notify-send \"Keyboard Backlight\" \"$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("code:237", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s 10- && notify-send \"Keyboard Backlight\" \"$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("Shift + F2", hl.dsp.exec_cmd("brightnessctl -q s +10% && notify-send \"Screen Brightness\" \"$(brightnessctl | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("Shift + F1", hl.dsp.exec_cmd("brightnessctl -q s 10%- && notify-send \"Screen Brightness\" \"$(brightnessctl | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("Shift + F9", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle && if pactl get-sink-mute @DEFAULT_SINK@ | grep -q 'yes'; then notify-send \"Volume\" \"Muted\" -t 1000; else notify-send \"Volume\" \"$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)\" -t 1000; fi"))
+hl.bind("Shift + F8", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5% && notify-send \"Volume\" \"$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("Shift + F7", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5% && notify-send \"Volume\" \"$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1)\" -t 1000"))
+hl.bind("Shift + F4", hl.dsp.exec_cmd("playerctl play-pause"), { description = "Toggle play/pause" })
+hl.bind("Shift + F6", hl.dsp.exec_cmd("playerctl next"), { description = "Play next video/song" })
+hl.bind("Shift + F5", hl.dsp.exec_cmd("playerctl previous"), { description = "Play previous video/song" })
+
+return true
 EOF
 
-            # Add default content to the custom_lock.conf file
-            cat > "$USER_HOME/.config/hyprcustom/custom_lock.conf" << 'EOF'
-# ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
-# ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
-# ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ██║   ██║██║     █████╔╝ 
-# ██╔══██║  ╚██╔╝  ██╔═══╝ ██╔══██╗██║     ██║   ██║██║     ██╔═██╗ 
-# ██║  ██║   ██║   ██║     ██║  ██║███████╗╚██████╔╝╚██████╗██║  ██╗
-# ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝
-
-source = ~/.config/hypr/colors.conf
-
-general {
-    ignore_empty_input = true
-    hide_cursor = true
-}
-
-auth {
-    fingerprint {
-        enabled = true
-        ready_message = Scan fingerprint to unlock
-        present_message = Scanning...
-        retry_delay = 250 # in milliseconds
-    }
-}
-
-background {
-    monitor =
-    path = ~/.config/background.png
-    blur_passes = 4
-    blur_sizes = 0
-    vibrancy = 0.1696
-    noise = 0.01
-    contrast = 0.8916
-}
-
-input-field {
-    monitor =
-    size = 200, 50
-    outline_thickness = 3
-    dots_size = 0.25 # Scale of input-field height, 0.2 - 0.8
-    dots_spacing = 0.2 # Scale of dots' absolute size, 0.0 - 1.0
-    dots_center = true
-    dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
-    outer_color = $primary_fixed_dim $on_secondary 90deg
-    inner_color = $on_primary_fixed_variant
-    font_color = $primary_fixed_dim
-    font_family = C059 Bold Italic
-    fade_on_empty = false
-    fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
-    placeholder_text = <i><span>       $USER       </span></i># Text rendered in the input box when it's empty. # foreground="$inverse_primary ##ffffff99
-    hide_input = false
-    rounding = 20 # -1 means complete rounding (circle/oval)
-    check_color = $rimary
-    fail_color = $error # if authentication failed, changes outer_color and fail message color
-    fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
-    fail_transition = 300 # transition time in ms between normal outer_color and fail_color
-    capslock_color = $primary_fixed_dim
-    numlock_color = $primary_fixed_dim $on_secondary 90deg
-    #bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
-    invert_numlock = false # change color if numlock is off
-    swap_font_color = false # see below
-    position = 0, 150
-    halign = center
-    valign = bottom
-    shadow_passes = 10
-    shadow_size = 20
-    shadow_color = $shadow
-    shadow_boost = 1.6
-}
-
-label {
-    monitor =
-    #date
-    text = cmd[update:60000] date +"%A, %d %B %Y"
-    color = $primary
-    font_size = 20
-    font_family = C059 Bold
-    position = 0, -35
-    halign = center
-    valign = top
-}
-
-label {
-    monitor =
-    #clock
-    text = cmd[update:1000] echo "$TIME"
-    color = $on_primary_fixed_variant
-    font_size = 55
-    font_family = C059 Bold Italic
-    position = 0, -150
-    halign = center
-    valign = top
-    shadow_passes = 5
-    shadow_size = 10
-}
-
-#label {
-    monitor =
-    #text = ✝      $USER    ✝ #  $USER
-    color = $primary_fixed_dim
-    font_size = 20
-    font_family = C059 Bold
-    position = 0, 100
-    halign = center
-    valign = bottom
-    shadow_passes = 5
-    shadow_size = 10
-}
-
-image {
-    monitor =
-    path = ~/.config/lock.png #.face.icon
-    size = 160  lesser side if not 1:1 ratio
-    rounding = -1 # negative values mean circle
-    border_size = 4
-    border_color = $primary_fixed_dim $on_secondary 90deg
-    rotate = 0 # degrees, counter-clockwise
-    reload_time = -1 # seconds between reloading, 0 to reload with SIGUSR2
-#    reload_cmd =  # command to get new path. if empty, old path will be used. don't run "follow" commands like tail -F
-    position = 0, 0
-    halign = center
-    valign = center
-}
-EOF
-
-    # 🎨 Update Hyprland custom.conf with current username  
+    # 🎨 Update Hyprland hyprviz.conf with current username  
     USERNAME=$(whoami)      
-    HYPRLAND_CUSTOM="$USER_HOME/.config/hypr/hyprviz.conf"
+    HYPRLAND_CUSTOM="$USER_HOME/.config/hypr/hyprviz.lua"
     echo "🎨 Updating Hyprland custom.conf with current username..."		
     
     if [ -f "$HYPRLAND_CUSTOM" ]; then
@@ -4097,26 +5083,10 @@ EOF
         echo "⚠️  File not found: $HYPRLAND_CUSTOM"
     fi
         fi
-    
-    if [ "$PANEL_CHOICE" = "waybar" ]; then
-        # Replace hyprpanel with waybar
-        sed -i 's/hyprpanel/waybar/g' "$CONFIG_FILE"
-        # Also update specific script paths that might reference hyprpanel
-        sed -i 's/kill_hyprpanel_safe\.sh/kill_waybar_safe.sh/g' "$CONFIG_FILE"
-        sed -i 's/restart_hyprpanel\.sh/restart_waybar.sh/g' "$CONFIG_FILE"
-        echo -e "${GREEN}Updated keybinds for waybar${NC}"
-    else
-        # Replace waybar with hyprpanel
-        sed -i 's/waybar/hyprpanel/g' "$CONFIG_FILE"
-        # Also update specific script paths that might reference waybar
-        sed -i 's/kill_waybar_safe\.sh/kill_hyprpanel_safe.sh/g' "$CONFIG_FILE"
-        sed -i 's/restart_waybar\.sh/restart_hyprpanel.sh/g' "$CONFIG_FILE"
-        echo -e "${GREEN}Updated keybinds for hyprpanel${NC}"
-    fi
 }
 
 update_custom() {
-    local CUSTOM_CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.conf"
+    local CUSTOM_CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.lua"
     
     # Check if custom config file exists
     if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
