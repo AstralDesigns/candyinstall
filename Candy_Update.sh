@@ -1065,9 +1065,9 @@ mkdir -p mkdir -p "$USER_HOME/.config/custom" "$USER_HOME/.config/hyprcandy/hook
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
-
-cat > "$USER_HOME/.config/custom/custom.lua" << 'EOF'
---  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
+if [ ! -f "$USER_HOME/.config/custom/custom.lua" ]; then
+    cat > "$USER_HOME/.config/custom/custom.lua" << 'EOF'
+--  ██████╗ █████╗ ███╗   ██║██████╗ ██╗   ██╗
 -- ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 -- ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
 -- ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
@@ -1080,6 +1080,7 @@ cat > "$USER_HOME/.config/custom/custom.lua" << 'EOF'
 
 return true
 EOF
+fi
 
 # ═══════════════════════════════════════════════════════════════
 #                   		Update Checker
