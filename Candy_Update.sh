@@ -1060,13 +1060,13 @@ rm -rf "$USER_HOME/.hyprcandy/.config/waybar" "$USER_HOME/.config/waybar"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
-mkdir -p mkdir -p "$HOME/.config/custom" "$USER_HOME/.config/hyprcandy/hooks" "$USER_HOME/.config/hyprcandy/scripts" "$USER_HOME/.config/systemd/user" "$USER_HOME/.config/pypr" 
+mkdir -p mkdir -p "$USER_HOME/.config/custom" "$USER_HOME/.config/hyprcandy/hooks" "$USER_HOME/.config/hyprcandy/scripts" "$USER_HOME/.config/systemd/user" "$USER_HOME/.config/pypr" 
 
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/custom/custom.lua" << 'EOF'
+cat > "$USER_HOME/.config/custom/custom.lua" << 'EOF'
 --  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
 -- ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
 -- ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
@@ -1080,6 +1080,8 @@ cat > "$HOME/.config/custom/custom.lua" << 'EOF'
 -- You can also extend the sourcing to more custom folders as well if you 
 -- wish to be modular and not stack everything in this single file e.g
 -- create ~/.config/custom/keybinds.lua and source it in this file.
+
+return true
 EOF
 
 # ═══════════════════════════════════════════════════════════════
