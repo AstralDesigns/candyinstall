@@ -1215,20 +1215,20 @@ mkdir -p "$HOME/.config/custom" "$HOME/.config/hyprcandy/hooks" "$HOME/.config/s
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/custom/custom.conf" << 'EOF'
-#  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
-# ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
-# ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
-# ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
-# ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
-#  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
-# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-# ┃                          User Settings                      ┃
-# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-# [NOTE!!] Your personal settings added here are sourced in hyprland.conf. 
-# You can also extend the sourcing to more custom folders as well if you 
-# wish to be modular and not stack everythingin this single file e.g
-# create ~/.config/custom/keybinds.conf and source it in this file.
+cat > "$HOME/.config/custom/custom.lua" << 'EOF'
+--  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
+-- ██╔════╝██╔══██╗████╗  ██║██╔══██╗╚██╗ ██╔╝
+-- ██║     ███████║██╔██╗ ██║██║  ██║ ╚████╔╝ 
+-- ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
+-- ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
+--  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
+-- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+-- ┃                          User Settings                      ┃
+-- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+-- [NOTE!!] Your personal settings added here are sourced in hyprland.lua. 
+-- You can also extend the sourcing to more custom folders as well if you 
+-- wish to be modular and not stack everything in this single file e.g
+-- create ~/.config/custom/keybinds.lua and source it in this file.
 EOF
 
 # ═══════════════════════════════════════════════════════════════
@@ -3226,7 +3226,7 @@ EOF
     fi
 }
 
-# Function to setup default "custom.conf" file
+# Function to setup default custom config file
 setup_custom_config() {
 # Create the custom settings directory and files if it doesn't already exist
         if [ -d "$HOME/.config/hypr" ]; then
@@ -3270,6 +3270,9 @@ dofile(home .. "/.config/hypr/hyprviz.lua")
 
 -- Mutable overrides written by Quickshell Control Center sliders/buttons.
 optional_dofile(home .. "/.config/hypr/hyprviz-state.lua", "HyprCandyPlus mutable Hyprland state")
+
+-- Custom settings file for user-preferences.
+optional_dofile(home .. "/.config/custom/custom.lua", "HyprCandyPlus custom user-preferences file")
 
 -- Animation preset selected by ~/.config/hypr/scripts/animations.sh.
 optional_dofile(home .. "/.config/hypr/animations.lua", "HyprCandyPlus animation preset")
@@ -5241,14 +5244,14 @@ hl.bind("Shift + F5", hl.dsp.exec_cmd("playerctl previous"), { description = "Pl
 return true
 EOF
 
-    # 🎨 Update Hyprland custom.conf with current username  
+    # 🎨 Update Hyprland custom config with current username  
     USERNAME=$(whoami)      
     HYPRLAND_CUSTOM="$HOME/.config/hypr/hyprviz.conf"
-    echo "🎨 Updating Hyprland custom.conf with current username..."		
+    echo "🎨 Updating Hyprland custom config with current username..."		
     
     if [ -f "$HYPRLAND_CUSTOM" ]; then
         sed -i "s|\$USERNAME|$USERNAME|g" "$HYPRLAND_CUSTOM"
-        echo "✅ Updated custom.conf PATH with username: $USERNAME"
+        echo "✅ Updated custom config PATH with username: $USERNAME"
     else
         echo "⚠️  File not found: $HYPRLAND_CUSTOM"
     fi
@@ -5795,7 +5798,7 @@ main() {
     # Enable display manager
     enable_display_manager
 
-    # Setup default "custom.conf" file
+    # Setup default custom config file
     setup_custom_config
 
     # Update keybinds based on choice
