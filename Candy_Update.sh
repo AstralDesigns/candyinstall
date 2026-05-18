@@ -5328,7 +5328,7 @@ main() {
     #enable_display_manager
 
     # Setup default custom config file
-    setup_custom_config
+    #setup_custom_config
 
     # Update keybinds based on choice
     #update_keybinds
