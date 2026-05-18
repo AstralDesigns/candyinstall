@@ -1076,10 +1076,10 @@ cat > "$HOME/.config/custom/custom.lua" << 'EOF'
 -- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 -- ┃                          User Settings                      ┃
 -- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
--- [NOTE!!] Your personal settings added here are sourced in hyprland.conf. 
+-- [NOTE!!] Your personal settings added here are sourced in hyprland.lua. 
 -- You can also extend the sourcing to more custom folders as well if you 
--- wish to be modular and not stack everythingin this single file e.g
--- create ~/.config/custom/keybinds.conf and source it in this file.
+-- wish to be modular and not stack everything in this single file e.g
+-- create ~/.config/custom/keybinds.lua and source it in this file.
 EOF
 
 # ═══════════════════════════════════════════════════════════════
