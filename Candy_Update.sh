@@ -5094,62 +5094,6 @@ EOF
         fi
 }
 
-update_custom() {
-    local CUSTOM_CONFIG_FILE="$USER_HOME/.config/hypr/hyprviz.lua"
-    
-    # Check if custom config file exists
-    if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
-        print_error "Custom config file not found: $CUSTOM_CONFIG_FILE"
-        return 1
-    fi
-    
-    # Optional: Create backup (uncomment if needed)
-    # cp "$CUSTOM_CONFIG_FILE" "${CUSTOM_CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
-    # echo -e "${GREEN}Custom config backup created${NC}"
-    
-    if [ "$PANEL_CHOICE" = "waybar" ]; then
-        # Replace bar-0 with waybar in layer rules
-        sed -i '18s/exec-once = systemctl --user start hyprpanel/exec-once = waybar \&/g' "$CUSTOM_CONFIG_FILE"
-        sed -i '22s/exec-once = systemctl --user start hyprpanel-idle-monitor/exec-once = systemctl --user start waybar-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
-        
-        # Handle swaync line - uncomment if commented, or ensure it's uncommented
-        if grep -q "^#.*exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
-            # Line is commented, uncomment it
-            sed -i 's/^#\+\s*exec-once = swaync &/exec-once = swaync \&/g' "$CUSTOM_CONFIG_FILE"
-        elif ! grep -q "^exec-once = swaync &" "$CUSTOM_CONFIG_FILE"; then
-            # Line doesn't exist at all, add it (optional - you might want to handle this case)
-            echo "exec-once = swaync &" >> "$CUSTOM_CONFIG_FILE"
-        fi
-        
-        # Handle awww-daemon line - uncomment if commented
-        if grep -q "^#.*exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
-            # Line is commented, uncomment it
-            sed -i 's/^#\+\s*exec-once = awww-daemon &/exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        elif ! grep -q "^exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
-            # Line doesn't exist at all, add it (optional - you might want to handle this case)
-            echo "exec-once = awww-daemon &" >> "$CUSTOM_CONFIG_FILE"
-        fi
-        sed -i 's/layerrule = blur,bar-0/layerrule = blur,waybar/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/layerrule = ignorezero,bar-0/layerrule = ignorezero,waybar/g' "$CUSTOM_CONFIG_FILE"
-        echo -e "${GREEN}Updated custom config layer rules for waybar${NC}"
-    else
-        # Replace bar-0 with hyprpanel in layer rules
-        sed -i '18s/exec-once = waybar \&/exec-once = systemctl --user start hyprpanel/g' "$CUSTOM_CONFIG_FILE"
-        sed -i '22s/exec-once = systemctl --user start waybar-idle-monitor/exec-once = systemctl --user start hyprpanel-idle-monitor/g' "$CUSTOM_CONFIG_FILE"
-        
-        # Handle awww-daemon line - comment if uncommented
-        if grep -q "^exec-once = awww-daemon &" "$CUSTOM_CONFIG_FILE"; then
-            # Line is uncommented, comment it
-            sed -i 's/^exec-once = awww-daemon &#exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        fi
-        
-        sed -i 's/exec-once = awww-daemon &/#exec-once = awww-daemon \&/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/layerrule = blur,waybar/layerrule = blur,bar-0/g' "$CUSTOM_CONFIG_FILE"
-        sed -i 's/layerrule = ignorezero,waybar/layerrule = ignorezero,bar-0/g' "$CUSTOM_CONFIG_FILE"
-        echo -e "${GREEN}Updated custom config layer rules for hyprpanel${NC}"
-    fi
-}
-
 setup_gjs() {
 # Create the GJS directory and files if they don't already exist
 if [ ! -d "$USER_HOME/.hyprcandy/GJS/src" ]; then
