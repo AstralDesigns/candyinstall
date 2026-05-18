@@ -2937,6 +2937,10 @@ chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
 echo "🔄 Adding custom cursors..."
 cp -r "$USER_HOME"/.icons/* /usr/share/icons/
 echo "✅ Cursors updated."
+
+# Enabled SSD/NVME scheduled optimization
+systemctl enable --now fstrim.timer > /dev/null 2>&1
+echo
 }
 
 # Function to enable display manager and prompt for reboot

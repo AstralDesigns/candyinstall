@@ -3114,6 +3114,10 @@ sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 echo "🔄 Adding custom cursors..."
 sudo cp -r "$HOME"/.icons/* /usr/share/icons/
 echo "✅ Cursors updated."
+
+# Enabled SSD/NVME scheduled optimization
+sudo systemctl enable --now fstrim.timer > /dev/null 2>&1
+echo
 }
 
 # Function to enable display manager and prompt for reboot
