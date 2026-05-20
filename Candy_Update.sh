@@ -1077,9 +1077,9 @@ if [ ! -f "$USER_HOME/.config/custom/custom.lua" ]; then
 -- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 -- [NOTE!!] Your personal settings added here are sourced in hyprland.lua.
 
-hl.bind("SUPER + S", hl.dsp.exec_cmd("spotify-launcher"), { description = "Spotify" })
-hl.bind("SUPER + D", hl.dsp.exec_cmd("equibop"), { description = "Discord" })
-hl.bind("SUPER + C", hl.dsp.exec_cmd("gedit"), { description = "Editor" })
+hl.bind("SUPER + S", hl.dsp.exec_cmd("spotify-launcher"), { description = "Launch Spotify" })
+hl.bind("SUPER + D", hl.dsp.exec_cmd("equibop"), { description = "Launch the Discord app" })
+hl.bind("SUPER + C", hl.dsp.exec_cmd("gedit"), { description = "Launch the editor" })
 hl.bind("SUPER + Q", hl.dsp.exec_cmd("kitty"), { description = "Launch normal kitty instances" })
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("pypr toggle term"), { description = "Launch a kitty scratchpad through pyprland" })
 hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus"), { description = "Launch the filemanager" })
