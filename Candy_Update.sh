@@ -5173,10 +5173,7 @@ echo "✅ Files and Apps setup complete"
 # Function to cleanup post update
 cleanup() {
 	echo
-    REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
-    
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
-    return 0
+    exit 1
 }
 
     # Main execution
