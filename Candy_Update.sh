@@ -5170,40 +5170,6 @@ chmod +x "$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
 echo "✅ Files and Apps setup complete"
 }
 
-# Resolve once at top of main() after USER_HOME is set
-resolve_session_env() {
-    REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
-    REAL_UID=$PKEXEC_UID
-    RUNTIME_DIR="/run/user/$REAL_UID"
-    WAYLAND_DISP=$(ls "$RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v '\.lock' | head -1 | xargs -I{} basename {})
-    DBUS_ADDR=$(grep -z DBUS_SESSION_BUS_ADDRESS \
-        /proc/$(pgrep -u "$REAL_USER" Hyprland | head -1)/environ 2>/dev/null \
-        | tr -d '\0' | cut -d= -f2-)
-    export REAL_USER REAL_UID RUNTIME_DIR WAYLAND_DISP DBUS_ADDR
-}
-
-# Function to finalize updated setup
-finalize_setup() {
-    # Helper to run a command as the real user with full session env
-    as_user() {
-        su - "$REAL_USER" -c "
-            export HOME=$USER_HOME
-            export XDG_RUNTIME_DIR=$RUNTIME_DIR
-            export WAYLAND_DISPLAY=$WAYLAND_DISP
-            export DBUS_SESSION_BUS_ADDRESS=$DBUS_ADDR
-            $1
-        "
-    }
-
-	
-
-    as_user "notify-send 'HyprCandy' '🎨 Regenerating colors from current wallpaper...'"
-	as_user bash "$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
-    as_user "notify-send 'HyprCandy' '✅ Color generation complete.'"
-
-    print_success "HyprCandy update completed!"
-}
-
 # Function to cleanup post update — just file deletion, no display needed
 cleanup() {
     echo
@@ -5215,8 +5181,6 @@ cleanup() {
 main() {
     USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
     cd "$USER_HOME"
-    resolve_session_env
-	echo
 	
 	# Show multicolored ASCII art
     show_ascii_art 
@@ -5269,10 +5233,6 @@ main() {
 
     # Setup GJS
     setup_gjs
-    echo
-    
-    # Finalize setup requirements
-    finalize_setup
     echo
     
     # Function to cleanup post update
