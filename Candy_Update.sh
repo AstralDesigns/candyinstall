@@ -5218,19 +5218,9 @@ finalize_setup() {
         return 0
     fi
 
-    echo "🎨 Triggering color generation..."
-    su - "$REAL_USER" -c "
-        export HOME=$USER_HOME
-        export XDG_RUNTIME_DIR=$RUNTIME_DIR
-        export WAYLAND_DISPLAY=$WAYLAND_DISP
-        export DBUS_SESSION_BUS_ADDRESS=$DBUS_ADDR
-        wal -i '$current_bg' -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
-        matugen image '$current_bg' --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
-        sleep 0.5
-        magick '$current_bg' '$USER_HOME/.config/background'
-        sleep 1
-        bash '$HOOKS_DIR/update_background.sh'
-    "
+    wal -i '$current_bg' -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
+    matugen image '$current_bg' --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
+
     echo "✅ Color generation complete."
     print_success "HyprCandy update completed!"
 }
