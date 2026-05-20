@@ -5219,10 +5219,9 @@ finalize_setup() {
         wal -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25
 		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
         sleep 0.5
-        magick "$bg_path" "$HOME/.config/background"
+        magick "$bg_path" "$USER_HOME/.config/background"
         sleep 1
         "$HOOKS_DIR/update_background.sh"
-        #echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
     else
         echo "❌ Background file not found: $bg_path"
