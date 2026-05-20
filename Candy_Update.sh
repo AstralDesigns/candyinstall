@@ -5067,6 +5067,7 @@ hl.bind("code:237", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s 10- &
 
 return true
 EOF
+fi
 }
 
 setup_gjs() {
