@@ -5176,7 +5176,7 @@ echo "✅ Files and Apps setup complete"
 finalize_setup() {
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'"
+    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash -ic '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'"
 
     print_success "HyprCandy update completed!"
 }
@@ -5186,7 +5186,7 @@ cleanup() {
 	echo
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
+    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash -ic '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     return 0
 }
 
