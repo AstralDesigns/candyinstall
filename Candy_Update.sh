@@ -5170,10 +5170,12 @@ chmod +x "$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
 echo "✅ Files and Apps setup complete"
 }
 
-# Function to cleanup post update — just file deletion, no display needed
+# Function to cleanup post update
 cleanup() {
-    echo
-    su - "$REAL_USER" -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
+	echo
+    REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
+    
+    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     return 0
 }
 
