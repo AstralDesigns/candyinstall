@@ -5201,7 +5201,7 @@ finalize_setup() {
 
     as_user "notify-send 'HyprCandy' '🎨 Regenerating colors from current wallpaper...'"
 
-    # Get current wallpaper path (file reads are fine as root)
+    # Resolve the user's actual wallpaper path from their config (unaffected by dotfile overwrite)
     current_bg=""
     for cfg in "$WP_CONFIG" "$WAYPAPER_CONFIG"; do
         if [ -f "$cfg" ]; then
