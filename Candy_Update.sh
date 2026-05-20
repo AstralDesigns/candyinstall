@@ -5175,9 +5175,22 @@ echo "✅ Files and Apps setup complete"
 # Function to finalize updated setup
 finalize_setup() {
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
-    
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'"
+    REAL_UID=$PKEXEC_UID
+    RUNTIME_DIR="/run/user/$REAL_UID"
 
+    # Detect active Wayland display for this user
+    WAYLAND_SOCK=$(ls "$RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v '\.lock' | head -1)
+    WAYLAND_DISP=$(basename "$WAYLAND_SOCK" 2>/dev/null)
+    DBUS_ADDR=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u "$REAL_USER" Hyprland | head -1)/environ 2>/dev/null | tr -d '\0' | cut -d= -f2-)
+
+    su - "$REAL_USER" -c "
+        export HOME=$USER_HOME
+        export USER=$REAL_USER
+        export XDG_RUNTIME_DIR=$RUNTIME_DIR
+        export WAYLAND_DISPLAY=$WAYLAND_DISP
+        export DBUS_SESSION_BUS_ADDRESS=$DBUS_ADDR
+        bash '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'
+    "
     print_success "HyprCandy update completed!"
 }
 
