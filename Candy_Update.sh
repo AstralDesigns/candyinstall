@@ -5213,21 +5213,21 @@ finalize_setup() {
         fi
     done
 
-    if [ -z "$current_bg" ] || [ ! -f "$current_bg" ]; then
-        as_user "notify-send 'HyprCandy' '⚠️ Could not determine wallpaper — skipping color generation.'"
-        print_success "HyprCandy update completed!"
+    local bg_path="$1"
+    if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
+        echo "🎨 Triggering color generation..."
+        wal -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25
+		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
+        sleep 0.5
+        magick "$bg_path" "$HOME/.config/background"
+        sleep 1
+        "$HOOKS_DIR/update_background.sh"
+        #echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
+    else
+        echo "❌ Background file not found: $bg_path"
+        return 1
     fi
-
-    if [ ! -f "$MATUGEN_CONFIG" ]; then
-        as_user "notify-send 'HyprCandy' '⚠️ matugen config not found — skipping color generation.'"
-        print_success "HyprCandy update completed!"
-        return 0
-    fi
-
-    as_user "notify-send 'HyprCandy' '🖼️ Running wal + matugen on: $current_bg'"
-    as_user "wal -i '$current_bg' -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25"
-    as_user "matugen image '$current_bg' --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2"
     as_user "notify-send 'HyprCandy' '✅ Color generation complete.'"
 
     print_success "HyprCandy update completed!"
