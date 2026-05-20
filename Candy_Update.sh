@@ -3185,7 +3185,6 @@ hl.on("hyprland.start", function()
 end)
 
 -- Environment variables
-hl.env("PATH", "$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin")
 hl.env("XCURSOR_THEME", "Marci-Crystal")
 hl.env("XCURSOR_SIZE", "18")
 hl.env("HYPRCURSOR_THEME", "Marci-Crystal")
@@ -5068,19 +5067,6 @@ hl.bind("code:237", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s 10- &
 
 return true
 EOF
-
-    # 🎨 Update Hyprland hyprviz.conf with current username  
-    USERNAME=$(whoami)      
-    HYPRLAND_CUSTOM="$USER_HOME/.config/hypr/hyprviz.lua"
-    echo "🎨 Updating Hyprland custom config with current username..."		
-    
-    if [ -f "$HYPRLAND_CUSTOM" ]; then
-        sed -i "s|\$USERNAME|$USERNAME|g" "$HYPRLAND_CUSTOM"
-        echo "✅ Updated custom config PATH with username: $USERNAME"
-    else
-        echo "⚠️  File not found: $HYPRLAND_CUSTOM"
-    fi
-        fi
 }
 
 setup_gjs() {
