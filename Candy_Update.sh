@@ -5213,20 +5213,13 @@ finalize_setup() {
         fi
     done
 
-    local bg_path="$1"
-    if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
-        echo "🎨 Triggering color generation..."
-        wal -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25
-		matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
-        sleep 0.5
-        magick "$bg_path" "$USER_HOME/.config/background"
-        sleep 1
-        "$HOOKS_DIR/update_background.sh"
-        return 0
-    else
-        echo "❌ Background file not found: $bg_path"
-        return 1
-    fi
+	as_user magick "$current_bg" "$USER_HOME/.config/background"
+    sleep 1
+    as_user bash "$HOOKS_DIR/update_background.sh"
+    echo "🎨 Triggering color generation..."
+    as_user wal -i "$current_bg" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25
+	as_user matugen image "$current_bg" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
+    
     as_user "notify-send 'HyprCandy' '✅ Color generation complete.'"
 
     print_success "HyprCandy update completed!"
