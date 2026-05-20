@@ -5184,14 +5184,54 @@ resolve_session_env() {
 
 # Function to finalize updated setup
 finalize_setup() {
+    echo "🎨 Regenerating colors from current wallpaper..."
+
+    # Resolve wallpaper path from config files as the real user
+    WP_CONFIG="$USER_HOME/.config/wallpaper/wallpaper.ini"
+    WAYPAPER_CONFIG="$USER_HOME/.config/waypaper/config.ini"
+    MATUGEN_CONFIG="$USER_HOME/.config/matugen/config.toml"
+    HOOKS_DIR="$USER_HOME/.config/hyprcandy/hooks"
+
+    # Get current wallpaper path
+    current_bg=""
+    for cfg in "$WP_CONFIG" "$WAYPAPER_CONFIG"; do
+        if [ -f "$cfg" ]; then
+            current_bg=$(grep -E "^wallpaper\s*=" "$cfg" | head -n1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            if [ -n "$current_bg" ]; then
+                current_bg=$(echo "$current_bg" | sed "s|^~|$USER_HOME|")
+                break
+            fi
+        fi
+    done
+
+    if [ -z "$current_bg" ] || [ ! -f "$current_bg" ]; then
+        echo "⚠️  Could not determine current wallpaper — skipping color generation."
+        print_success "HyprCandy update completed!"
+        return 0
+    fi
+
+    echo "📸 Wallpaper: $current_bg"
+
+    if [ ! -f "$MATUGEN_CONFIG" ]; then
+        echo "⚠️  matugen config not found — skipping color generation."
+        print_success "HyprCandy update completed!"
+        return 0
+    fi
+
+    echo "🎨 Triggering color generation..."
     su - "$REAL_USER" -c "
         export HOME=$USER_HOME
-        export USER=$REAL_USER
         export XDG_RUNTIME_DIR=$RUNTIME_DIR
         export WAYLAND_DISPLAY=$WAYLAND_DISP
         export DBUS_SESSION_BUS_ADDRESS=$DBUS_ADDR
-        bash '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'
+        wal -i '$current_bg' -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
+        matugen image '$current_bg' --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
+        sleep 0.5
+        magick '$current_bg' '$USER_HOME/.config/background'
+        sleep 1
+        bash '$HOOKS_DIR/update_background.sh'
     "
+    echo "✅ Color generation complete."
     print_success "HyprCandy update completed!"
 }
 
