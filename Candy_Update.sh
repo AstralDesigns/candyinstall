@@ -3356,7 +3356,7 @@ hl.window_rule({
 hl.window_rule({
     name = "windowrule-3",
     match = {
-        title = "(candy.utils)#center",
+        title = "(candy.utils)",
     },
     move = "((monitor_w*0.5)-(window_w*0.5)) 45",
 })
@@ -4960,7 +4960,7 @@ local function expand_vars(cmd)
     cmd = cmd:gsub("%$HYPRSCRIPTS", HYPRSCRIPTS):gsub("%$SCRIPTS", SCRIPTS):gsub("%$mainMod", mainMod)
     return cmd
 end
-hl.bind("SUPER + Escape", hl.dsp.exec_cmd("hl.dsp.window.close("), { description = "Kill active window" })
+hl.bind("SUPER + Escape",hl.dsp.window.close(), { description = "Kill active window" })
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/rofi-menus.sh"), { description = "Launch utilities rofi-menu" })
 hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh"), { description = "Show/hide rofi application finder" })
 hl.bind("SUPER + CTRL + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/animations.sh"), { description = "Select animations" })
