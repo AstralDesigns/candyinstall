@@ -5218,9 +5218,10 @@ finalize_setup() {
         return 0
     fi
 
-    wal -i '$current_bg' -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
-    matugen image '$current_bg' --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
-
+    notify-send "🖼️  Running wal + matugen on: $current_bg"
+    wal -i "$current_bg" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
+    matugen image "$current_bg" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
+	
     echo "✅ Color generation complete."
     print_success "HyprCandy update completed!"
 }
