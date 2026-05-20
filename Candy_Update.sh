@@ -1078,8 +1078,6 @@ if [ ! -f "$USER_HOME/.config/custom/custom.lua" ]; then
 -- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 -- [NOTE!!] Your personal settings added here are sourced in hyprland.lua.
 
-hl.bind("SUPER + Escape", hl.dsp.window.close(), { description = "Kill single active window" })
-hl.bind("SUPER + SHIFT + Escape", hl.dsp.exec_cmd("hyprctl activewindow | grep pid | tr -d 'pid:' | xargs kill"), { description = "Quit active window and all similar open instances" })
 hl.bind("SUPER + S", hl.dsp.exec_cmd("spotify-launcher"), { description = "Spotify" })
 hl.bind("SUPER + D", hl.dsp.exec_cmd("equibop"), { description = "Discord" })
 hl.bind("SUPER + C", hl.dsp.exec_cmd("gedit"), { description = "Editor" })
@@ -4962,6 +4960,7 @@ local function expand_vars(cmd)
     cmd = cmd:gsub("%$HYPRSCRIPTS", HYPRSCRIPTS):gsub("%$SCRIPTS", SCRIPTS):gsub("%$mainMod", mainMod)
     return cmd
 end
+hl.bind("SUPER + Escape", hl.dsp.exec_cmd("hl.dsp.window.close("), { description = "Kill active window" })
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/rofi-menus.sh"), { description = "Launch utilities rofi-menu" })
 hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh"), { description = "Show/hide rofi application finder" })
 hl.bind("SUPER + CTRL + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/animations.sh"), { description = "Select animations" })
