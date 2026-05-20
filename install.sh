@@ -416,6 +416,7 @@ build_package_list() {
         "micro"
         
         # Utilities
+        "fzf"
         "zip"
         "p7zip"
         "wtype"
