@@ -1065,6 +1065,8 @@ mkdir -p "$USER_HOME/.config/custom" "$USER_HOME/.config/hyprcandy/hooks" "$USER
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
+rm -f "$USER_HOME/.config/custom/custom.lua"
+
 if [ ! -f "$USER_HOME/.config/custom/custom.lua" ]; then
     cat > "$USER_HOME/.config/custom/custom.lua" << 'EOF'
 --  ██████╗ █████╗ ███╗   ██║██████╗ ██╗   ██╗
