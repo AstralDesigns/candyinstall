@@ -380,6 +380,7 @@ build_package_list() {
         "rofi-nerdy"
         
         # Wallpaper and screenshot tools
+       	"imagemagick"
         "awww-bin"
         "grimblast-git"
         "wob"
@@ -405,6 +406,7 @@ build_package_list() {
         "htop"
         
         # Customization
+        "python-pillow"
         "matugen-bin"
 		"python-pywal16"
 		"python-colorthief"
@@ -417,6 +419,7 @@ build_package_list() {
         
         # Utilities
         "fzf"
+        "xdg-utils"
         "zip"
         "p7zip"
         "wtype"
@@ -563,6 +566,14 @@ build_package_list() {
 
 # Function to install packages
 install_packages() {
+    local conf="/etc/pacman.conf"
+
+    # Uncomment Color if commented out
+    grep -q "^#Color" "$conf" && sudo sed -i "s/^#Color/Color/" "$conf"
+
+    # ILoveCandy doesn't exist on vanilla Arch — add it after Color if missing
+    grep -q "^ILoveCandy" "$conf" || sudo sed -i "/^Color$/a\\ILoveCandy" "$conf"
+    
     print_status "Handling conflicting packages first..."
     if pacman -Qi jack &>/dev/null; then
         print_status "Removing jack package..."
@@ -570,6 +581,7 @@ install_packages() {
     else
         echo ""
     fi
+    
     
     print_status "Starting installation of ${#packages[@]} packages using $AUR_HELPER..."
     
