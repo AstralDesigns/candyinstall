@@ -1062,7 +1062,6 @@ echo "📁 Updating HyprCandyPlus scripts..."
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
-rm -f "$USER_HOME/.config/custom/custom.lua"
 
 if [ ! -f "$USER_HOME/.config/custom/custom.lua" ]; then
     cat > "$USER_HOME/.config/custom/custom.lua" << 'EOF'
