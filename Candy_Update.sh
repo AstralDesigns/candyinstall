@@ -5184,8 +5184,6 @@ resolve_session_env() {
 
 # Function to finalize updated setup
 finalize_setup() {
-    WP_CONFIG="$USER_HOME/.config/wallpaper/wallpaper.ini"
-	
     # Helper to run a command as the real user with full session env
     as_user() {
         su - "$REAL_USER" -c "
@@ -5197,25 +5195,10 @@ finalize_setup() {
         "
     }
 
-	as_user rm -f "$USER_HOME/.hyprcandy/.config/background" "$USER_HOME/.hyprcandy/.config/background.png"
+	
 
     as_user "notify-send 'HyprCandy' '🎨 Regenerating colors from current wallpaper...'"
-
-    # Resolve the user's actual wallpaper path from their config (unaffected by dotfile overwrite)
-    current_bg=""
-    for cfg in "$WP_CONFIG"; do
-        if [ -f "$cfg" ]; then
-            current_bg=$(grep -E "^wallpaper\s*=" "$cfg" | head -n1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-        fi
-    done
-
-	as_user magick "$current_bg" "$USER_HOME/.config/background"
-    sleep 1
-    as_user bash "$HOOKS_DIR/update_background.sh"
-	sleep 0.5
-    as_user wal -i "$current_bg" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25
-	as_user matugen image "$current_bg" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2
-    
+	as_user bash "$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     as_user "notify-send 'HyprCandy' '✅ Color generation complete.'"
 
     print_success "HyprCandy update completed!"
