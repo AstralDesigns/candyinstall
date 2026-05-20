@@ -5222,8 +5222,8 @@ main() {
     #enable_display_manager
 
     # Setup default custom config file
-    setup_custom_config
-    echo
+    #setup_custom_config
+    #echo
     
     # Update keybinds based on choice
     #update_keybinds
