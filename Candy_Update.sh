@@ -1,7 +1,5 @@
 #!/bin/bash
 
-USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
-cd "$USER_HOME"
 # HyprCandy Installer Script
 # This script installs Hyprland and related packages across multiple distributions
 
@@ -5172,17 +5170,20 @@ chmod +x "$USER_HOME/.hyprcandy/GJS/candy-daemon.js"
 echo "✅ Files and Apps setup complete"
 }
 
-# Function to finalize updated setup
-finalize_setup() {
+# Resolve once at top of main() after USER_HOME is set
+resolve_session_env() {
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     REAL_UID=$PKEXEC_UID
     RUNTIME_DIR="/run/user/$REAL_UID"
+    WAYLAND_DISP=$(ls "$RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v '\.lock' | head -1 | xargs -I{} basename {})
+    DBUS_ADDR=$(grep -z DBUS_SESSION_BUS_ADDRESS \
+        /proc/$(pgrep -u "$REAL_USER" Hyprland | head -1)/environ 2>/dev/null \
+        | tr -d '\0' | cut -d= -f2-)
+    export REAL_USER REAL_UID RUNTIME_DIR WAYLAND_DISP DBUS_ADDR
+}
 
-    # Detect active Wayland display for this user
-    WAYLAND_SOCK=$(ls "$RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v '\.lock' | head -1)
-    WAYLAND_DISP=$(basename "$WAYLAND_SOCK" 2>/dev/null)
-    DBUS_ADDR=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$(pgrep -u "$REAL_USER" Hyprland | head -1)/environ 2>/dev/null | tr -d '\0' | cut -d= -f2-)
-
+# Function to finalize updated setup
+finalize_setup() {
     su - "$REAL_USER" -c "
         export HOME=$USER_HOME
         export USER=$REAL_USER
@@ -5194,18 +5195,21 @@ finalize_setup() {
     print_success "HyprCandy update completed!"
 }
 
-# Function to cleanup post update
+# Function to cleanup post update — just file deletion, no display needed
 cleanup() {
-	echo
-    REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
-    
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
+    echo
+    su - "$REAL_USER" -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
     return 0
 }
 
     # Main execution
 main() {
-    # Show multicolored ASCII art
+    USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
+    cd "$USER_HOME"
+    resolve_session_env
+	echo
+	
+	# Show multicolored ASCII art
     show_ascii_art 
     echo
     
