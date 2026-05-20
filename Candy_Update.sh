@@ -1057,8 +1057,7 @@ echo "✅ Update merged"
 rm -rf "$USER_HOME/.hyprcandy/.config/waybar" "$USER_HOME/.config/waybar"
 
 ### ✅ Setup mako config, hook scripts and needed services
-echo "📁 Creating background hook scripts..."
-mkdir -p "$USER_HOME/.config/custom" "$USER_HOME/.config/hyprcandy/hooks" "$USER_HOME/.config/hyprcandy/scripts" "$USER_HOME/.config/systemd/user" "$USER_HOME/.config/pypr" 
+echo "📁 Updating HyprCandyPlus scripts..."
 
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
