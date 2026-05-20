@@ -5176,7 +5176,7 @@ echo "✅ Files and Apps setup complete"
 finalize_setup() {
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash -ic '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'"
+    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/wallpaper_integration.sh'"
 
     print_success "HyprCandy update completed!"
 }
@@ -5186,14 +5186,15 @@ cleanup() {
 	echo
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash -ic '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
+    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     return 0
 }
 
-# Main execution
+    # Main execution
 main() {
     # Show multicolored ASCII art
     show_ascii_art 
+    echo
     
     # Choose display manager first
     #choose_display_manager
@@ -5213,8 +5214,8 @@ main() {
 
     # Check for AUR helper or install one
     check_or_install_package_manager
+    echo
     
-    print_status "Setting up shell configuration..."
     if [ "$SHELL_CHOICE" = "fish" ]; then
         setup_fish
     elif [ "$SHELL_CHOICE" = "zsh" ]; then
@@ -5224,15 +5225,16 @@ main() {
     fi
     
     # Automatically setup HyprCandy configuration
-    print_status "Proceeding with HyprCandy configuration setup..."
     setup_hyprcandy
+    echo
 
     # Enable display manager
     #enable_display_manager
 
     # Setup default custom config file
     setup_custom_config
-
+    echo
+    
     # Update keybinds based on choice
     #update_keybinds
     
@@ -5241,57 +5243,11 @@ main() {
 
     # Setup GJS
     setup_gjs
+    echo
     
     # Finalize setup requirements
     finalize_setup
-    
-    # Configuration management tips
     echo
-    print_status "Configuration management tips:"
-    #print_status "• Your HyprCandy configs are in: ~/.hyprcandy/"
-    #print_status "• Minor updates: cd ~/.hyprcandy && git pull && stow */"
-    #print_status "• Major updates: rerun the install script for updated apps and configs"
-    #print_status "• To remove a config: cd ~/.hyprcandy && stow -D <config_name> -t $HOME"
-    #print_status "• To reinstall a config: cd ~/.hyprcandy && stow -R <config_name> -t $HOME"
-    
-    # Display and wallpaper configuration notes
-    echo
-    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
-    echo -e "${WHITE}                              🖥️  Post-Installation Configuration  🖼️${NC}"
-    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
-    echo
-    print_status "Extra pointers:"
-    echo
-    echo -e "${PURPLE}📱 Display Configuration:${NC}"
-    print_status "• Use ${YELLOW}nwg-displays${NC} to configure monitor scaling, resolution, and positioning"
-    print_status "• Adjust scaling for HiDPI displays if needed"
-    echo
-    echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
-    #print_status "• To personalize Fish, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Fish shell setup"
-    print_status "• You can also rerun the script to install Zsh shell"
-    print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
-    echo
-    echo -e "${PURPLE}🐚 Zsh Configuration:${NC}"
-    #print_status "• To personalize Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Zsh shell setup"
-    print_status "• You can also rerun the script to install Fish shell"
-    print_status "• When both are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
-    echo
-    echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
-    print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
-    print_status "• Prefered font to set through nwg-look is ${CYAN}CaskaydiaCove Nerd Font Mono Regular${NC} at size ${CYAN}10${NC}"
-    print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
-    echo
-    echo -e "${PURPLE}🔎 Browser Color Theming:${NC}"
-    print_status "• If you chose Brave, go to ${YELLOW}Appearance${NC} in Settings and set the 'Theme' to ${CYAN}GTK${NC} and Brave colors to Same as Linux"
-    print_status "• If you chose Firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
-    print_status "• If you chose Zen Browser, for slight additional theming install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC}"
-    print_status "• If you chose Librewolf, I bet you know what you're doing 😄"
-    echo
-	echo -e "${PURPLE}🪄 Enjoy the HyprCandyPlus setup 🙂 🪄${NC}"
-	echo
-    echo -e "${CYAN}════════════════════════════════════════════════════════════════════════════════════════════════════════════${NC}"
     
     # Function to cleanup post update
     cleanup
