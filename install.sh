@@ -3394,7 +3394,7 @@ hl.config({
     },
     general = {
         gaps_in = 4,
-        gaps_out = 6,
+        gaps_out = 8,
         gaps_workspaces = 50,
         border_size = 3,
         col = {
@@ -3459,7 +3459,7 @@ hl.config({
         pass_mouse_when_bound = false,
     },
     decoration = {
-        rounding = 10,
+        rounding = 20,
         rounding_power = 2,
         active_opacity = 0.85,
         inactive_opacity = 0.85,
