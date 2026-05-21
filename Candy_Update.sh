@@ -1001,7 +1001,7 @@ setup_hyprcandy() {
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
 			#$AUR_HELPER -R --noconfirm waypaper
-			#$AUR_HELPER -R --noconfirm octopi
+			$AUR_HELPER -S --noconfirm hyprshutdown
             $AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else

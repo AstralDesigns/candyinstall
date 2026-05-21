@@ -291,6 +291,7 @@ build_package_list() {
             "hyprsunset-git"
             "hyprutils-git"
             "hyprwayland-scanner-git"
+            "hyprshutdown-git"
         )
     else
         hyprland_packages=(
@@ -308,6 +309,7 @@ build_package_list() {
             "hyprsunset"
             "hyprutils"
             "hyprwayland-scanner"
+            "hyprshutdown"
         )
     fi
 	
