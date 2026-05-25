@@ -4950,6 +4950,22 @@ hl.layer_rule({
     },
     ignore_alpha = 0.01,
 })
+hl.layer_rule({
+    name = "layer-rule-62",
+    match = {
+        namespace = "hyprcandy-trash-dialog",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-63",
+    match = {
+        namespace = "hyprcandy-trash-dialog",
+    },
+    ignore_alpha = 0.01,
+})
 
 -- Keybindings
 -- Legacy variables retained as Lua locals for scripts used by keybinds.
@@ -5222,8 +5238,8 @@ main() {
     #enable_display_manager
 
     # Setup default custom config file
-    #setup_custom_config
-    #echo
+    setup_custom_config
+    echo
     
     # Update keybinds based on choice
     #update_keybinds
