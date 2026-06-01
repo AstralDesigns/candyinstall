@@ -717,7 +717,7 @@ symbol = ""
 [username]
 style_user = "bold blue"
 style_root = "bold red"
-format = "[󱞬](blue) [](green) [](blue) [$user](grey) [](green) ($style)"
+format = "[󱞬](grey) [](red) [](blue) [$user](grey) [](red) ($style)"
 show_always = true
 
 [directory]
@@ -727,12 +727,12 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[󱞪](blue) [](green)"
-error_symbol = "[󱞪](blue) [x](red)"
-vimcmd_symbol = "[󱞪](blue) [](green)"
+success_symbol = "[󱞪](grey) [](red)"
+error_symbol = "[󱞪](grey) [x](red)"
+vimcmd_symbol = "[󱞪](grey) [](green)"
 
 [git_branch]
-symbol = "[](green) 🌱 "
+symbol = "[](red) 🌱 "
 truncation_length = 4
 truncation_symbol = ""
 style = "blue"
@@ -744,29 +744,29 @@ behind = "⇣${count}"
 deleted = "x"
 
 [nodejs]
-symbol = "[](green) 💠 "
+symbol = "[](red) 💠 "
 style = "bold grey"
 
 [python]
-symbol = "[](green) 🐍 "
+symbol = "[](red) 🐍 "
 style = "bold yellow"
 
 [rust]
-symbol = "[](green) ⚙️ "
+symbol = "[](red) ⚙️ "
 style = "bold red"
 
 [time]
-format = '[](blue) [\[ $time \]](grey) [](green)($style)'#🕙
+format = '[](blue) [\[ $time \]](grey) [](red)($style)'#🕙
 time_format = "%T"
 disabled = false
 style = "bright-white"
 
 [cmd_duration]
-format = "[](green) ⏱️ [$duration]($style)"
+format = "[](red) ⏱️ [$duration]($style)"
 style = "yellow"
 
 [jobs]
-symbol = "[](green) ⚡ "
+symbol = "[](red) ⚡ "
 style = "bold blue"
 EOF
         
@@ -916,7 +916,7 @@ symbol = ""
 [username]
 style_user = "bold blue"
 style_root = "bold red"
-format = "[󱞬](blue) [](green) [](blue) [$user](grey) [](green) ($style)"
+format = "[󱞬](grey) [](red) [](blue) [$user](grey) [](red) ($style)"
 show_always = true
 
 [directory]
@@ -926,12 +926,12 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[󱞪](blue) [](green)"
-error_symbol = "[󱞪](blue) [x](red)"
-vimcmd_symbol = "[󱞪](blue) [](green)"
+success_symbol = "[󱞪](grey) [](red)"
+error_symbol = "[󱞪](grey) [x](red)"
+vimcmd_symbol = "[󱞪](grey) [](green)"
 
 [git_branch]
-symbol = "[](green) 🌱 "
+symbol = "[](red) 🌱 "
 truncation_length = 4
 truncation_symbol = ""
 style = "blue"
@@ -943,29 +943,29 @@ behind = "⇣${count}"
 deleted = "x"
 
 [nodejs]
-symbol = "[](green) 💠 "
+symbol = "[](red) 💠 "
 style = "bold grey"
 
 [python]
-symbol = "[](green) 🐍 "
+symbol = "[](red) 🐍 "
 style = "bold yellow"
 
 [rust]
-symbol = "[](green) ⚙️ "
+symbol = "[](red) ⚙️ "
 style = "bold red"
 
 [time]
-format = '[](blue) [\[ $time \]](grey) [](green)($style)'#🕙
+format = '[](blue) [\[ $time \]](grey) [](red)($style)'#🕙
 time_format = "%T"
 disabled = false
 style = "bright-white"
 
 [cmd_duration]
-format = "[](green) ⏱️ [$duration]($style)"
+format = "[](red) ⏱️ [$duration]($style)"
 style = "yellow"
 
 [jobs]
-symbol = "[](green) ⚡ "
+symbol = "[](red) ⚡ "
 style = "bold blue"
 EOF
         
