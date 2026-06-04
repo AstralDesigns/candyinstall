@@ -593,7 +593,7 @@ fi
         # Add Starship to Fish config
         echo 'starship init fish | source' >> "$USER_HOME/.config/fish/config.fish"
         
-        # Create Starship config
+        # Create Starship config (same as Fish setup)
         mkdir -p "$USER_HOME/.config"
         cat > "$USER_HOME/.config/starship.toml" << 'EOF'
 # Starship Configuration for HyprCandy
@@ -625,7 +625,7 @@ symbol = ""
 [username]
 style_user = "bold blue"
 style_root = "bold red"
-format = "[󱞬](blue) [](green) [](blue) [$user](grey) [](green) ($style)"
+format = "[󱞬](grey) [](red) [](blue) [$user](grey) [](red) ($style)"
 show_always = true
 
 [directory]
@@ -635,12 +635,12 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[󱞪](blue) [](green)"
-error_symbol = "[󱞪](blue) [x](red)"
-vimcmd_symbol = "[󱞪](blue) [](green)"
+success_symbol = "[󱞪](grey) [](red)"
+error_symbol = "[󱞪](grey) [x](red)"
+vimcmd_symbol = "[󱞪](grey) [](green)"
 
 [git_branch]
-symbol = "[](green) 🌱 "
+symbol = "[](red) 🌱 "
 truncation_length = 4
 truncation_symbol = ""
 style = "blue"
@@ -652,29 +652,29 @@ behind = "⇣${count}"
 deleted = "x"
 
 [nodejs]
-symbol = "[](green) 💠 "
+symbol = "[](red) 💠 "
 style = "bold grey"
 
 [python]
-symbol = "[](green) 🐍 "
+symbol = "[](red) 🐍 "
 style = "bold yellow"
 
 [rust]
-symbol = "[](green) ⚙️ "
+symbol = "[](red) ⚙️ "
 style = "bold red"
 
 [time]
-format = '[](blue) [\[ $time \]](grey) [](green)($style)'#🕙
+format = '[](blue) [\[ $time \]](grey) [](red)($style)'#🕙
 time_format = "%T"
 disabled = false
 style = "bright-white"
 
 [cmd_duration]
-format = "[](green) ⏱️ [$duration]($style)"
+format = "[](red) ⏱️ [$duration]($style)"
 style = "yellow"
 
 [jobs]
-symbol = "[](green) ⚡ "
+symbol = "[](red) ⚡ "
 style = "bold blue"
 EOF
         
@@ -837,7 +837,7 @@ symbol = ""
 [username]
 style_user = "bold blue"
 style_root = "bold red"
-format = "[󱞬](blue) [](green) [](blue) [$user](grey) [](green) ($style)"
+format = "[󱞬](grey) [](red) [](blue) [$user](grey) [](red) ($style)"
 show_always = true
 
 [directory]
@@ -847,12 +847,12 @@ truncation_length = 4
 truncate_to_repo = false
 
 [character]
-success_symbol = "[󱞪](blue) [](green)"
-error_symbol = "[󱞪](blue) [x](red)"
-vimcmd_symbol = "[󱞪](blue) [](green)"
+success_symbol = "[󱞪](grey) [](red)"
+error_symbol = "[󱞪](grey) [x](red)"
+vimcmd_symbol = "[󱞪](grey) [](green)"
 
 [git_branch]
-symbol = "[](green) 🌱 "
+symbol = "[](red) 🌱 "
 truncation_length = 4
 truncation_symbol = ""
 style = "blue"
@@ -864,29 +864,29 @@ behind = "⇣${count}"
 deleted = "x"
 
 [nodejs]
-symbol = "[](green) 💠 "
+symbol = "[](red) 💠 "
 style = "bold grey"
 
 [python]
-symbol = "[](green) 🐍 "
+symbol = "[](red) 🐍 "
 style = "bold yellow"
 
 [rust]
-symbol = "[](green) ⚙️ "
+symbol = "[](red) ⚙️ "
 style = "bold red"
 
 [time]
-format = '[](blue) [\[ $time \]](grey) [](green)($style)'#🕙
+format = '[](blue) [\[ $time \]](grey) [](red)($style)'#🕙
 time_format = "%T"
 disabled = false
 style = "bright-white"
 
 [cmd_duration]
-format = "[](green) ⏱️ [$duration]($style)"
+format = "[](red) ⏱️ [$duration]($style)"
 style = "yellow"
 
 [jobs]
-symbol = "[](green) ⚡ "
+symbol = "[](red) ⚡ "
 style = "bold blue"
 EOF
         
@@ -992,91 +992,6 @@ setup_hyprcandy() {
     print_status "Setting up HyprCandy configuration..."
 	# Legacy desktop entry will be replaced later with a new version
 	rm -rf ~/.local/share/applications/Candy.desktop 
-	
-    # Create Starship config (same as Fish setup)
-        mkdir -p "$USER_HOME/.config"
-        cat > "$USER_HOME/.config/starship.toml" << 'EOF'
-# Starship Configuration for HyprCandy
-format = """
-$username\
-$hostname\
-$time $directory\
-$git_branch\
-$git_state\
-$git_status\
-$git_metrics\
-$fill\
-$nodejs\
-$python\
-$rust\
-$golang\
-$php\
-$java\
-$kotlin\
-$haskell\
-$swift\
-$cmd_duration $jobs\
-$line_break\
-$character"""
-
-[fill]
-symbol = ""
-
-[username]
-style_user = "bold blue"
-style_root = "bold red"
-format = "[󱞬](grey) [](red) [](blue) [$user](grey) [](red) ($style)"
-show_always = true
-
-[directory]
-style = "blue"
-read_only = " 🔒"
-truncation_length = 4
-truncate_to_repo = false
-
-[character]
-success_symbol = "[󱞪](grey) [](red)"
-error_symbol = "[󱞪](grey) [x](red)"
-vimcmd_symbol = "[󱞪](grey) [](green)"
-
-[git_branch]
-symbol = "[](red) 🌱 "
-truncation_length = 4
-truncation_symbol = ""
-style = "blue"
-
-[git_status]
-ahead = "⇡${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-behind = "⇣${count}"
-deleted = "x"
-
-[nodejs]
-symbol = "[](red) 💠 "
-style = "bold grey"
-
-[python]
-symbol = "[](red) 🐍 "
-style = "bold yellow"
-
-[rust]
-symbol = "[](red) ⚙️ "
-style = "bold red"
-
-[time]
-format = '[](blue) [\[ $time \]](grey) [](red)($style)'#🕙
-time_format = "%T"
-disabled = false
-style = "bright-white"
-
-[cmd_duration]
-format = "[](red) ⏱️ [$duration]($style)"
-style = "yellow"
-
-[jobs]
-symbol = "[](red) ⚡ "
-style = "bold blue"
-EOF
     
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
@@ -1117,8 +1032,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update  "hyprcandydock"
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
+# Folders with user-specific changes — never overwritten on update
+SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct" "hyprcandydock")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
