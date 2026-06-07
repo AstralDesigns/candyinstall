@@ -2973,6 +2973,10 @@ if [ ! -f "$PINNED_FILE" ]; then
 	cat > "$PINNED_FILE" << 'EOF'
 org.gnome.Nautilus
 org.gnome.gedit
+org.gnome.DiskUtility
+nwg-displays
+nwg-look
+hyprviz
 com.shellyorg.shelly
 EOF
 
@@ -2986,9 +2990,6 @@ fi
 DESKTOP_FILE="$HOME/.config/desktop-pinned"
 if [ ! -f "$DESKTOP_FILE" ]; then
 	cat > "$DESKTOP_FILE" << 'EOF'
-nwg-displays
-nwg-look
-hyprviz
 EOF
 
 else

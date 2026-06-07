@@ -2875,11 +2875,15 @@ EOF
 # ═══════════════════════════════════════════════════════════════
 #               		  Pinned Apps File 
 # ═══════════════════════════════════════════════════════════════
-PINNED_FILE="$USER_HOME/.config/pinned"
+PINNED_FILE="$HOME/.config/pinned"
 if [ ! -f "$PINNED_FILE" ]; then
 	cat > "$PINNED_FILE" << 'EOF'
 org.gnome.Nautilus
 org.gnome.gedit
+org.gnome.DiskUtility
+nwg-displays
+nwg-look
+hyprviz
 com.shellyorg.shelly
 EOF
 
@@ -2890,12 +2894,9 @@ fi
 # ═══════════════════════════════════════════════════════════════
 #               	  Desktop Pinned Apps File 
 # ═══════════════════════════════════════════════════════════════
-DESKTOP_FILE="$USER_HOME/.config/desktop-pinned"
+DESKTOP_FILE="$HOME/.config/desktop-pinned"
 if [ ! -f "$DESKTOP_FILE" ]; then
 	cat > "$DESKTOP_FILE" << 'EOF'
-nwg-displays
-nwg-look
-hyprviz
 EOF
 
 else
