@@ -1032,8 +1032,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update >  "hyprcandydock"
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
+# Folders with user-specific changes — never overwritten on update >  "hypr" "hyprcandydock"
+SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hyprcandy" "qt5ct" "qt6ct")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -1059,13 +1059,17 @@ rm -rf "$USER_HOME/.hyprcandy/.config/waybar" "$USER_HOME/.config/waybar"
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Updating HyprCandyPlus scripts..."
 
+# ═══════════════════════════════════════════════════════════════
+#                    Updates Patch Notes
+# ═══════════════════════════════════════════════════════════════
+
 	cat > "$USER_HOME/.config/hypr/scripts/notify.sh" << 'EOF'
 #!/bin/bash
 
 notify-send " HC+ Major Update Complete" "Updates made:
  Added persistent right-click clock, weather and system-monitor widgets. Left click still toggles visibility of their 'popup versions' while right-click launches and closes the perisstent widgets. Reposition the widgets with left-click + drag.
- Control-Center: removed legacy clock tab + bar:visibility tab least opacity patched from 0 to 0.05 to maintain blur
- Bar & Dock: minor default config patches
+ Control-Center: removed legacy clock tab + bar:visibility tab least opacity patched from 0 to 0.05 to maintain blur on low transparency.
+ Bar & Dock: padding fixes and default config patches
 (Future HC+ updates won't affect your Hyprland, bar and dock settings anymore)"
 EOF
 
