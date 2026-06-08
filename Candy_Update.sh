@@ -1059,6 +1059,18 @@ rm -rf "$USER_HOME/.hyprcandy/.config/waybar" "$USER_HOME/.config/waybar"
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Updating HyprCandyPlus scripts..."
 
+	cat > "$USER_HOME/.config/hypr/scripts/notify.sh" << 'EOF'
+#!/bin/bash
+
+notify-send " HC+ Major Update Complete" "Updates made:
+ Added persistent right-click clock, weather and system-monitor widgets. Left click still toggles visibility of their 'popup versions' while right-click launches and closes the perisstent widgets. Reposition the widgets with left-click + drag.
+ Control-Center: removed legacy clock tab + bar:visibility tab least opacity patched from 0 to 0.05 to maintain blur
+ Bar & Dock: minor default config patches
+(Future HC+ updates won't affect your Hyprland, bar and dock settings anymore)"
+EOF
+
+chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
+
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
@@ -5189,7 +5201,8 @@ echo "✅ Files and Apps setup complete"
 cleanup() {
 	echo
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
-    
+
+	su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
     su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     return 0
 }
