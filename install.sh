@@ -5137,6 +5137,54 @@ hl.layer_rule({
     },
     ignore_alpha = 0.01,
 })
+hl.layer_rule({
+    name = "layer-rule-64",
+    match = {
+        namespace = "quickshell:clock-widget",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-65",
+    match = {
+        namespace = "quickshell:clock-widget",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-66",
+    match = {
+        namespace = "quickshell:weather-widget",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-67",
+    match = {
+        namespace = "quickshell:weather-widget",
+    },
+    ignore_alpha = 0.01,
+})
+hl.layer_rule({
+    name = "layer-rule-68",
+    match = {
+        namespace = "quickshell:sysmon-widget",
+    },
+    blur = true,
+    xray = true,
+    no_anim = true,
+})
+hl.layer_rule({
+    name = "layer-rule-69",
+    match = {
+        namespace = "quickshell:sysmon-widget",
+    },
+    ignore_alpha = 0.01,
+})
 
 -- Keybindings
 -- Legacy variables retained as Lua locals for scripts used by keybinds.
