@@ -1070,7 +1070,8 @@ notify-send " HC+ Major Update Complete" "Updates made:
  Added persistent right-click clock, weather and system-monitor widgets. Left click still toggles visibility of their 'popup versions' while right-click launches and closes the perisstent widgets. Reposition the widgets with left-click + drag.
  Changed the dektop-icons' layer to 'Background' so they don't conflict with the widgets and added workspace dispatch to the app-icon right-click context menu.
  Control-Center: removed legacy clock tab + bar:visibility tab least opacity patched from 0 to 0.05 to maintain blur on low transparency.
- Bar & Dock: padding fixes and default config patches
+ Bar & Dock: padding fixes and default config patches.
+NOTE: if you get the red Hyprland config error then simply reapply your keybourd layout in the control-center Hyprland tab 'Keyboard Layour' entry and hit 'Enter'/'Return' to apply.
 (Future HC+ updates won't affect your Hyprland, bar and dock settings anymore)"
 EOF
 
