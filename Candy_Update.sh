@@ -3197,7 +3197,6 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("/usr/bin/pypr")
     hl.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/autostart.sh")
     hl.exec_cmd("qs -c bar")
-    hl.exec_cmd("qs -c overview")
     hl.exec_cmd("wl-paste --watch cliphist store")
 end)
 
