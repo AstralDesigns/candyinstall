@@ -1073,7 +1073,7 @@ notify-send " HC+ Major Update Complete" "Updates made:
  Control-Center: repositioned 'Mode & Position' over the 'Corne Radius' subsection in the 'bar:general' and removed legacy clock tab + bar:visibility tab least opacity patched from 0 to 0.05 to maintain blur on low transparency.
  Bar & Dock: padding fixes and default config patches.
 NOTE: if you get the red Hyprland config error then simply reapply your keybourd layout in the control-center Hyprland tab 'Keyboard Layour' entry and hit 'Enter'/'Return' to apply.
-(Future HC+ updates won't affect your Hyprland, bar and dock settings anymore)"
+(After this update future HC+ updates will preserve your Hyprland, bar and dock settings)"
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
