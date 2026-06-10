@@ -1108,6 +1108,28 @@ EOF
 fi
 
 # ═══════════════════════════════════════════════════════════════
+#                 Notification DBus Handoff Script
+# ═══════════════════════════════════════════════════════════════
+
+	cat > "$USER_HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh" << 'EOF'
+#!/usr/bin/env bash
+# Notification DBus handoff for candylock — bar must not restart the daemon while locked.
+CANDYLOCK_NOTIF_LOCK="${CANDYLOCK_NOTIF_LOCK:-/tmp/candylock-notif.lock}"
+
+candylock_notif_acquire() {
+    touch "$CANDYLOCK_NOTIF_LOCK"
+    pkill -f "notify-daemon.py" 2>/dev/null || true
+    sleep 0.25
+}
+
+candylock_notif_release() {
+    rm -f "$CANDYLOCK_NOTIF_LOCK"
+}
+EOF
+
+chmod +x "$USER_HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh"
+
+# ═══════════════════════════════════════════════════════════════
 #                   		Update Checker
 # ═══════════════════════════════════════════════════════════════
 
