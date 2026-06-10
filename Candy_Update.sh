@@ -1032,8 +1032,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct" "hyprcandydock")
+# Folders with user-specific changes — never overwritten on update >  "hyprcandydock"
+SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -1066,14 +1066,9 @@ echo "📁 Updating HyprCandyPlus scripts..."
 	cat > "$USER_HOME/.config/hypr/scripts/notify.sh" << 'EOF'
 #!/bin/bash
 
-notify-send " HC+ Major Update Complete" "Updates made:
- Major overall bar, widgets, dock and app-launcher process optimations for significant cpu usage reduction and improved performance.
- Added persistent right-click clock, weather and system-monitor widgets. Left click still toggles visibility of their 'popup versions' while right-click launches and closes the perisstent widgets. Reposition the widgets with left-click + drag.
- Changed the dektop-icons' layer to 'Background' so they don't conflict with the widgets and added workspace dispatch to the app-icon right-click context menu.
- Control-Center: repositioned 'Mode & Position' over the 'Corne Radius' subsection in the 'bar:general' and removed legacy clock tab + bar:visibility tab least opacity patched from 0 to 0.05 to maintain blur on low transparency.
- Bar & Dock: padding fixes and default config patches.
-NOTE: if you get the red Hyprland config error then simply reapply your keybourd layout in the control-center Hyprland tab 'Keyboard Layour' entry and hit 'Enter'/'Return' to apply.
-(After this update future HC+ updates will preserve your Hyprland, bar and dock settings)"
+notify-send " HC+ Update Complete" "Updates made:
+ Final performance optimizations for the bar, panels, widgets, dock and app-launcher related processes plus slight UI changes to the start-menu and lock-screen.
+(Final update affecting dock settings)"
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
