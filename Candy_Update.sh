@@ -1068,6 +1068,7 @@ echo "📁 Updating HyprCandyPlus scripts..."
 
 notify-send " HC+ Update Complete" "Updates made:
  Final performance optimizations for the bar, panels, widgets, dock and app-launcher related processes plus slight UI changes to the start-menu and lock-screen.
+ Color genration and palette optimizations.
 (Final update affecting dock settings)"
 EOF
 
