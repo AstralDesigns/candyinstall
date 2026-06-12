@@ -3554,7 +3554,7 @@ hl.window_rule({
     match = {
         class = "^(kitty|kitty-scratchpad|Alacritty|floating-installer|clock)$",
     },
-    opacity = "0.85 0.85",
+    opacity = "1.0 1.0",
 })
 hl.window_rule({
     name = "windowrule-8",
