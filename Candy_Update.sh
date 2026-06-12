@@ -671,7 +671,7 @@ style = "bright-white"
 
 [cmd_duration]
 format = "[](red) ⏱️ [$duration]($style)"
-style = "yellow"
+style = "grey"
 
 [jobs]
 symbol = "[](red) ⚡ "
@@ -883,11 +883,11 @@ style = "bright-white"
 
 [cmd_duration]
 format = "[](red) ⏱️ [$duration]($style)"
-style = "yellow"
+style = "grey"
 
 [jobs]
 symbol = "[](red) ⚡ "
-style = "bold cyan""
+style = "bold cyan"
 EOF
         
         # Create .zshrc with Starship configuration
@@ -1069,7 +1069,7 @@ style = "bright-white"
 
 [cmd_duration]
 format = "[](red) ⏱️ [$duration]($style)"
-style = "yellow"
+style = "grey"
 
 [jobs]
 symbol = "[](red) ⚡ "
@@ -1115,8 +1115,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update >  "hyprcandydock"
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
+# Folders with user-specific changes — never overwritten on update >  "fastfetch"
+SKIP_DIRS=("background" "background.png" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct" "hyprcandydock")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -2569,7 +2569,7 @@ update_config_background() {
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         echo "🎨 Triggering color generation..."
 wal -s -t -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
-matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.115 --source-color-index 0 --contrast 0.15 2>/dev/null
+matugen image "$bg_path" --type scheme-fidelity -m dark -r nearest --base16-backend wal --lightness-dark -0.115 --source-color-index 0 --contrast 0.15 2>/dev/null
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
         sleep 1
