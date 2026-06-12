@@ -715,13 +715,13 @@ $character"""
 symbol = ""
 
 [username]
-style_user = "bold blue"
+style_user = "bold cyan"
 style_root = "bold red"
-format = "[󱞬](grey) [](red) [](blue) [$user](grey) [](red) ($style)"
+format = "[󱞬](grey) [](red) [](cyan) [$user](grey) [](red) ($style)"
 show_always = true
 
 [directory]
-style = "blue"
+style = "cyan"
 read_only = " 🔒"
 truncation_length = 4
 truncate_to_repo = false
@@ -735,7 +735,7 @@ vimcmd_symbol = "[󱞪](grey) [](green)"
 symbol = "[](red) 🌱 "
 truncation_length = 4
 truncation_symbol = ""
-style = "blue"
+style = "cyan"
 
 [git_status]
 ahead = "⇡${count}"
@@ -756,7 +756,7 @@ symbol = "[](red) ⚙️ "
 style = "bold red"
 
 [time]
-format = '[](blue) [\[ $time \]](grey) [](red)($style)'#🕙
+format = '[](cyan) [\[ $time \]](grey) [](red)($style)'#🕙
 time_format = "%T"
 disabled = false
 style = "bright-white"
@@ -767,7 +767,7 @@ style = "yellow"
 
 [jobs]
 symbol = "[](red) ⚡ "
-style = "bold blue"
+style = "bold cyan"
 EOF
         
         print_success "Starship configured for Fish"
@@ -914,13 +914,13 @@ $character"""
 symbol = ""
 
 [username]
-style_user = "bold blue"
+style_user = "bold cyan"
 style_root = "bold red"
-format = "[󱞬](grey) [](red) [](blue) [$user](grey) [](red) ($style)"
+format = "[󱞬](grey) [](red) [](cyan) [$user](grey) [](red) ($style)"
 show_always = true
 
 [directory]
-style = "blue"
+style = "cyan"
 read_only = " 🔒"
 truncation_length = 4
 truncate_to_repo = false
@@ -934,7 +934,7 @@ vimcmd_symbol = "[󱞪](grey) [](green)"
 symbol = "[](red) 🌱 "
 truncation_length = 4
 truncation_symbol = ""
-style = "blue"
+style = "cyan"
 
 [git_status]
 ahead = "⇡${count}"
@@ -955,7 +955,7 @@ symbol = "[](red) ⚙️ "
 style = "bold red"
 
 [time]
-format = '[](blue) [\[ $time \]](grey) [](red)($style)'#🕙
+format = '[](cyan) [\[ $time \]](grey) [](red)($style)'#🕙
 time_format = "%T"
 disabled = false
 style = "bright-white"
@@ -966,7 +966,7 @@ style = "yellow"
 
 [jobs]
 symbol = "[](red) ⚡ "
-style = "bold blue"
+style = "bold cyan"
 EOF
         
         # Create .zshrc with Starship configuration
@@ -2541,7 +2541,7 @@ update_config_background() {
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         echo "🎨 Triggering color generation..."
 wal -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
-matugen image "$bg_path" --type scheme-fidelity -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.2 2>/dev/null
+matugen image "$bg_path" --type scheme-content -m dark -r nearest --base16-backend wal --lightness-dark -0.115 --source-color-index 0 --contrast 0.15 2>/dev/null
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
         sleep 1
