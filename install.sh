@@ -1953,17 +1953,18 @@ if [[ -f "$WAYPAPER_CONFIG" && -f "$SDDM_CONF" ]]; then
         echo "⚠️  colors.css not found at $COLORS_CSS"
     fi
 
-    # ── AccentColor from primary_container in colors.css ───────────────────
+    # ── AccentColor from surface_tint in colors.css ───────────────────
     if [[ -f "$COLORS_CSS" ]]; then
-        FULL_HEX=$(grep -E '@define-color\s+primary_container\s+#' "$COLORS_CSS" \
+        FULL_HEX=$(grep -E '@define-color\s+surface_tint\s+#' "$COLORS_CSS" \
             | head -n1 \
             | grep -oP '(?<=#)[0-9a-fA-F]{6}')
 
         if [[ -n "$FULL_HEX" ]]; then
             sudo sed -i "s|^AccentColor=.*|AccentColor=\"#$FULL_HEX\"|" "$SDDM_CONF"
-            #echo "🎨 SDDM AccentColor updated → #$FULL_HEX (from primary_container)"
+            #echo "🎨 SDDM AccentColor updated → #$FULL_HEX (from surface_tint)"
+            pkill -f magick
         else
-            echo "⚠️  Could not parse primary_container from $COLORS_CSS"
+            echo "⚠️  Could not parse surface_tint from $COLORS_CSS"
         fi
     else
         echo "⚠️  colors.css not found at $COLORS_CSS"
@@ -2528,6 +2529,7 @@ get_waypaper_background() {
 update_config_background() {
     local bg_path="$1"
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
+        pkill -f magick
         echo "🎨 Triggering color generation..."
 wal -s -t -i "$bg_path" -n --cols16 darken --backend colorthief --contrast 1.5 --saturate 0.25 2>/dev/null
 matugen image "$bg_path" --type scheme-fidelity -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.15 2>/dev/null
