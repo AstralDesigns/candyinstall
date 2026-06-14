@@ -3114,6 +3114,7 @@ SUDOERS_ENTRIES=(
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^FormPosition=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BlurRadius=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
+	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
 )
 
 # Add all entries to sudoers safely using visudo
@@ -3242,6 +3243,55 @@ EOF
             print_warning "Sugar Candy theme not found. SDDM will use default theme."
         fi
     fi
+}
+
+sddm_nvidia() {
+# Update power script with version with extra '--vt 2' logout flag for NVIDIA systems
+cat > "$HOME/.config/hypr/scripts/power.sh" << 'EOF'
+#!/bin/bash
+#    ___                    
+#   / _ \___ _    _____ ____
+#  / ___/ _ \ |/|/ / -_) __/
+# /_/   \___/__,__/\__/_/   
+#                           
+
+USERNAME=$(whoami)
+
+if [[ "$1" == "exit" ]]; then
+  echo ":: Exit"
+  hyprshutdown --vt 2 -t 'Logging out...' --post-cmd "hyprctl dispatch hl.dsp.exit()" > /dev/null 2>&1
+fi
+
+if [[ "$1" == "lock" ]]; then
+  echo ":: Lock"
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+fi
+
+if [[ "$1" == "reboot" ]]; then
+  echo ":: Reboot"
+  hyprshutdown -t 'Restarting...' --post-cmd 'reboot' > /dev/null 2>&1
+fi
+
+if [[ "$1" == "shutdown" ]]; then
+  echo ":: Shutdown"
+  hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0' > /dev/null 2>&1
+fi
+
+if [[ "$1" == "suspend" ]]; then
+  echo ":: Suspend"
+  touch /tmp/.qs-candylock-sleep
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+  rm -f /tmp/.qs-candylock-sleep
+fi
+
+if [[ "$1" == "hibernate" ]]; then
+  echo ":: Hibernate"
+  sleep 1
+  systemctl hibernate
+fi
+EOF
+
+print_success "SDDM configured for your NVIDIA GPU"
 }
 
 # Function to setup default custom config file
@@ -5717,6 +5767,18 @@ main() {
     
     # Enable display manager
     enable_display_manager
+    
+    # SDDM logout for NVIDIA
+    echo -e "${YELLOW}Is NVIDIA your iGPU/default GPU? (n/Y)${NC}"
+    read -r response
+    case "$response" in
+        [nN][oO]|[nN])
+            print_status "Skipping NVIDIA SDDM setup."
+            ;;
+        *)
+            sddm_nvidia
+            ;;
+    esac
 
     # Setup default custom config file
     setup_custom_config
