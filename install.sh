@@ -1520,10 +1520,16 @@ EOF
 if [ "$PANEL_CHOICE" = "waybar" ]; then
 
 # ═══════════════════════════════════════════════════════════════
-#                      Waybar XDG Script
+#                      XDG Script & Config
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
+cat > "$USER_HOME/.config/xdg-desktop-portal/hyprland-portals.conf" << 'EOF'
+[preferred]
+default=hyprland;gtk
+org.freedesktop.impl.portal.FileChooser=gtk
+EOF
+
+cat > "$USER_HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
 #!/bin/bash
 # __  ______   ____
 # \ \/ /  _ \ / ___|
@@ -1531,39 +1537,22 @@ cat > "$HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
 #  /  \| |_| | |_| |
 # /_/\_\____/ \____|
 
-# Kill any stale portal processes not managed by systemd
-killall -e xdg-desktop-portal-hyprland 2>/dev/null
-killall -e xdg-desktop-portal-gtk      2>/dev/null
 killall -e xdg-desktop-portal          2>/dev/null
 
 sleep 1
 
 # Stop all managed services cleanly
 systemctl --user stop \
-    pipewire \
-    wireplumber \
     xdg-desktop-portal \
-    xdg-desktop-portal-hyprland \
-    xdg-desktop-portal-gtk
 
 sleep 1
 
 # Start portals in the correct order:
-# hyprland portal first (screen capture, toplevel), then gtk/gnome for file pickers
-systemctl --user start xdg-desktop-portal-hyprland
-sleep 1
-systemctl --user start xdg-desktop-portal-gtk
+
 systemctl --user start xdg-desktop-portal
-
-sleep 1
-
-# Restart audio and other services
-systemctl --user start \
-    pipewire \
-    wireplumber \
 EOF
 
-chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
+chmod +x "$USER_HOME/.config/hypr/scripts/xdg.sh"
 else
 
 # ═══════════════════════════════════════════════════════════════
