@@ -1115,8 +1115,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update >  "fastfetch" "hyprcandydock"
-SKIP_DIRS=("background" "background.png" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
+# Folders with user-specific changes — never overwritten on update >   
+SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct" "hyprcandydock")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -1150,9 +1150,7 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "Updates made:
- Final performance optimizations for the bar, panels, widgets, dock and app-launcher related processes plus slight UI changes to the start-menu and lock-screen.
- Color genration and palette optimizations.
-(Final update affecting dock settings)"
+ Changed active focus color on SDDM-greeter for better visibility plus minor palette optimizations in the other panels & widgets.
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
