@@ -1150,6 +1150,8 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "Updates made:
+ Improved control-center UI.
+ Borders for panels and desktop-icons.
  Changed active focus color on SDDM-greeter for better visibility plus minor palette optimizations in the other panels & widgets.
 EOF
 
