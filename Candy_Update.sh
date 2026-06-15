@@ -1115,8 +1115,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update >   
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct" "hyprcandydock")
+# Folders with user-specific changes — never overwritten on update > "fastfetch" "hypr" "hyprcandy" "hyprcandydock"
+SKIP_DIRS=("background" "background.png" "gtk-3.0" "gtk-4.0" "qt5ct" "qt6ct")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
