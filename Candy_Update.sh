@@ -3052,10 +3052,9 @@ chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
 	
-# Add custom cursors and HC theme
-echo "🔄 Adding custom cursors & HC theme..."
+# Add custom cursors
+echo "🔄 Adding custom cursors..."
 cp -r "$USER_HOME"/.icons/* /usr/share/icons/
-cp -r "$USER_HOME"/.hyprcandy/.themes/* /usr/share/themes/
 echo "✅ Cursors updated."
 
 # Enabled SSD/NVME scheduled optimization
@@ -3076,7 +3075,6 @@ USERNAME=$(whoami)
 # Create the sudoers entries for background script and required commands
 SUDOERS_ENTRIES=(
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/cp -r /home/$USERNAME/.icons/* /usr/share/icons/"
-	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/cp -r /home/$USERNAME/.hyprcandy/.themes/* /usr/share/themes/"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Background=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BackgroundColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
