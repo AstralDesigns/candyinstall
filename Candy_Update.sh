@@ -1150,10 +1150,7 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "Updates made:
- Improved control-center UI + new 'System' stats tab.
- Borders for panels and desktop-icons.
- Dock 'active indicator' enlarged and position corrected.
- Changed active focus color on SDDM-greeter for better visibility plus minor palette optimizations in the other panels & widgets.
+ Patched the bar in 'bar' mode to remain visible when the calendar popup is visible + overall color palette improvements.
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
