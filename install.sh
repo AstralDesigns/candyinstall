@@ -409,6 +409,7 @@ build_package_list() {
         
         # Customization
         "python-pillow"
+        "wallust"
         "matugen-bin"
 		"python-pywal16"
 		"python-colorthief"
