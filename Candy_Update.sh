@@ -1084,7 +1084,7 @@ EOF
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
 			#$AUR_HELPER -R --noconfirm waypaper
-			$AUR_HELPER -S --noconfirm hyprshutdown
+			$AUR_HELPER -S --noconfirm wallust
             $AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -1136,8 +1136,8 @@ rsync -a \
 
 echo "✅ Update merged"
 
-# Remove legacy waybar folder
-rm -rf "$USER_HOME/.hyprcandy/.config/waybar" "$USER_HOME/.config/waybar"
+# Symlink new wallust folder
+ln -sf "$USER_HOME/.hyprcandy/.config/wallust/" "$USER_HOME/.config"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Updating HyprCandyPlus scripts..."
