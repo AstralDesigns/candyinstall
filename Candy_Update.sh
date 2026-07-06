@@ -1115,8 +1115,8 @@ if [ ! -d "$UPDATE_DIR" ]; then
 	echo "✅ Clone complete"
 fi
 
-# Folders with user-specific changes — never overwritten on update >
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct" "hyprcandydock")
+# Folders with user-specific changes — never overwritten on update > "hyprcandydock" "fastfetch"
+SKIP_DIRS=("background" "background.png" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -1153,6 +1153,7 @@ notify-send " HC+ Update Complete" "Updates made:
  Integrated wallust color generator for the bar, dock, app-launcher and lock-screen.
  Unified the app-launcher, bar & dock borders plus bar & dock bakgrounds.
  Extra patches system-wide.
+Re-login post-update for everything to work properly.
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
