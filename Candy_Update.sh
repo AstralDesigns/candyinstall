@@ -1084,6 +1084,7 @@ EOF
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
 			#$AUR_HELPER -R --noconfirm waypaper
+			$AUR_HELPER -S --noconfirm rust
 			$AUR_HELPER -S --noconfirm wallust
             $AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
