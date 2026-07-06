@@ -1150,7 +1150,9 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "Updates made:
- Patched the bar in 'bar' mode to remain visible when the calendar popup is visible + overall color palette improvements.
+ Integrated wallust color generator for the bar, dock, app-launcher and lock-screen.
+ Unified the app-launcher, bar & dock borders plus bar & dock bakgrounds.
+ Extra patches system-wide.
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
