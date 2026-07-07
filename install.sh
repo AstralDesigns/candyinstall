@@ -1247,7 +1247,7 @@ fi
 #                 Notification DBus Handoff Script
 # ═══════════════════════════════════════════════════════════════
 
-	cat > "$USER_HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh" << 'EOF'
+	cat > "$HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh" << 'EOF'
 #!/usr/bin/env bash
 # Notification DBus handoff for candylock — bar must not restart the daemon while locked.
 CANDYLOCK_NOTIF_LOCK="${CANDYLOCK_NOTIF_LOCK:-/tmp/candylock-notif.lock}"
@@ -1263,13 +1263,13 @@ candylock_notif_release() {
 }
 EOF
 
-chmod +x "$USER_HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh"
+chmod +x "$HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                   		Update Checker
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/scripts/hc-update-check.sh" << 'EOF'
 #!/usr/bin/env bash
 # hc-update-check.sh
 # Checks for HyprCandy Plus dotfile updates and maintains a persistent state
@@ -1344,7 +1344,7 @@ else
 fi
 EOF
 
-chmod +x "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh"
+chmod +x "$HOME/.config/hyprcandy/scripts/hc-update-check.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Increase Script
