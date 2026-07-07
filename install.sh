@@ -1091,20 +1091,6 @@ setup_hyprcandy() {
         echo -e "${GREEN}Previous default config folder backup created${NC}"
     fi
     sleep 1
-    
-    # Backup previous custom config folder if it exists
-    PREVIOUS_CUSTOM_CONFIG_FOLDER="$HOME/.config/hyprcustom"
-    
-    if [ ! -d "$PREVIOUS_CUSTOM_CONFIG_FOLDER" ]; then
-        print_error "Backing up: $PREVIOUS_CUSTOM_CONFIG_FOLDER"
-        cp -r "$PREVIOUS_CUSTOM_CONFIG_FOLDER" "${PREVIOUS_CUSTOM_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
-    else
-        # Remove any previous backups before creating a new one
-        rm -rf "${PREVIOUS_CUSTOM_CONFIG_FOLDER}".backup.*
-        cp -r "$PREVIOUS_CUSTOM_CONFIG_FOLDER" "${PREVIOUS_CUSTOM_CONFIG_FOLDER}.backup.$(date +%Y%m%d_%H%M%S)"
-        echo -e "${GREEN}Previous custom config folder backup created${NC}"
-    fi
-    sleep 1
 
     # Remove existing .hyprcandy folder
     if [ -d "$HOME/.hyprcandy" ]; then
@@ -5598,13 +5584,13 @@ fi
 
 # WAYLAND_DISPLAY is inherited from the Hyprland session when called correctly.
 # If somehow unset, derive it from the running compositor socket.
-if [ -z "$WAYLAND_DISPLAY" ]; then
-    export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
-fi
-pgrep -x awww-daemon > /dev/null 2>&1 || awww-daemon &
+#if [ -z "$WAYLAND_DISPLAY" ]; then
+#    export WAYLAND_DISPLAY=$(ls /run/user/$(id -u)/wayland-* 2>/dev/null | head -1 | xargs -I{} basename {})
+#fi
+pgrep -x awww-daemon > /dev/null 2>&1 || awww &
 sleep 1
 # Wait for awww-daemon socket — it may still be starting up
-RETRIES=10
+RETRIES=1
 until timeout 2 awww query &>/dev/null || [ $RETRIES -eq 0 ]; do
     sleep 1
     (( RETRIES-- ))
@@ -5624,28 +5610,27 @@ sudo systemctl enable switcheroo-control
 sudo systemctl enable bluetooth
 echo "✅ Services set..."
 
-if timeout 2 awww query &>/dev/null; then
-  	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")" &>/dev/null
+if timeout 2 awww query >/dev/null; then
+	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
-    sudo bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" &>/dev/null
+    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
-	sleep 0.5
-	qs -c bar &>/dev/null
-	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" &>/dev/null
-	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" &>/dev/null
-	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" &>/dev/null
+	#sleep 0.5
+	#qs -c bar >/dev/null
+	#gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" >/dev/null
+	#gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" >/dev/null
+	#bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" >/dev/null
 else
     echo "Setting background..."
-	qs -c bar &>/dev/null
-	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" &>/dev/null
-	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" &>/dev/null
-	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > &>/dev/null
-	sleep 1
-	awww-daemon &>/dev/null
-	sleep 1
-	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")" &>/dev/null
-	sleep 1
-	sudo bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" &>/dev/null
+	#qs -c bar >/dev/null
+	#gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" >/dev/null
+	#gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" >/dev/null
+	#bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" >/dev/null
+	awww-daemon &
+	sleep 2
+	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
+	sleep 2
+	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 fi
 
