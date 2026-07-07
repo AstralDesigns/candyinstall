@@ -383,7 +383,7 @@ build_package_list() {
         
         # Wallpaper and screenshot tools
        	"imagemagick"
-        "awww-bin"
+        "awww"
         "grimblast-git"
         "wob"
         "wf-recorder"
@@ -1525,13 +1525,13 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 #                      XDG Script & Config
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/xdg-desktop-portal/hyprland-portals.conf" << 'EOF'
+cat > "$HOME/.config/xdg-desktop-portal/hyprland-portals.conf" << 'EOF'
 [preferred]
 default=hyprland;gtk
 org.freedesktop.impl.portal.FileChooser=gtk
 EOF
 
-cat > "$USER_HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
+cat > "$HOME/.config/hypr/scripts/xdg.sh" << 'EOF'
 #!/bin/bash
 # __  ______   ____
 # \ \/ /  _ \ / ___|
@@ -1554,7 +1554,7 @@ sleep 1
 systemctl --user start xdg-desktop-portal
 EOF
 
-chmod +x "$USER_HOME/.config/hypr/scripts/xdg.sh"
+chmod +x "$HOME/.config/hypr/scripts/xdg.sh"
 else
 
 # ═══════════════════════════════════════════════════════════════
@@ -3306,7 +3306,7 @@ setup_custom_config() {
             touch "$HOME/.config/hypr/hyprviz.lua"
 
   # Add default content to the hyprland.lua file
-		cat > "$USER_HOME/.config/hypr/hyprland.lua" << 'EOF'
+		cat > "$HOME/.config/hypr/hyprland.lua" << 'EOF'
 -- ██╗  ██╗██╗   ██╗██████╗ ██████╗ ██╗      █████╗ ███╗   ██╗██████╗ 
 -- ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██║     ██╔══██╗████╗  ██║██╔══██╗
 -- ███████║ ╚████╔╝ ██████╔╝██████╔╝██║     ███████║██╔██╗ ██║██║  ██║
@@ -5344,7 +5344,12 @@ hl.bind("code:237", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s 10- &
 
 return true
 EOF
+        fi
+}
 
+update_keybinds() {
+    local CONFIG_FILE="$HOME/.config/hyprcustom/custom_keybinds.conf"
+    
     # 🎨 Update Hyprland custom config with current username  
     USERNAME=$(whoami)      
     HYPRLAND_CUSTOM="$HOME/.config/hypr/hyprviz.conf"
@@ -5356,11 +5361,6 @@ EOF
     else
         echo "⚠️  File not found: $HYPRLAND_CUSTOM"
     fi
-        fi
-}
-
-update_keybinds() {
-    local CONFIG_FILE="$HOME/.config/hyprcustom/custom_keybinds.conf"
     
     # Check if config file exists
     if [ ! -f "$CONFIG_FILE" ]; then
@@ -5789,16 +5789,16 @@ main() {
     setup_custom_config
 
     # Update keybinds based on choice
-    update_keybinds
+    #update_keybinds
     
     # Update custom config based on choice
-    update_custom
+    #update_custom
 
     # Setup GJS
     setup_gjs
 
     # Setup keyboard layout
-    setup_keyboard_layout
+    select_keyboard_layout
     
     # Configuration management tips
     echo
