@@ -1110,11 +1110,11 @@ setup_hyprcandy() {
     if [ -d "$HOME/.hyprcandy" ]; then
         echo "🗑️  Removing existing .hyprcandy folder..."
         rm -rf "$HOME/.hyprcandy"
-		rm -rf "$HOME/.ultracandy"
+		rm -rf "$HOME/.ultracandy" "$HOME/.HCUpdates"
         sleep 2
     else
         echo "✅ .hyprcandy dotfiles folder doesn't exist — seems to be a fresh install."
-        rm -rf "$HOME/.ultracandy"
+        rm -rf "$HOME/.ultracandy" "$HOME/.HCUpdates"
         sleep 2
     fi
 
@@ -1226,7 +1226,7 @@ fi
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
-mkdir -p "$HOME/.config/custom" "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/pypr"
+mkdir -p "$HOME/.config/custom" "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/pypr" "$HOME/.config/xdg-desktop-portal"
 
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
@@ -3047,7 +3047,6 @@ find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
 chmod +x "$HOME/.config/quickshell/candylock/auth.sh"
 chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
@@ -5628,7 +5627,7 @@ echo "✅ Services set..."
 if timeout 2 awww query &>/dev/null; then
   	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
-    bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+    #bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 	sleep 0.5
 	qs -c bar > /dev/null
@@ -5641,7 +5640,7 @@ else
 	sleep 1
 	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
 	sleep 1
-	bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+	#bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
     echo "✅ Initial background set"
 	sleep 0.5
 	qs -c bar > /dev/null
