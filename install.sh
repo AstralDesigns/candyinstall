@@ -5625,28 +5625,28 @@ sudo systemctl enable bluetooth
 echo "✅ Services set..."
 
 if timeout 2 awww query &>/dev/null; then
-  	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
+  	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")" &>/dev/null
 	sleep 1
-    #bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+    sudo bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" &>/dev/null
     echo "✅ Initial background set"
 	sleep 0.5
-	qs -c bar > /dev/null
-	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" > /dev/null
-	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" > /dev/null
-	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > /dev/null
+	qs -c bar &>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" &>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" &>/dev/null
+	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" &>/dev/null
 else
     echo "Setting background..."
-	awww-daemon
+	qs -c bar &>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" &>/dev/null
+	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" &>/dev/null
+	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > &>/dev/null
 	sleep 1
-	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")"
+	awww-daemon &>/dev/null
 	sleep 1
-	#bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh"
+	awww img "$(grep '^wallpaper' ~/.config/wallpaper/wallpaper.ini | cut -d= -f2 | sed "s|^ *||;s|^~|$HOME|")" &>/dev/null
+	sleep 1
+	sudo bash "$HOME/.config/hyprcandy/hooks/wallpaper_integration.sh" &>/dev/null
     echo "✅ Initial background set"
-	sleep 0.5
-	qs -c bar > /dev/null
-	gjs "$HOME/.hyprcandy/GJS/candy-daemon.js" > /dev/null
-	gjs "$HOME/.hyprcandy/GJS/hyprcandydock/daemon.js" > /dev/null
-	bash "$HOME/.hyprcandy/GJS/hyprcandydock/autostart.sh" > /dev/null
 fi
 
     # 🔄 Reload Hyprland
