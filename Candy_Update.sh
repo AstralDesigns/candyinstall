@@ -3324,7 +3324,7 @@ hl.env("QEMU_AUDIO_DRV", "pa")
 -- Core Hyprland config blocks
 hl.config({
     input = {
-        kb_layout = "us",
+        kb_layout = "$LAYOUT",
         kb_variant = "",
         kb_model = "",
         kb_options = "",
@@ -3415,7 +3415,7 @@ hl.config({
             passes = 5,
             new_optimizations = true,
             ignore_opacity = true,
-            xray = true,
+            xray = trua,
             vibrancy = 0.24999999999999933,
             noise = 0,
             popups = true,
