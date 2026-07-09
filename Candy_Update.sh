@@ -2997,7 +2997,6 @@ org.gnome.gedit
 org.gnome.DiskUtility
 nwg-displays
 nwg-look
-hyprviz
 com.shellyorg.shelly
 EOF
 
