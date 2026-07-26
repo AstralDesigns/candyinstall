@@ -812,6 +812,7 @@ alias df="df -h"
 alias du="du -h"
 alias mkdir="mkdir -pv"
 alias wget="wget -c"
+alias ff="fastfetch"
 
 # Git aliases
 alias g="git clone --depth 1"
@@ -1020,6 +1021,7 @@ alias df="df -h"
 alias du="du -h"
 alias mkdir="mkdir -pv"
 alias wget="wget -c"
+alias ff="fastfetch"
 
 # Git aliases
 alias g="git clone --depth 1"
