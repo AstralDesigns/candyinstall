@@ -3532,7 +3532,7 @@ hl.config({
         gaps_workspaces = 50,
         border_size = 3,
         col = {
-            active_border = inverse_primary,
+            active_border = color5,
             inactive_border = background,
         },
         layout = "scrolling",
@@ -3593,7 +3593,7 @@ hl.config({
         pass_mouse_when_bound = false,
     },
     decoration = {
-        rounding = 20,
+        rounding = 10,
         rounding_power = 2,
         active_opacity = 0.85,
         inactive_opacity = 0.85,
