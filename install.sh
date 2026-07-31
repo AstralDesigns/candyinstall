@@ -3680,7 +3680,7 @@ hl.window_rule({
     match = {
         title = "(candy.media)",
     },
-    move = "(monitor_w*0.01) 50",
+    move = "((monitor_w*0.5)-(window_w*0.5))",
 })
 hl.window_rule({
     name = "windowrule-7",
