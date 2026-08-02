@@ -374,6 +374,8 @@ build_package_list() {
         "nwg-displays"
         "uwsm"
         "quickshell-git"
+        "nm-connection-editor"
+        "proton-vpn-gtk-app"
         "flatpak"
         
         # Application launcher and menus
