@@ -3530,7 +3530,7 @@ hl.config({
     },
     general = {
         gaps_in = 4,
-        gaps_out = 8,
+        gaps_out = 20,
         gaps_workspaces = 50,
         border_size = 3,
         col = {
