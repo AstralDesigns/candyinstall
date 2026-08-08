@@ -373,7 +373,7 @@ build_package_list() {
 		"switcheroo-control"
         "nwg-displays"
         "uwsm"
-        "quickshell-git"
+        "noctalia-qs"
         "nm-connection-editor"
         "proton-vpn-gtk-app"
         "flatpak"
