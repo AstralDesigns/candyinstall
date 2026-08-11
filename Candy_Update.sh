@@ -5348,15 +5348,7 @@ echo "✅ Files and Apps setup complete"
 cleanup() {
 	echo
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
-
-    # Clear the persisted "has updates" state synchronously, before notify/complete.
-    # This MUST happen here rather than being left to the bar's post-hoc pgrep-driven
-    # cleanup: the rsync merge above just overwrote the bar's own QML files, which
-    # can trigger a Quickshell reload around the same time this script exits. If that
-    # reload tears down the QML component tree before the bar's async cleanup Process
-    # gets to run, hc-update-state is never removed and hc-update-check.sh keeps
-    # reporting the stale pre-update "updates available" state (with its own spurious
-    # notify-send) on every rescan afterward. Doing it here guarantees it runs.
+    
     su - "$REAL_USER" -c "rm -f \"\$HOME/.config/hyprcandy/hc-update-state\" \"\$HOME/.config/hyprcandy/.hc-update-sentinel\""
 
 	su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
