@@ -1083,8 +1083,8 @@ EOF
 			#$AUR_HELPER -R --noconfirm qt6ct-kde
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
-			#$AUR_HELPER -R --noconfirm waypaper
-			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app
+			$AUR_HELPER -R --noconfirm qt6ct
+			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt6ct-kde
             $AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
