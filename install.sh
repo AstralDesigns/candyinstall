@@ -1251,7 +1251,7 @@ fi
 #                 	  Candylock Script
 # ═══════════════════════════════════════════════════════════════
 
-	cat > "$USER_HOME/.config/hyprcandy/scripts/candylock.sh" << 'EOF'
+	cat > "$HOME/.config/hyprcandy/scripts/candylock.sh" << 'EOF'
 #!/usr/bin/env bash
 # candylock.sh — launch the unified candylock
 # Use this as your lock command in swayidle / Hyprland bindl
@@ -1295,13 +1295,13 @@ trap cleanup EXIT INT TERM
 qs -c candylock
 EOF
 
-chmod +x "$USER_HOME/.config/hyprcandy/scripts/candylock.sh"
+chmod +x "$HOME/.config/hyprcandy/scripts/candylock.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                 Notification DBus Handoff Script
 # ═══════════════════════════════════════════════════════════════
 
-	cat > "$USER_HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh" << 'EOF'
+	cat > "$HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh" << 'EOF'
 #!/usr/bin/env bash
 # Notification DBus handoff for candylock — bar must not restart the daemon while locked.
 CANDYLOCK_NOTIF_LOCK="${CANDYLOCK_NOTIF_LOCK:-/tmp/candylock-notif.lock}"
@@ -1318,7 +1318,7 @@ candylock_notif_release() {
 }
 EOF
 
-chmod +x "$USER_HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh"
+chmod +x "$HOME/.config/hyprcandy/scripts/candylock-notif-handoff.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                   		Update Checker
