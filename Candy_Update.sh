@@ -1151,6 +1151,7 @@ echo "📁 Updating HyprCandyPlus scripts..."
 
 notify-send " HC+ Update Complete" "Updates made:
  Patched update process.
+ Added more SDDM entries in the control-center.
  Minimized clock and system-monitor widgets.
  Optimized the start menu - connected network now always on top.
  Cleaned up the app-launcher and lock screen."
@@ -3135,6 +3136,9 @@ SUDOERS_ENTRIES=(
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^HeaderText=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^FormPosition=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BlurRadius=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenWidth=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenHeight=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
 )
