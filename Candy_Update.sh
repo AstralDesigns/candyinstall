@@ -1150,9 +1150,10 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "Updates made:
- Fixed GJS and QML UI.
- Unified the app-launcher, bar & dock borders plus bar & dock bakgrounds.
- Extra patches system-wide.
+ Patched update process.
+ Minimized clock and system-monitor widgets.
+ Optimized the start menu - connected network now always on top.
+ Cleaned up the app-launcher and lock screen"
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
