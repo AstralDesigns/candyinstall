@@ -1270,9 +1270,8 @@ cat > "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh" << 'EOF'
 # file so update availability survives bar restarts and session restarts.
 #
 # State file: ~/.config/hyprcandy/hc-update-state
-#   - Written (with tooltip text) only when updates are detected
-#   - Never written when git pull says "Already up to date"
-#   - Deleted only by the HC update process after a successful apply
+#   - Written (with tooltip text) only when new updates are detected
+#   - Deleted when git pull says "Already up to date" or after update is applied
 #
 # Outputs one JSON line:
 #   {"hasUpdates": true|false, "tooltip": "...", "noStore": true|false}
@@ -1286,55 +1285,41 @@ emit() {
     echo "{\"hasUpdates\":${has},\"tooltip\":\"${tip}\",\"noStore\":${nostore}}"
 }
 
-write_state() {
-    # Write tooltip to state file so the update is remembered across restarts
-    echo "$1" > "$STATE_FILE"
-}
-
-# ── If state file already exists, updates were previously detected and not
-#    yet applied — honour that regardless of what git pull says this scan
-# ─────────────────────────────────────────────────────────────────────────────
-if [ -f "$STATE_FILE" ]; then
-    saved_tip=$(cat "$STATE_FILE")
-    emit "true" "${saved_tip}" "false"
-    # Still run the git pull in background to keep the store current so the
-    # apply step gets the latest changes, but don't let its output affect state
-    if [ -d "$HC_STORE/.git" ]; then
-        git -C "$HC_STORE" pull 2>&1 > /dev/null &
-    fi
-    notify-send " HC+ Update" "New updates available"
-    exit 0
-fi
-
-# ── No state file — evaluate current situation fresh ─────────────────────────
-
-# Store folder absent or not a git repo → needs setup
+# ── Store folder absent or not a git repo → needs setup ───────────────────────
 if [ ! -d "$HC_STORE" ] || [ ! -d "$HC_STORE/.git" ]; then
     tip="HC+ store not found — 󰇚 to set up and sync dotfiles."
-    write_state "$tip"
+    echo "$tip" > "$STATE_FILE"
     emit "true" "$tip" "true"
     exit 0
 fi
 
-# Store present and is a git repo — pull and check for changes
+# ── Store present and is a git repo — pull and check for changes ──────────────
 pull_out=$(git -C "$HC_STORE" pull 2>&1)
 pull_exit=$?
 
 if [ $pull_exit -ne 0 ]; then
-    # Network/git failure — don't write state, don't claim updates
-    emit "false" "HC+ check failed: ${pull_out}" "false"
+    # Network/git failure — if state file already exists, keep previous state
+    if [ -f "$STATE_FILE" ]; then
+        saved_tip=$(cat "$STATE_FILE")
+        emit "true" "${saved_tip}" "false"
+    else
+        emit "false" "HC+ check failed: ${pull_out}" "false"
+    fi
     exit 0
 fi
 
 if echo "$pull_out" | grep -q "Already up to date"; then
-    # Genuinely up to date and no prior state file — nothing to report
+    # Genuinely up to date — clean up any stale state or sentinel files
+    rm -f "$STATE_FILE" "$HOME/.config/hyprcandy/.hc-update-sentinel"
     emit "false" "HyprCandy Plus is up to date" "false"
 else
-    # New changes were pulled — write state so this survives restarts
+    # New changes were pulled — write state and notify only on newly detected update
     tip="HC+ files changed — 󰇚 to sync."
-    write_state "$tip"
+    if [ ! -f "$STATE_FILE" ]; then
+        notify-send " HC+ Update" "New updates available"
+    fi
+    echo "$tip" > "$STATE_FILE"
     emit "true" "$tip" "false"
-    notify-send " HC+ Update" "New updates available"
 fi
 EOF
 
@@ -5397,13 +5382,20 @@ echo "✅ Files and Apps setup complete"
 
 # Function to cleanup post update
 cleanup() {
-	echo
+    echo
+    USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
     REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
-    su - "$REAL_USER" -c "rm -f \"\$HOME/.config/hyprcandy/hc-update-state\" \"\$HOME/.config/hyprcandy/.hc-update-sentinel\""
-
-	su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
-    su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
+    [ -z "$USER_HOME" ] && USER_HOME="$HOME"
+    [ -z "$REAL_USER" ] && REAL_USER="$USER"
+    
+    # Directly remove state and sentinel files
+    rm -f "$USER_HOME/.config/hyprcandy/hc-update-state" "$USER_HOME/.config/hyprcandy/.hc-update-sentinel"
+    if [ -n "$REAL_USER" ]; then
+        su - "$REAL_USER" -c "rm -f ~/.config/hyprcandy/hc-update-state ~/.config/hyprcandy/.hc-update-sentinel"
+        su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
+        su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
+    fi
     return 0
 }
 
