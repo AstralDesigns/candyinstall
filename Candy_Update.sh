@@ -1154,6 +1154,8 @@ echo "📁 Updating HyprCandyPlus scripts..."
 
 notify-send " HC+ Update Complete" "Updates made:
  Patched update process.
+ New smooth animations for bars & panels (including lockscreen)
+  - Especially noticeable in notifications and startmenu.
  Added more SDDM entries in the control-center.
  Minimized clock and system-monitor widgets.
  Updated default popup positions of the widgets.
