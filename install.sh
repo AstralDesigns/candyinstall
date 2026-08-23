@@ -3173,7 +3173,7 @@ chmod +x "$HOME/.config/hyprcandy/hooks/complete.sh"
 #             		      Config
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$HOME/.hyprcandy/.config/hyprcandy/hyprcandy-bar.con" << 'EOF'
+cat > "$HOME/.hyprcandy/.config/hyprcandy/hyprcandy-bar.conf" << 'EOF'
 [cc-appearance-v1]
 winBgAlpha=1
 
