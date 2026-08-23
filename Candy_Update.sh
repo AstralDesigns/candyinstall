@@ -1075,6 +1075,9 @@ style = "grey"
 symbol = "[](red) ⚡ "
 style = "bold cyan"
 EOF
+
+# Remove previous cached installer
+rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
     
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
@@ -1083,8 +1086,8 @@ EOF
 			#$AUR_HELPER -R --noconfirm qt6ct-kde
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
-			$AUR_HELPER -R --noconfirm qt6ct
-			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt6ct-kde
+			$AUR_HELPER -R --noconfirm qt6ct hyprcandy-plus
+			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt6ct-kde hyprcandy-plus
             $AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
