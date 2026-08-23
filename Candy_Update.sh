@@ -1153,7 +1153,9 @@ notify-send " HC+ Update Complete" "Updates made:
  Patched update process.
  Added more SDDM entries in the control-center.
  Minimized clock and system-monitor widgets.
- Optimized the start menu - connected network now always on top.
+ Updated default popup positions of the widgets.
+ Streamlined start menu network & BT lists: 
+  - the connected network is now always on top.
  Cleaned up the app-launcher and lock screen."
 EOF
 
