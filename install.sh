@@ -3554,7 +3554,7 @@ enable_display_manager() {
             sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
 [Theme]
 Current=sugar-candy
-CursorTheme=Bibata-Modern-Classic
+CursorTheme=geared-brass-32x
 CursorSize=18
 EOF
             # Write full theme config to the sugar-candy theme directory
@@ -3775,9 +3775,9 @@ end)
 
 -- Environment variables
 hl.env("PATH", "$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin")
-hl.env("XCURSOR_THEME", "Marci-Crystal")
+hl.env("XCURSOR_THEME", "geared-brass-32x")
 hl.env("XCURSOR_SIZE", "18")
-hl.env("HYPRCURSOR_THEME", "Marci-Crystal")
+hl.env("HYPRCURSOR_THEME", "geared-brass-32x")
 hl.env("HYPRCURSOR_SIZE", "18")
 hl.env("GTK_THEME", "adw-gtk3-dark")
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
