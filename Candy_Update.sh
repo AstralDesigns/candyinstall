@@ -5444,7 +5444,7 @@ main() {
     echo
 
     # Enable display manager
-    enable_display_manager
+    #enable_display_manager
 
     # Setup default custom config file
     #setup_custom_config
