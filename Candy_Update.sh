@@ -1083,11 +1083,12 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         if pacman -Qi sddm &>/dev/null; then
             #$AUR_HELPER -R --noconfirm swww
-			#$AUR_HELPER -R --noconfirm qt6ct-kde
 			#$AUR_HELPER -R --noconfirm wlogout
 			#$AUR_HELPER -R --noconfirm waybar
-			$AUR_HELPER -R --noconfirm qt6ct hyprcandy-plus
-			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt6ct-kde hyprcandy-plus
+			$AUR_HELPER -R --noconfirm qt5ct-kde
+			$AUR_HELPER -R --noconfirm qt6ct-kde
+			$AUR_HELPER -R --noconfirm hyprcandy-plus
+			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct hyprcandy-plus
             $AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -1153,6 +1154,13 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "Updates made:
+
+LATEST:
+ Fixed system-wide icon-theme application.
+ Restored app-launcher border application.
+ Updated QS files with missing imports.
+
+PREVIOUS:
  Patched update process.
  Added 'Adaptive' amtugen theme option in the control-center.
  New smooth animations for bars & panels (including lockscreen)
@@ -2967,6 +2975,8 @@ pkill -f "qs -c overview"
 dbus-send --session --type=signal /kdeglobals \
     org.kde.kconfig.notify.ConfigChanged \
     'array:dict:string,variant:{"Icons":{"Theme":"'"$ICON_THEME"'"}}' 2>/dev/null || true
+    
+dconf update
 
 echo "✅ Icon theme synced to: $ICON_THEME"
 EOF
@@ -3094,20 +3104,6 @@ chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
     else
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
-	
-# Add custom cursors
-echo "🔄 Adding custom cursors..."
-cp -r "$USER_HOME"/.icons/* /usr/share/icons/
-echo "✅ Cursors updated."
-
-# Enabled SSD/NVME scheduled optimization
-systemctl enable --now fstrim.timer > /dev/null 2>&1
-echo
-}
-
-# Function to enable display manager and prompt for reboot
-enable_display_manager() {
-    print_status "Setting up $DISPLAY_MANAGER display manager..."
 
 	# 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
@@ -3155,6 +3151,20 @@ printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d
 chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
+	
+# Add custom cursors
+echo "🔄 Adding custom cursors..."
+cp -r "$USER_HOME"/.icons/* /usr/share/icons/
+echo "✅ Cursors updated."
+
+# Enabled SSD/NVME scheduled optimization
+systemctl enable --now fstrim.timer > /dev/null 2>&1
+echo
+}
+
+# Function to enable display manager and prompt for reboot
+enable_display_manager() {
+    print_status "Setting up $DISPLAY_MANAGER display manager..."
     
     # Additional SDDM configuration if selected
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
@@ -5449,7 +5459,7 @@ main() {
     echo
 
     # Enable display manager
-    enable_display_manager
+    #enable_display_manager
 
     # Setup default custom config file
     #setup_custom_config

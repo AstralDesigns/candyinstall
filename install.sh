@@ -354,11 +354,11 @@ build_package_list() {
         
         # Qt and GTK theming
         "adw-gtk-theme"
-        "qt5ct-kde"
+        "qt5ct"
         "qt5-imageformats"
         "qt5-graphicaleffects"
         "qt5-quickcontrols2"
-        "qt6ct-kde"
+        "qt6ct"
 		"qt6-imageformats"
         "attica"
         "frameworkintegration" 
