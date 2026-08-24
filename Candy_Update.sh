@@ -1154,6 +1154,7 @@ echo "📁 Updating HyprCandyPlus scripts..."
 
 notify-send " HC+ Update Complete" "Updates made:
  Patched update process.
+ Added 'Adaptive' amtugen theme option in the control-center.
  New smooth animations for bars & panels (including lockscreen)
   - Especially noticeable in notifications and startmenu.
  Added more SDDM entries in the control-center.
