@@ -1156,6 +1156,7 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
+ Fixed unresponsive dock when auto-hide was enabled.
  Unified theme detection for all 3 color engines.
  Fixed system-wide icon-theme application.
  Restored app-launcher border application.
