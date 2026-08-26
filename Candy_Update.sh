@@ -1156,23 +1156,8 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
- Fixed unresponsive dock when auto-hide was enabled.
- Unified theme detection for all 3 color engines.
- Fixed system-wide icon-theme application.
- Restored app-launcher border application.
- Updated QS files with missing imports.
-
-PREVIOUS:
- Patched update process.
- Added 'Adaptive' amtugen theme option in the control-center.
- New smooth animations for bars & panels (including lockscreen)
-  - Especially noticeable in notifications and startmenu.
- Added more SDDM entries in the control-center.
- Minimized clock and system-monitor widgets.
- Updated default popup positions of the widgets.
- Streamlined start menu network & BT lists: 
-  - the connected network is now always on top.
- Cleaned up the app-launcher and lock screen."
+ Color changes made to the Bar, control-center,
+  start-menu and app-launcher."
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
