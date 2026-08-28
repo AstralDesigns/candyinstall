@@ -1156,7 +1156,15 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
- Refactored recording and screenshot logic
+ Refactored recording and screenshot logic:
+  - New recorder popup with audio options, region
+    selection and improved quality.
+  - Starmenu has a permanent microphone slider with
+    with clear active state logic and an inputs row
+    when >1 are available during active mic use.
+  - Added region selection to the screenshot UI.
+  - Notifications for both redirect on click directly 
+    to the specific file in the file manager.
 
 PREVIOUS:
  Color changes made to the Bar, control-center,
