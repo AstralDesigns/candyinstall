@@ -1156,6 +1156,9 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
+ Refactored recording and screenshot logic
+
+PREVIOUS:
  Color changes made to the Bar, control-center,
   start-menu and app-launcher."
 EOF
