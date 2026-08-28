@@ -1157,9 +1157,9 @@ notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
  Refactored recording and screenshot logic:
-  - New recorder popup with audio options, region
+  - New recorder popup with mic audio options, region
     selection and improved quality.
-  - Starmenu has a permanent microphone slider with
+  - Startmenu has a permanent microphone slider with
     with clear active state logic and an inputs row
     when >1 are available during active mic use.
   - Added region selection to the screenshot UI.
