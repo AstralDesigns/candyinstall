@@ -1156,6 +1156,9 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
+Fixed GTK dialog bg and fg colors.
+
+PREVIOUS:
  Refactored recording and screenshot logic:
   - New recorder popup with mic audio options, region
     selection and improved quality.
@@ -1164,11 +1167,7 @@ LATEST:
     when >1 are available during active mic use.
   - Added region selection to the screenshot UI.
   - Notifications for both redirect on click directly 
-    to the specific file in the file manager.
-
-PREVIOUS:
- Color changes made to the Bar, control-center,
-  start-menu and app-launcher."
+    to the specific file in the file manager."
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
