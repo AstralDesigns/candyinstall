@@ -1088,7 +1088,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
-			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct hyprcandy-plus
+			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct hyprcandy-plus libsecret secrets docker
             $AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -3139,6 +3139,13 @@ SUDOERS_ENTRIES=(
 	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
+    # Docker service & container permissions for HyprCandy launcher SearXNG web search
+    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl start docker"
+    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop docker"
+    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart docker"
+    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl is-active docker"
+    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/chmod 666 /var/run/docker.sock"
+    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/usermod -aG docker *"
 )
 
 # Add all entries to sudoers safely using visudo

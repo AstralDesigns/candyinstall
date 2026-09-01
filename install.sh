@@ -347,6 +347,8 @@ build_package_list() {
         "gnome-system-monitor"
         "gnome-calculator"
         "evince"
+        "libsecret"
+        "secrets"
         
         # Terminals and file manager
         "kitty"
@@ -377,6 +379,7 @@ build_package_list() {
         "nm-connection-editor"
         "proton-vpn-gtk-app"
         "flatpak"
+        "docker"
         
         # Application launcher and menus
         "rofi"
@@ -3497,6 +3500,13 @@ SUDOERS_ENTRIES=(
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
+    # Docker service & container permissions for HyprCandy launcher SearXNG web search
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl start docker"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop docker"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart docker"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl is-active docker"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 666 /var/run/docker.sock"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/usermod -aG docker *"
 )
 
 # Add all entries to sudoers safely using visudo
