@@ -1156,18 +1156,11 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
-Fixed GTK dialog bg and fg colors.
+ Replaced applauncher DuckDuckGo scraping with a 
+  localized Docker SearxNG search engine.
 
 PREVIOUS:
- Refactored recording and screenshot logic:
-  - New recorder popup with mic audio options, region
-    selection and improved quality.
-  - Startmenu has a permanent microphone slider with
-    with clear active state logic and an inputs row
-    when >1 are available during active mic use.
-  - Added region selection to the screenshot UI.
-  - Notifications for both redirect on click directly 
-    to the specific file in the file manager."
+ Fixed GTK dialog bg and fg colors."
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
