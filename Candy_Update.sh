@@ -1088,8 +1088,8 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
-			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct hyprcandy-plus libsecret secrets docker
-            $AUR_HELPER -S --noconfirm quickshell-git --rebuild
+			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct hyprcandy-plus libsecret secrets docker
+            #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
             echo ""
@@ -3077,7 +3077,6 @@ find "$USER_HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
-find "$USER_HOME/.config/waybar/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
 chmod +x "$USER_HOME/.config/quickshell/candylock/auth.sh"
 chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
@@ -3086,18 +3085,18 @@ chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
 #mkdir -p "$USER_HOME/.cache/quickshell/wallpaper"
 
     # 🛠️ GNOME Window Button Layout Adjustment
-    echo
-    echo "🛠️ Disabling GNOME titlebar buttons..."
+    #echo
+    #echo "🛠️ Disabling GNOME titlebar buttons..."
 
     # Check if 'gsettings' is available on the system
-    if command -v gsettings >/dev/null 2>&1; then
+    #if command -v gsettings >/dev/null 2>&1; then
         # Run the command to change the window button layout (e.g., remove minimize/maximize buttons)
-        gsettings set org.gnome.desktop.wm.preferences button-layout ":close" \
-            && echo "✅ GNOME button layout updated." \
-            || echo "❌ Failed to update GNOME button layout."
-    else
-        echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
-    fi
+        #gsettings set org.gnome.desktop.wm.preferences button-layout ":close" \
+            #&& echo "✅ GNOME button layout updated." \
+            #|| echo "❌ Failed to update GNOME button layout."
+    #else
+       #echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
+    #fi
 
 	# 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
@@ -3105,47 +3104,47 @@ chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
 
 # Create the sudoers entries for background script and required commands
 SUDOERS_ENTRIES=(
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/cp -r /home/$USER_HOME/.icons/* /usr/share/icons/"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Background=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BackgroundColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^AccentColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/sugar-candy.conf"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/sugar-candy.conf"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/mkdir -p /usr/local/share/gtk3-reload"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/gtk3-reload.c"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/.gtk3-version"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/gcc * /usr/local/lib/gtk3-reload.so"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/gcc -shared -fPIC -o /usr/local/lib/gtk3-reload.so /usr/local/share/gtk3-reload/gtk3-reload.c *"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/dconf update"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/gpu_busy_percent"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/hwmon/hwmon*/temp*_input"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_vram_total"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_vram_used"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_gtt_total"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_gtt_used"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/product_name"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/address"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/readlink -f /sys/class/drm/card*/device/driver"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^HeaderText=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^FormPosition=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BlurRadius=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenWidth=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenHeight=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
-	"$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl start docker"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop docker"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart docker"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/systemctl is-active docker"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/chmod 666 /var/run/docker.sock"
-    "$USER_HOME ALL=(ALL) NOPASSWD: /usr/bin/usermod -aG docker *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/cp -r /home/$USER_NAME/.icons/* /usr/share/icons/"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/magick * /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Background=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BackgroundColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^AccentColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/sugar-candy/theme.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/sugar-candy.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/sugar-candy.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/mkdir -p /usr/local/share/gtk3-reload"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/gtk3-reload.c"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/.gtk3-version"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/gcc * /usr/local/lib/gtk3-reload.so"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/gcc -shared -fPIC -o /usr/local/lib/gtk3-reload.so /usr/local/share/gtk3-reload/gtk3-reload.c *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/dconf update"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/gpu_busy_percent"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/hwmon/hwmon*/temp*_input"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_vram_total"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_vram_used"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_gtt_total"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_gtt_used"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/product_name"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/address"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/readlink -f /sys/class/drm/card*/device/driver"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^HeaderText=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^FormPosition=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BlurRadius=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenWidth=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenHeight=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
+	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl start docker"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop docker"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart docker"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl is-active docker"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 666 /var/run/docker.sock"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/usermod -aG docker *"
 )
 
 # Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background  > /dev/null 2>&1
 
 # Set proper permissions on the sudoers file
 chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
@@ -5402,17 +5401,17 @@ echo "✅ Files and Apps setup complete"
 cleanup() {
     echo
     USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
-    REAL_USER=$(getent passwd $PKEXEC_UID | cut -d: -f1)
+    USER_NAME=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
-    [ -z "$REAL_USER" ] && REAL_USER="$USER"
+    [ -z "$USER_NAME" ] && USER_NAME="$USER"
     
     # Directly remove state and sentinel files
     rm -f "$USER_HOME/.config/hyprcandy/hc-update-state" "$USER_HOME/.config/hyprcandy/.hc-update-sentinel"
-    if [ -n "$REAL_USER" ]; then
-        su - "$REAL_USER" -c "rm -f ~/.config/hyprcandy/hc-update-state ~/.config/hyprcandy/.hc-update-sentinel"
-        su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
-        su - "$REAL_USER" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
+    if [ -n "$USER_NAME" ]; then
+        su - "$USER_NAME" -c "rm -f ~/.config/hyprcandy/hc-update-state ~/.config/hyprcandy/.hc-update-sentinel"
+        su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
+        su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     fi
     return 0
 }
@@ -5420,6 +5419,7 @@ cleanup() {
     # Main execution
 main() {
     USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
+    USER_NAME=$(getent passwd $PKEXEC_UID | cut -d: -f1)
     cd "$USER_HOME"
 	
 	# Show multicolored ASCII art
