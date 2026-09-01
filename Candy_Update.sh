@@ -1157,7 +1157,11 @@ notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
  Replaced applauncher DuckDuckGo scraping with a 
-  localized Docker SearxNG search engine.
+  localized Docker SearxNG search engine with a ronded 
+  webkitgtk view.
+ Unified the dock and app-launcher border width to 
+  the Control-Center Bar:Genral tab 'Border W' slider.
+  - Removed unnecessary sliders from the CC Menus tab.
 
 PREVIOUS:
  Fixed GTK dialog bg and fg colors."
