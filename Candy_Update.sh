@@ -3146,7 +3146,7 @@ SUDOERS_ENTRIES=(
 )
 
 # Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
 
 # Set proper permissions on the sudoers file
 chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
