@@ -1088,7 +1088,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
-			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct hyprcandy-plus libsecret secrets docker
+			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else

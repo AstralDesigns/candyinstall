@@ -3482,7 +3482,6 @@ SUDOERS_ENTRIES=(
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/gcc * /usr/local/lib/gtk3-reload.so"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/gcc -shared -fPIC -o /usr/local/lib/gtk3-reload.so /usr/local/share/gtk3-reload/gtk3-reload.c *"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/dconf update"
-    # GPU monitoring permissions for system monitor widget
     "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/gpu_busy_percent"
     "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/hwmon/hwmon*/temp*_input"
     "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/mem_info_vram_total"
@@ -3500,7 +3499,6 @@ SUDOERS_ENTRIES=(
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
-    # Docker service & container permissions for HyprCandy launcher SearXNG web search
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl start docker"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop docker"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart docker"
