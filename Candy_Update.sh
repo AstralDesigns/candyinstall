@@ -1159,6 +1159,8 @@ LATEST:
  Replaced applauncher DuckDuckGo scraping with a 
   localized Docker SearxNG search engine with a ronded 
   webkitgtk view.
+ Improved dock and ap-launcher memory handling & cpu 
+  usage along with launcher UI improvements.
  Unified the dock and app-launcher border width to 
   the Control-Center Bar:Genral tab 'Border W' slider.
   - Removed unnecessary sliders from the CC Menus tab.
