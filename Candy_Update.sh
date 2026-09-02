@@ -1161,6 +1161,8 @@ LATEST:
   webkitgtk view.
  Improved dock and ap-launcher memory handling & cpu 
   usage along with launcher UI improvements.
+  - Significantly reduced web view CPU usage including on
+  video-playback.
  Unified the dock and app-launcher border width to 
   the Control-Center Bar:Genral tab 'Border W' slider.
   - Removed unnecessary sliders from the CC Menus tab.
