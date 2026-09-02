@@ -1156,13 +1156,16 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "Updates made:
 
 LATEST:
+ Significantly reduced web view CPU usage including on
+  video-playback.
+ Bookmarks support added to launcher's web search tab.  
+
+RECENT:
  Replaced applauncher DuckDuckGo scraping with a 
   localized Docker SearxNG search engine with a ronded 
   webkitgtk view.
  Improved dock and ap-launcher memory handling & cpu 
   usage along with launcher UI improvements.
-  - Significantly reduced web view CPU usage including on
-  video-playback.
  Unified the dock and app-launcher border width to 
   the Control-Center Bar:Genral tab 'Border W' slider.
   - Removed unnecessary sliders from the CC Menus tab.
