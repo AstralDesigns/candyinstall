@@ -1153,14 +1153,16 @@ echo "📁 Updating HyprCandyPlus scripts..."
 	cat > "$USER_HOME/.config/hypr/scripts/notify.sh" << 'EOF'
 #!/bin/bash
 
-notify-send " HC+ Update Complete" "Updates made:
+notify-send " HC+ Update Complete" "LATEST:
+ App-launcer bookmarks now autostart the backend 
+  SearXNG docker container.
 
-LATEST:
+RECENT:
  Significantly reduced web view CPU usage including on
   video-playback.
  Bookmarks support added to launcher's web search tab.  
 
-RECENT:
+PREVIOUS:
  Replaced applauncher DuckDuckGo scraping with a 
   localized Docker SearxNG search engine with a ronded 
   webkitgtk view.
@@ -1168,10 +1170,7 @@ RECENT:
   usage along with launcher UI improvements.
  Unified the dock and app-launcher border width to 
   the Control-Center Bar:Genral tab 'Border W' slider.
-  - Removed unnecessary sliders from the CC Menus tab.
-
-PREVIOUS:
- Fixed GTK dialog bg and fg colors."
+  - Removed unnecessary sliders from the CC Menus tab."
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
@@ -1335,7 +1334,7 @@ else
     # New changes were pulled — write state so update button stays visible until applied
     tip="HC+ files changed — 󰇚 to sync."
     echo "$tip" > "$STATE_FILE"
-    notify-send " HC+ Update" "New updates available"
+    notify-send " HC+ Updates" "New updates available"
     emit "true" "$tip" "false"
 fi
 EOF
