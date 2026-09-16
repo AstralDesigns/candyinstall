@@ -326,6 +326,11 @@ build_package_list() {
         "shelly"
         "rebuild-detector"
         "equibop-bin"
+        "python"
+        "uv"
+        "npm"
+        "npm-check-updates"
+        "nodejs"
         
         # Dependacies
         "meson" 
