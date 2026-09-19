@@ -5419,6 +5419,7 @@ cleanup() {
         su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
         su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     fi
+    cd "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app" && bash build.sh
     return 0
 }
 
