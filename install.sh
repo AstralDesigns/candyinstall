@@ -1221,6 +1221,11 @@ fi
     if [ ${#stow_failed[@]} -ne 0 ]; then
         echo "❌ Failed to install: ${stow_failed[*]}"
     fi
+    
+# Workspace setup
+echo "✅ Setting up HC+ workspace"
+bash "$HOME/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
+echo "✅ Succesfully created HC+ workspace"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
@@ -6007,9 +6012,9 @@ echo "🔄 Setting up services..."
 systemctl --user daemon-reload
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
-    systemctl --user restart rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart rofi-font-watcher.service cursor-theme-watcher.service lactd &>/dev/null
 else
-    systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service &>/dev/null
+    systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service lactd &>/dev/null
 fi
 sudo systemctl enable switcheroo-control
 sudo systemctl enable bluetooth

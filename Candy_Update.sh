@@ -5412,6 +5412,8 @@ cleanup() {
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
     [ -z "$USER_NAME" ] && USER_NAME="$USER"
     
+    bash "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
+    
     # Directly remove state and sentinel files
     rm -f "$USER_HOME/.config/hyprcandy/hc-update-state" "$USER_HOME/.config/hyprcandy/.hc-update-sentinel"
     if [ -n "$USER_NAME" ]; then
@@ -5419,7 +5421,6 @@ cleanup() {
         su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
         su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     fi
-    cd "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app" && bash "build.sh"
     return 0
 }
 
