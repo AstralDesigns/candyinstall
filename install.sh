@@ -1225,6 +1225,7 @@ fi
 # Workspace setup
 echo "✅ Setting up HC+ workspace"
 cd "$HOME/.hyprcandy/GJS/hyprcandydock/agent-app/"
+chmod +x hc-agent-build.sh
 bash build.sh
 cd
 echo "✅ Succesfully created HC+ workspace"
