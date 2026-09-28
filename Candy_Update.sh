@@ -5407,10 +5407,10 @@ cleanup() {
     
     #bash "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
     
-    # Directly remove state and sentinel files
-    rm -f "$USER_HOME/.config/hyprcandy/hc-update-state" "$USER_HOME/.config/hyprcandy/.hc-update-sentinel"
+    # Clear persisted update state; sentinels are cleaned up by Quickshell after agent build
+    rm -f "$USER_HOME/.config/hyprcandy/hc-update-state"
     if [ -n "$USER_NAME" ]; then
-        su - "$USER_NAME" -c "rm -f ~/.config/hyprcandy/hc-update-state ~/.config/hyprcandy/.hc-update-sentinel"
+        su - "$USER_NAME" -c "rm -f ~/.config/hyprcandy/hc-update-state"
         su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
         su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hyprcandy/hooks/complete.sh'"
     fi
