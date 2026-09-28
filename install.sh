@@ -1224,7 +1224,9 @@ fi
     
 # Workspace setup
 echo "✅ Setting up HC+ workspace"
-bash "$HOME/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
+cd "$HOME/.hyprcandy/GJS/hyprcandydock/agent-app/"
+bash build.sh
+cd
 echo "✅ Succesfully created HC+ workspace"
 
 ### ✅ Setup mako config, hook scripts and needed services
@@ -3436,9 +3438,8 @@ find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
-chmod +x "$HOME/.config/quickshell/candylock/auth.sh"
-chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
-chmod +x "$HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
+find "$HOME/.config/quickshell/candylock/" -name "*.sh" -exec chmod +x {} \;
+find "$HOME/.config/quickshell/wallpaper/" -name "*.sh" -exec chmod +x {} \;
 mkdir -p "$HOME/.cache/quickshell/overview"
 mkdir -p "$HOME/.cache/quickshell/wallpaper"
 
@@ -3509,12 +3510,8 @@ SUDOERS_ENTRIES=(
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl start docker"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop docker"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart docker"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl is-active docker"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 666 /var/run/docker.sock"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/usermod -aG docker *"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.hyprcandy/GJS/hyprcandydock/hyprcandy-docker.sh"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.hyprcandy/GJS/hyprcandydock/hyprcandy-docker.sh *"
 )
 
 # Add all entries to sudoers safely using visudo

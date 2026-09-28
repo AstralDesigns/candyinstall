@@ -1154,23 +1154,17 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
- App-launcer bookmarks now autostart the backend 
-  SearXNG docker container.
+ Auto-start/stop SearXNG-docker.
+ Improved integration of cloud-model-providers.
 
 RECENT:
- Significantly reduced web view CPU usage including on
-  video-playback.
- Bookmarks support added to launcher's web search tab.  
+ App-launcer bookmarks now autostart the backend 
+  SearXNG docker container.  
 
 PREVIOUS:
- Replaced applauncher DuckDuckGo scraping with a 
-  localized Docker SearxNG search engine with a ronded 
-  webkitgtk view.
- Improved dock and ap-launcher memory handling & cpu 
-  usage along with launcher UI improvements.
- Unified the dock and app-launcher border width to 
-  the Control-Center Bar:Genral tab 'Border W' slider.
-  - Removed unnecessary sliders from the CC Menus tab."
+ Significantly reduced web view CPU usage including on
+  video-playback.
+ Bookmarks support added to launcher's web search tab."
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
@@ -3041,7 +3035,7 @@ EOF
 # ═══════════════════════════════════════════════════════════════
 #               		  Pinned Apps File 
 # ═══════════════════════════════════════════════════════════════
-PINNED_FILE="$HOME/.config/pinned"
+PINNED_FILE="$USER_HOME/.config/pinned"
 if [ ! -f "$PINNED_FILE" ]; then
 	cat > "$PINNED_FILE" << 'EOF'
 org.gnome.Nautilus
@@ -3059,7 +3053,7 @@ fi
 # ═══════════════════════════════════════════════════════════════
 #               	  Desktop Pinned Apps File 
 # ═══════════════════════════════════════════════════════════════
-DESKTOP_FILE="$HOME/.config/desktop-pinned"
+DESKTOP_FILE="$USER_HOME/.config/desktop-pinned"
 if [ ! -f "$DESKTOP_FILE" ]; then
 	cat > "$DESKTOP_FILE" << 'EOF'
 EOF
@@ -3084,9 +3078,8 @@ find "$USER_HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
-chmod +x "$USER_HOME/.config/quickshell/candylock/auth.sh"
-chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-apply.sh"
-chmod +x "$USER_HOME/.config/quickshell/wallpaper/wallpaper-cycle.sh"
+find "$USER_HOME/.config/quickshell/candylock/" -name "*.sh" -exec chmod +x {} \;
+find "$USER_HOME/.config/quickshell/wallpaper/" -name "*.sh" -exec chmod +x {} \;
 #mkdir -p "$USER_HOME/.cache/quickshell/overview"
 #mkdir -p "$USER_HOME/.cache/quickshell/wallpaper"
 
@@ -3141,12 +3134,8 @@ SUDOERS_ENTRIES=(
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl start docker"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop docker"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart docker"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/systemctl is-active docker"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 666 /var/run/docker.sock"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/usermod -aG docker *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.hyprcandy/GJS/hyprcandydock/hyprcandy-docker.sh"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.hyprcandy/GJS/hyprcandydock/hyprcandy-docker.sh *"
 )
 
 # Add all entries to sudoers safely using visudo
