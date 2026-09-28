@@ -5412,7 +5412,7 @@ cleanup() {
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
     [ -z "$USER_NAME" ] && USER_NAME="$USER"
     
-    bash "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
+    #bash "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
     
     # Directly remove state and sentinel files
     rm -f "$USER_HOME/.config/hyprcandy/hc-update-state" "$USER_HOME/.config/hyprcandy/.hc-update-sentinel"
