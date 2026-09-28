@@ -6046,8 +6046,8 @@ fi
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
     if command -v hyprctl > /dev/null 2>&1; then
-        if pgrep -x "Hyprland" > /dev/null; then
-            hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+        if pgrep -f "Hyprland" > /dev/null; then
+            bash "$HOME/.config/hypr/scripts/loadconfig.sh" && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
         else
             echo "ℹ️  Hyprland is not currently running. Configuration will be applied on next start and Hyprland login."
         fi
