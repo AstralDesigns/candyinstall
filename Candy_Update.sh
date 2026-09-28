@@ -1156,6 +1156,9 @@ echo "📁 Updating HyprCandyPlus scripts..."
 notify-send " HC+ Update Complete" "LATEST:
  Auto-start/stop SearXNG-docker.
  Improved integration of cloud-model-providers.
+ Added Wallhaven integration to the wallpaper-picker
+  and extra awww-walpaper engine options on the bottom
+  row.
 
 RECENT:
  App-launcer bookmarks now autostart the backend 
