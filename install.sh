@@ -2674,8 +2674,8 @@ update_config_background() {
         pkill -f magick
         echo "🎨 Triggering color generation..."
 wallust -s run "$bg_path"
-wal -s -t -i "$bg_path" -n --cols16 darken --backend wal --contrast 1.5 --saturate 0.25 2>/dev/null
-matugen image "$bg_path" --type scheme-fidelity -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.15 2>/dev/null
+wal -s -t -i "$bg_path" -n --cols16 foxify-darken --backend wal --contrast 1.5 --saturate 0.25 2>/dev/null
+matugen image "$bg_path" --type scheme-smart -m smart -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.15 2>/dev/null
         sleep 0.5
         magick "$bg_path" "$HOME/.config/background"
         sleep 1
@@ -3223,7 +3223,7 @@ activeKbSubTab=0
 activeTab=1
 
 [cc-theme-v1]
-currentTheme=scheme-fidelity
+currentTheme=scheme-smart
 
 [cc-weather-loc-v1]
 pinnedLat=
