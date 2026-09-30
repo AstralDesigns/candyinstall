@@ -5649,7 +5649,7 @@ hl.bind("Shift + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma +10"), { descript
 hl.bind("Alt + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma -10"), { description = "Reduce gamma by 10%" })
 hl.bind("ALT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/gamemode.sh"), { description = "Toggle game-mode" })
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/loadconfig.sh"), { description = "Reload Hyprland configuration" })
-hl.bind("SUPER + PRINT", hl.dsp.exec_cmd("qs -p ~/.config/quickshell/bar ipc call bar toggleScreenshot"), { description = "Take a screenshot" })
+hl.bind("SUPER + PRINT", hl.dsp.exec_cmd("qs -p ~/.config/quickshell/bar ipc call bar toggleCaptureMenu"), { description = "Capture screen (Screenshot or Recorder)" })
 hl.bind("SUPER + V", hl.dsp.exec_cmd("cliphist wipe"), { description = "Clear cliphist database" })
 hl.bind("SUPER + CTRL + D", hl.dsp.exec_cmd("$ cliphist list | dmenu | cliphist delete"), { description = "Delete an old item" })
 hl.bind("SUPER + ALT + D", hl.dsp.exec_cmd("$ cliphist delete-query \"secret item\""), { description = "Delete an old item quering manually" })
@@ -6046,8 +6046,8 @@ fi
     echo
     echo "🔄 Reloading Hyprland with 'hyprctl reload'..."
     if command -v hyprctl > /dev/null 2>&1; then
-        if pgrep -f "Hyprland" > /dev/null; then
-            bash "$HOME/.config/hypr/scripts/loadconfig.sh" && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
+        if pgrep -x "Hyprland" > /dev/null; then
+            hyprctl reload && echo "✅ Hyprland reloaded successfully." || echo "❌ Failed to reload Hyprland."
         else
             echo "ℹ️  Hyprland is not currently running. Configuration will be applied on next start and Hyprland login."
         fi
