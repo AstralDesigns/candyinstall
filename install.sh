@@ -367,6 +367,7 @@ build_package_list() {
         "qt5-quickcontrols2"
         "qt6ct"
 		"qt6-imageformats"
+		"qt6-webengine"
         "attica"
         "frameworkintegration" 
         "knewstuff" 
@@ -1229,6 +1230,46 @@ chmod +x hc-agent-build.sh
 bash build.sh
 cd
 echo "✅ Succesfully created HC+ workspace"
+
+# ── Patched noctalia-qs with QtWebEngine support (launcher browser) ─────────
+# The repo/CachyOS noctalia-qs builds Quickshell with QGuiApplication(argc=0),
+# which crashes QtWebEngine/Chromium (it reads argv[0] at startup). We install a
+# patched build (argc=1 + qt6-webengine). FAST PATH: download the prebuilt
+# .pkg.tar.zst the HyprCandy+ release ships -- via releases/latest/download so the
+# URL is version-agnostic forever (no future script edits). If that asset is
+# missing, or pacman refuses it on an unusual box (rare glibc/Qt ABI mismatch),
+# fall back to building from the vendored PKGBUILD under
+# ~/.config/quickshell/noctalia-qs. Repo quickshell stays the last-resort fallback
+# (the launcher browser simply won't load WebEngine).
+HC_NOCT_URL="https://github.com/AstralDesigns/candyinstall/releases/latest/download/noctalia-qs-webengine.pkg.tar.zst"
+HC_NOCT_PKG="$HOME/.cache/noctalia-qs-webengine.pkg.tar.zst"
+HC_NOCT_SRC="$HOME/.config/quickshell/noctalia-qs"
+HC_NOCT_BUILD="$HOME/.cache/noctalia-qs-build"
+hc_noct_installed=0
+print_status "Fetching prebuilt patched noctalia-qs (QtWebEngine)..."
+if curl -fL "$HC_NOCT_URL" -o "$HC_NOCT_PKG"; then
+    if sudo pacman -U --noconfirm --overwrite='*' "$HC_NOCT_PKG"; then
+        print_success "Patched noctalia-qs installed (prebuilt) - embedded browser enabled."
+        hc_noct_installed=1
+    else
+        print_warning "Prebuilt package failed to install (ABI/glibc mismatch) - building from source..."
+    fi
+else
+    print_warning "Prebuilt package unavailable - building from vendored PKGBUILD (slower)..."
+fi
+if [ "$hc_noct_installed" -eq 0 ]; then
+    if [ -f "$HC_NOCT_SRC/PKGBUILD" ]; then
+        rm -rf "$HC_NOCT_BUILD"; mkdir -p "$HC_NOCT_BUILD"
+        cp -f "$HC_NOCT_SRC/PKGBUILD" "$HC_NOCT_BUILD/PKGBUILD"
+        if ( cd "$HC_NOCT_BUILD" && makepkg -si --noconfirm ); then
+            print_success "Patched noctalia-qs installed (source build) - embedded browser enabled."
+        else
+            print_warning "Patched noctalia-qs build FAILED - falling back to repo quickshell (launcher browser unavailable)."
+        fi
+    else
+        print_warning "No vendored noctalia-qs PKGBUILD at $HC_NOCT_SRC - skipping WebEngine install."
+    fi
+fi
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."

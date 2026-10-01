@@ -1088,7 +1088,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
-			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs
+			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs qt6-webengine
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -1139,6 +1139,46 @@ rsync -a \
     "$UPDATE_DIR/" "$HYPRCANDY_DIR/"
 
 echo "✅ Update merged"
+
+# ── Patched noctalia-qs with QtWebEngine support (launcher browser) ─────────
+# The repo/CachyOS noctalia-qs builds Quickshell with QGuiApplication(argc=0),
+# which crashes QtWebEngine/Chromium (it reads argv[0] at startup). We install a
+# patched build (argc=1 + qt6-webengine). FAST PATH: download the prebuilt
+# .pkg.tar.zst the HyprCandy+ release ships -- via releases/latest/download so the
+# URL is version-agnostic forever (no future script edits). Only if that asset is
+# missing, or pacman refuses it (rare glibc/Qt ABI mismatch), do we fall back to
+# building from the vendored PKGBUILD rsync merged into the stowed dotfiles. Either
+# way the epoch=1 package upgrades the repo noctalia-qs; repo quickshell stays the
+# last-resort fallback (launcher browser simply won't load WebEngine).
+HC_NOCT_URL="https://github.com/AstralDesigns/candyinstall/releases/latest/download/noctalia-qs-webengine.pkg.tar.zst"
+HC_NOCT_PKG="$USER_HOME/.cache/noctalia-qs-webengine.pkg.tar.zst"
+HC_NOCT_SRC="$USER_HOME/.config/quickshell/noctalia-qs"
+HC_NOCT_BUILD="$USER_HOME/.cache/noctalia-qs-build"
+hc_noct_installed=0
+print_status "Fetching prebuilt patched noctalia-qs (QtWebEngine)..."
+if curl -fL "$HC_NOCT_URL" -o "$HC_NOCT_PKG"; then
+    if sudo pacman -U --noconfirm --overwrite='*' "$HC_NOCT_PKG"; then
+        print_success "Patched noctalia-qs installed (prebuilt) - embedded browser enabled."
+        hc_noct_installed=1
+    else
+        print_warning "Prebuilt package failed to install (ABI/glibc mismatch) - rebuilding from source..."
+    fi
+else
+    print_warning "Prebuilt package unavailable - rebuilding from vendored PKGBUILD (slower)..."
+fi
+if [ "$hc_noct_installed" -eq 0 ]; then
+    if [ -f "$HC_NOCT_SRC/PKGBUILD" ]; then
+        rm -rf "$HC_NOCT_BUILD"; mkdir -p "$HC_NOCT_BUILD"
+        cp -f "$HC_NOCT_SRC/PKGBUILD" "$HC_NOCT_BUILD/PKGBUILD"
+        if ( cd "$HC_NOCT_BUILD" && makepkg -si --noconfirm ); then
+            print_success "Patched noctalia-qs installed (source build) - embedded browser enabled."
+        else
+            print_warning "Patched noctalia-qs build FAILED - falling back to repo quickshell (launcher browser unavailable)."
+        fi
+    else
+        print_warning "No vendored noctalia-qs PKGBUILD at $HC_NOCT_SRC - skipping WebEngine install."
+    fi
+fi
 
 # Symlink new wallust folder
 ln -sf "$USER_HOME/.hyprcandy/.config/wallust/" "$USER_HOME/.config"
