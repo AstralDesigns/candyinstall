@@ -3178,8 +3178,8 @@ SUDOERS_ENTRIES=(
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.hyprcandy/GJS/hyprcandydock/hyprcandy-docker.sh"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.hyprcandy/GJS/hyprcandydock/hyprcandy-docker.sh *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh *"
 )
 
 # Add all entries to sudoers safely using visudo
