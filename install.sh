@@ -336,6 +336,7 @@ build_package_list() {
         "meson" 
         "cpio" 
         "cmake"
+        "cli11"
         
         # GNOME components (always include gnome-control-center and gnome-tweaks)
         #"mutter"
@@ -367,7 +368,7 @@ build_package_list() {
         "qt5-quickcontrols2"
         "qt6ct"
 		"qt6-imageformats"
-		"qt6-webengine"
+		"python-pyqt6-webengine"
         "attica"
         "frameworkintegration" 
         "knewstuff" 
