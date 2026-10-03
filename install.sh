@@ -387,6 +387,7 @@ build_package_list() {
         "proton-vpn-gtk-app"
         "flatpak"
         "docker"
+        "adguardhome"
         
         # Application launcher and menus
         "rofi"
@@ -1271,6 +1272,10 @@ if [ "$hc_noct_installed" -eq 0 ]; then
         print_warning "No vendored noctalia-qs PKGBUILD at $HC_NOCT_SRC - skipping WebEngine install."
     fi
 fi
+
+### ✅ Setup mako config, hook scripts and needed services
+echo "📁 Creating background hook scripts..."
+bash "$HOME/.config/quickshell/bar/scripts/webproxy/hcproxy enable"
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
@@ -3820,8 +3825,6 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
     hl.exec_cmd("systemctl --user start rofi-font-watcher")
     hl.exec_cmd("systemctl --user start cursor-theme-watcher")
-    hl.exec_cmd("gjs ~/.hyprcandy/GJS/candy-daemon.js")
-    hl.exec_cmd("gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js")
     hl.exec_cmd("bash ~/.config/hypr/scripts/wallpaper-restore.sh")
     hl.exec_cmd("hypridle")
     hl.exec_cmd("/usr/bin/pypr")
@@ -6057,6 +6060,7 @@ else
     systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service lactd &>/dev/null
 fi
 sudo systemctl enable switcheroo-control
+sudo systemctl enable adguardhome
 sudo systemctl enable bluetooth
 echo "✅ Services set..."
 

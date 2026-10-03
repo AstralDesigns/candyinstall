@@ -1088,7 +1088,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
-			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11
+			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11 adguardhome
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -5445,7 +5445,11 @@ cleanup() {
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
     [ -z "$USER_NAME" ] && USER_NAME="$USER"
     
-    #bash "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
+    systemctl enable --now adguardhome
+    
+    ### ✅ Setup mako config, hook scripts and needed services
+    echo "📁 Creating background hook scripts..."
+    bash "$USER_HOME/.config/quickshell/bar/scripts/webproxy/hcproxy enable"
     
     # Clear persisted update state; sentinels are cleaned up by Quickshell after agent build
     rm -f "$USER_HOME/.config/hyprcandy/hc-update-state"
