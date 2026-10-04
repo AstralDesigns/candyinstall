@@ -1088,7 +1088,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
-			$AUR_HELPER -S --noconfirm noctalia-qs nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11 adguardhome
+			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -1148,11 +1148,11 @@ echo "✅ Update merged"
 # URL is version-agnostic forever (no future script edits). Only if that asset is
 # missing, or pacman refuses it (rare glibc/Qt ABI mismatch), do we fall back to
 # building from the vendored PKGBUILD rsync merged into the stowed dotfiles. Either
-# way the epoch=1 package upgrades the repo noctalia-qs; repo quickshell stays the
-# last-resort fallback (launcher browser simply won't load WebEngine).
+# way hyprcandy-qs (provides+conflicts noctalia-qs) replaces the repo noctalia-qs
+# cleanly under its own name, so -Syu never warns about a newer local version.
 HC_NOCT_URL="https://github.com/AstralDesigns/candyinstall/releases/latest/download/noctalia-qs-webengine.pkg.tar.zst"
 HC_NOCT_PKG="$USER_HOME/.cache/noctalia-qs-webengine.pkg.tar.zst"
-HC_NOCT_SRC="$USER_HOME/.config/quickshell/noctalia-qs"
+HC_NOCT_SRC="$USER_HOME/.config/quickshell/hyprcandy-qs"
 HC_NOCT_BUILD="$USER_HOME/.cache/noctalia-qs-build"
 hc_noct_installed=0
 print_status "Fetching prebuilt patched noctalia-qs (QtWebEngine)..."
@@ -5444,8 +5444,6 @@ cleanup() {
     
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
     [ -z "$USER_NAME" ] && USER_NAME="$USER"
-    
-    systemctl enable --now adguardhome
     
     ### ✅ Setup mako config, hook scripts and needed services
     echo "📁 Creating background hook scripts..."

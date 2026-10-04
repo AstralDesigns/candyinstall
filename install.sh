@@ -382,12 +382,10 @@ build_package_list() {
 		"switcheroo-control"
         "nwg-displays"
         "uwsm"
-        "noctalia-qs"
         "nm-connection-editor"
         "proton-vpn-gtk-app"
         "flatpak"
         "docker"
-        "adguardhome"
         
         # Application launcher and menus
         "rofi"
@@ -1241,11 +1239,11 @@ echo "✅ Succesfully created HC+ workspace"
 # URL is version-agnostic forever (no future script edits). If that asset is
 # missing, or pacman refuses it on an unusual box (rare glibc/Qt ABI mismatch),
 # fall back to building from the vendored PKGBUILD under
-# ~/.config/quickshell/noctalia-qs. Repo quickshell stays the last-resort fallback
+# ~/.config/quickshell/hyprcandy-qs. Vendored PKGBUILD source-build is the fallback
 # (the launcher browser simply won't load WebEngine).
 HC_NOCT_URL="https://github.com/AstralDesigns/candyinstall/releases/latest/download/noctalia-qs-webengine.pkg.tar.zst"
 HC_NOCT_PKG="$HOME/.cache/noctalia-qs-webengine.pkg.tar.zst"
-HC_NOCT_SRC="$HOME/.config/quickshell/noctalia-qs"
+HC_NOCT_SRC="$HOME/.config/quickshell/hyprcandy-qs"
 HC_NOCT_BUILD="$HOME/.cache/noctalia-qs-build"
 hc_noct_installed=0
 print_status "Fetching prebuilt patched noctalia-qs (QtWebEngine)..."
@@ -5692,7 +5690,36 @@ hl.bind("SUPER + R", hl.dsp.exec_cmd("bash -c 'wf-recorder -g -a --audio=bluez_o
 hl.bind("Alt + R", hl.dsp.exec_cmd("pkill -x wf-recorder"), { description = "Stop recording" })
 hl.bind("Shift + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma +10"), { description = "Increase gamma by 10%" })
 hl.bind("Alt + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma -10"), { description = "Reduce gamma by 10%" })
+-- Visuallypresent the Gamemode keybind in the CC 
 hl.bind("ALT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/gamemode.sh"), { description = "Toggle game-mode" })
+-- Toggle Gamemode Performance Profile directly in Lua
+hl.bind("ALT + G", function()
+    -- Check if animations are currently active
+    if hl.get_config("animations.enabled") == true then
+        -- Turn OFF eye candy for Max Performance
+        hl.config({
+            animations = { enabled = false },
+            decoration = {
+                blur = { enabled = false },
+                shadow = { enabled = false }
+            },
+            --general = { gaps_in = 0, gaps_out = 0, border_size = 1 }
+        })
+        hl.exec_cmd("notify-send \"Game-mode\" \"Activated\" -t 2000")
+    else
+        -- Restore eye candy
+        hl.config({
+            animations = { enabled = true },
+            decoration = {
+                blur = { enabled = true },
+                shadow = { enabled = true }
+            },
+            --general = { gaps_in = 0, gaps_out = 0, border_size = 1 }
+        })
+        hl.dsp.exec_cmd("hyprctl reload")
+        hl.exec_cmd("notify-send \"Game-mode\" \"Deactivated\" -t 2000")
+    end
+end)
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/loadconfig.sh"), { description = "Reload Hyprland configuration" })
 hl.bind("SUPER + PRINT", hl.dsp.exec_cmd("qs -p ~/.config/quickshell/bar ipc call bar toggleCaptureMenu"), { description = "Capture screen (Screenshot or Recorder)" })
 hl.bind("SUPER + V", hl.dsp.exec_cmd("cliphist wipe"), { description = "Clear cliphist database" })
@@ -6060,7 +6087,6 @@ else
     systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service rofi-font-watcher.service cursor-theme-watcher.service lactd &>/dev/null
 fi
 sudo systemctl enable switcheroo-control
-sudo systemctl enable adguardhome
 sudo systemctl enable bluetooth
 echo "✅ Services set..."
 
