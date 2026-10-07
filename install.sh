@@ -397,7 +397,8 @@ build_package_list() {
         "awww"
         "grimblast-git"
         "wob"
-        "wf-recorder"
+        "gpu-screen-recorder"
+        "gpu-screen-recorder-qt"
         "slurp"
         "satty"
         
