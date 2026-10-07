@@ -1194,6 +1194,11 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Migrating screen recorder from wf-recorder to
+  gpu-screen-recorder with added 'stream' option
+  in the recorder popup.
+ Fixed masking of new cava styles in the bar cava
+  modules.
  Migrated the dock and launcher from GJS to
   Quickshell for reduced cpu usage and faster
   animations plus unified theming.
