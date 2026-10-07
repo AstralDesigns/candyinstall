@@ -412,6 +412,8 @@ build_package_list() {
         "pipewire-pulse"
         "pipewire-alsa"
         "alsa-utils"
+        "easyeffects"
+	"easyeffects-bundy01-presets"
         
         # System monitoring
         "btop"

@@ -1088,7 +1088,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
-			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11
+			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11 easyeffects easyeffects-bundy01-presets
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -1194,17 +1194,25 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Migrated the dock and launcher from GJS to
+  Quickshell for reduced cpu usage and faster
+  animations plus unified theming.
+ Updated the launcher's web-search tabto a full
+  browser experience with the same focus on secirty
+  and privacy.
+ Added 6 sound profiles to the media-player popup.
+ Minor shell and feature fixes:
+  - Auto-hide in tri & shll modes conflicting.
+  - Cava color in popup not being vsisible.
+
+RECENT:
  Auto-start/stop SearXNG-docker.
  Improved integration of cloud-model-providers.
  Added Wallhaven integration to the wallpaper-picker
   and extra awww-walpaper engine options on the bottom
   row.
-
-RECENT:
  App-launcer bookmarks now autostart the backend 
-  SearXNG docker container.  
-
-PREVIOUS:
+  SearXNG docker container.
  Significantly reduced web view CPU usage including on
   video-playback.
  Bookmarks support added to launcher's web search tab."
