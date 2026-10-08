@@ -1195,6 +1195,9 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Wallpaper popup image-preview on right-click of
+  thumbnails as well as image deletion logic has
+  been added.
  Migrating screen recorder from wf-recorder to
   gpu-screen-recorder with added 'stream' option
   in the recorder popup.
