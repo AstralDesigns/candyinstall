@@ -1207,7 +1207,8 @@ notify-send " HC+ Update Complete" "LATEST:
   and privacy.
  Added 6 sound profiles to the media-player popup.
  Minor shell and feature fixes:
-  - Auto-hide in tri & shll modes conflicting.
+  - Contflicting auto-hide in tri & shell modes.
+    - Restored center-island auto-hide.
   - Cava color in popup not being vsisible.
 
 RECENT:
