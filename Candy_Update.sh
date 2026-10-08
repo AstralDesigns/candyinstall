@@ -1088,6 +1088,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt5ct-kde
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
+			$AUR_HELPER -R --noconfirm noctalia-qs
 			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11 easyeffects easyeffects-bundy01-presets gpu-screen-recorder gpu-screen-recorder-qt
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"

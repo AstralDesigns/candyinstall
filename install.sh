@@ -1276,8 +1276,8 @@ fi
 
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
-bash "$HOME/.config/quickshell/bar/scripts/webproxy/hcproxy enable"
-
+bash "$HOME/.config/quickshell/bar/scripts/webproxy/hcproxy" &>/dev/null
+hcproxy enable &>/dev/null
 ### ✅ Setup mako config, hook scripts and needed services
 echo "📁 Creating background hook scripts..."
 mkdir -p "$HOME/.config/custom" "$HOME/.config/hyprcandy/hooks" "$HOME/.config/systemd/user" "$HOME/.config/pypr" "$HOME/.config/xdg-desktop-portal"
@@ -3863,7 +3863,7 @@ hl.env("QEMU_AUDIO_DRV", "pa")
 -- Core Hyprland config blocks
 hl.config({
     input = {
-        kb_layout = "$LAYOUT",
+        kb_layout = "",
         kb_variant = "",
         kb_model = "",
         kb_options = "",
@@ -6061,7 +6061,7 @@ fi
 if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
     print_error "hyprviz.lua not found at $CUSTOM_CONFIG_FILE."
 else
-    sed -i "s/\$LAYOUT/$KEYBOARD_LAYOUT/g" "$CUSTOM_CONFIG_FILE"
+    sed -i "s/kb_layout = "",/kb_layout = "$KEYBOARD_LAYOUT",/g" "$CUSTOM_CONFIG_FILE"
     print_status "Layout '$KEYBOARD_LAYOUT' applied."
 fi
 
@@ -6138,6 +6138,7 @@ fi
     #rm -f "$HOME/.config/hyprcandy/settings/xray-on"
 #fi
 
+    hyprctl reload
     print_success "HyprCandy configuration setup completed!"  
 }
 
