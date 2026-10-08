@@ -1111,12 +1111,12 @@ setup_hyprcandy() {
     # Remove existing .hyprcandy folder
     if [ -d "$HOME/.hyprcandy" ]; then
         echo "🗑️  Removing existing .hyprcandy folder..."
-        rm -rf "$HOME/.hyprcandy"
-		rm -rf "$HOME/.ultracandy" "$HOME/.HCUpdates"
+        sudo rm -rf "$HOME/.hyprcandy"
+		sudo rm -rf "$HOME/.ultracandy" "$HOME/.HCUpdates"
         sleep 2
     else
         echo "✅ .hyprcandy dotfiles folder doesn't exist — seems to be a fresh install."
-        rm -rf "$HOME/.ultracandy" "$HOME/.HCUpdates"
+        sudo rm -rf "$HOME/.ultracandy" "$HOME/.HCUpdates"
         sleep 2
     fi
 
