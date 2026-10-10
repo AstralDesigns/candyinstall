@@ -1195,6 +1195,8 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Fixed media playback disconnecting on launcher
+  web-search tab when launcher is hidden. 
  Wallpaper popup image-preview on right-click of
   thumbnails as well as image deletion logic has
   been added.
