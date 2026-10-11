@@ -5523,8 +5523,9 @@ echo "✅ Files and Apps setup complete"
 # Function to cleanup post update
 cleanup() {
     echo
-    USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
-    USER_NAME=$(getent passwd $PKEXEC_UID | cut -d: -f1)
+    _inv_uid="${PKEXEC_UID:-${SUDO_UID:-$(id -u)}}"
+    USER_NAME=$(getent passwd "$_inv_uid" | cut -d: -f1)
+    USER_HOME=$(getent passwd "$_inv_uid" | cut -d: -f6)
     
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
     [ -z "$USER_NAME" ] && USER_NAME="$USER"
@@ -5535,6 +5536,16 @@ cleanup() {
     
     # Clear persisted update state; sentinels are cleaned up by Quickshell after agent build
     rm -f "$USER_HOME/.config/hyprcandy/hc-update-state"
+    # This script runs fully as ROOT under pkexec, so files it wrote into the
+    # user home are root-owned and break the next user-mode run (e.g. install.sh
+    # "curl -o ~/.cache/noctalia-qs-webengine.pkg.tar.zst" -> permission denied)
+    # and the desktop session. Hand root-owned pollution back to the user; the
+    # -user root guard limits it to pollution so legit files stay untouched.
+    if [ "$(id -u)" = "0" ] && [ -n "$USER_NAME" ]; then
+        for _p in "$USER_HOME/.hyprcandy" "$USER_HOME/.config" "$USER_HOME/.cache" "$USER_HOME/.local" "$USER_HOME/.HCUpdates" "$USER_HOME/.oh-my-zsh"; do
+            [ -e "$_p" ] && find "$_p" -user root -exec chown "$USER_NAME" {} + 2>/dev/null
+        done
+    fi
     if [ -n "$USER_NAME" ]; then
         su - "$USER_NAME" -c "rm -f ~/.config/hyprcandy/hc-update-state"
         su - "$USER_NAME" -c "USER_HOME=$USER_HOME bash '$USER_HOME/.config/hypr/scripts/notify.sh'"
@@ -5545,9 +5556,15 @@ cleanup() {
 
     # Main execution
 main() {
-    USER_HOME=$(getent passwd $PKEXEC_UID | cut -d: -f6)
-    USER_NAME=$(getent passwd $PKEXEC_UID | cut -d: -f1)
-    cd "$USER_HOME"
+    # Resolve the INVOKING user: pkexec -> PKEXEC_UID, sudo -> SUDO_UID, else
+    # current uid. Without this USER_HOME collapses to "" when the script runs
+    # outside pkexec and every "$USER_HOME/..." path becomes "/..." (root fs).
+    _inv_uid="${PKEXEC_UID:-${SUDO_UID:-$(id -u)}}"
+    USER_NAME=$(getent passwd "$_inv_uid" | cut -d: -f1)
+    USER_HOME=$(getent passwd "$_inv_uid" | cut -d: -f6)
+    [ -z "$USER_HOME" ] && USER_HOME="${SUDO_HOME:-$HOME}"
+    [ -z "$USER_NAME" ] && USER_NAME="$(id -un)"
+    cd "$USER_HOME" || cd "$HOME"
 	
 	# Show multicolored ASCII art
     show_ascii_art 

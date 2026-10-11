@@ -1250,6 +1250,10 @@ HC_NOCT_SRC="$HOME/.config/quickshell/hyprcandy-qs"
 HC_NOCT_BUILD="$HOME/.cache/noctalia-qs-build"
 hc_noct_installed=0
 print_status "Fetching prebuilt patched noctalia-qs (QtWebEngine)..."
+# Self-heal a stale/root-owned package left by a prior pkexec update so a
+# user-mode install never trips "permission denied" overwriting its own cache.
+mkdir -p "$(dirname "$HC_NOCT_PKG")" 2>/dev/null || true
+rm -f "$HC_NOCT_PKG" 2>/dev/null || true
 if curl -fL "$HC_NOCT_URL" -o "$HC_NOCT_PKG"; then
     if sudo pacman -U --noconfirm --overwrite='*' "$HC_NOCT_PKG"; then
         print_success "Patched noctalia-qs installed (prebuilt) - embedded browser enabled."
