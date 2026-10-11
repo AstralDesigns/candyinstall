@@ -1195,6 +1195,11 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Fixed 'suspension' and 'hibernation' from the
+  startmenu and lock-screen.
+  - When triggered from the start-menu popup, the
+  process now correctly transitions to the lock-
+  screen prior to sleep or hibernation.
  Fixed media playback disconnecting on launcher
   web-search tab when launcher is hidden. 
  Wallpaper popup image-preview on right-click of
@@ -3077,6 +3082,62 @@ done
 EOF
 
 chmod +x "$USER_HOME/.config/hyprcandy/hooks/watch_gtk_font.sh"
+
+# ═══════════════════════════════════════════════════════════════
+#      			  Power Script
+# ═══════════════════════════════════════════════════════════════
+
+cat > "$USER_HOME/.config/hypr/scripts/power.sh" << 'EOF'
+#!/bin/bash
+#    ___                    
+#   / _ \___ _    _____ ____
+#  / ___/ _ \ |/|/ / -_) __/
+# /_/   \___/__,__/\__/_/   
+#                           
+
+USERNAME=$(whoami)
+
+if [[ "$1" == "exit" ]]; then
+  echo ":: Exit"
+  hyprshutdown -t 'Logging out...' --post-cmd "hyprctl dispatch hl.dsp.exit()" > /dev/null 2>&1
+fi
+
+if [[ "$1" == "lock" ]]; then
+  echo ":: Lock"
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+fi
+
+if [[ "$1" == "reboot" ]]; then
+  echo ":: Reboot"
+  hyprshutdown -t 'Restarting...' --post-cmd 'reboot' > /dev/null 2>&1
+fi
+
+if [[ "$1" == "shutdown" ]]; then
+  echo ":: Shutdown"
+  hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0' > /dev/null 2>&1
+fi
+
+if [[ "$1" == "suspend" ]]; then
+  echo ":: Suspend"
+  # Marker carries the action so candylock sleeps with the RIGHT method AFTER
+  # the session is locked (see suspendIfFlagged in candylock/shell.qml).
+  echo suspend > /tmp/.qs-candylock-sleep
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+  rm -f /tmp/.qs-candylock-sleep
+fi
+
+if [[ "$1" == "hibernate" ]]; then
+  echo ":: Hibernate"
+  # Mirror suspend: lock first, then suspend-to-disk once secured, so the
+  # session is never exposed on resume. Only reachable when the Hibernate
+  # button is shown, i.e. logind CanHibernate=yes (swap+resume configured).
+  echo hibernate > /tmp/.qs-candylock-sleep
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+  rm -f /tmp/.qs-candylock-sleep
+fi
+EOF
+
+chmod +x "$USER_HOME/.config/hypr/scripts/power.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #      Systemd Service: GTK Font → Rofi Font Syncer
