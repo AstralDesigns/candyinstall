@@ -1195,6 +1195,9 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Added a new 'Display' settings tab to the
+  control center and move the 'Dock' tab logic
+  under the Bar sub-stack.
  Fixed 'suspension' and 'hibernation' from the
   startmenu and lock-screen.
   - When triggered from the start-menu popup, the
