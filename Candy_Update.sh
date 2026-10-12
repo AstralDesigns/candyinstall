@@ -1195,6 +1195,10 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Added preview mode scrolling to the wallpaper
+  popup right-click preview UI and enhanced the
+  the display of Wallhaven search results with
+  pagination & auto-load of results on scroll.
  Added a new 'Display' settings tab to the
   control center and move the 'Dock' tab logic
   under the Bar sub-stack.
