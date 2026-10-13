@@ -1195,6 +1195,12 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Updatd the HC+ workspace themeing and agentic
+  logic: agents can create memories when prompted
+  to remember something and that chat flow is
+  improved to handle reversion of changes, user
+  qued prompts to steer the agent and new agent
+  instructions and tools for the agent's loop.
  Added preview mode scrolling to the wallpaper
   popup right-click preview UI and enhanced the
   the display of Wallhaven search results with
