@@ -137,10 +137,11 @@ choose_shell() {
     echo -e "${CYAN}Choose your shell: you can also rerun the script to switch from either or regenerate HyprCandy's default shell setup:${NC}"
     echo "1) Fish - A modern shell with builtin fzf search, intelligent autosuggestions and syntax highlighting (Fisher plugins + Starship prompt)"
     echo "2) Zsh - Powerful shell with extensive customization (Zsh plugins + Oh My Zsh + Starship prompt)"
+    echo "3) Bash - Classic, ubiquitous shell kept lightweight (Starship prompt + HyprCandy aliases)"
     echo
     
     while true; do
-        echo -e "${YELLOW}Enter your choice (1 for Fish, 2 for Zsh):${NC}"
+        echo -e "${YELLOW}Enter your choice (1 for Fish, 2 for Zsh, 3 for Bash):${NC}"
         read -r shell_choice
         case $shell_choice in
             1)
@@ -153,8 +154,13 @@ choose_shell() {
                 print_status "Selected Zsh with plugins, Oh My Zsh integration and Starship configuration"
                 break
                 ;;
+            3)
+                SHELL_CHOICE="bash"
+                print_status "Selected Bash with the shared Starship prompt and HyprCandy aliases"
+                break
+                ;;
             *)
-                print_error "Invalid choice. Please enter 1 or 2."
+                print_error "Invalid choice. Please enter 1, 2 or 3."
                 ;;
         esac
     done
@@ -531,6 +537,13 @@ build_package_list() {
             "oh-my-zsh-git"
         )
         print_status "Added Zsh and Oh My Zsh ecosystem with Starship to package list"
+    elif [ "$SHELL_CHOICE" = "bash" ]; then
+        packages+=(
+            "bash"
+            "bash-completion"
+            "starship"
+        )
+        print_status "Added Bash, bash-completion and Starship to package list"
     fi
     
     
@@ -874,6 +887,218 @@ end
 EOF
     
     print_success "Fish shell configuration completed!"
+}
+
+# Function to setup Bash configuration
+setup_bash() {
+    print_status "Setting up Bash shell configuration..."
+
+    # Set Bash as default shell
+    if command -v bash &> /dev/null; then
+        print_status "Setting Bash as default shell..."
+        chsh -s $(which bash)
+        print_success "Bash set as default shell"
+    else
+        print_error "Bash not found. Please install Bash first."
+        return 1
+    fi
+
+    # Configure Starship prompt (shared design with Fish/Zsh)
+    if command -v starship &> /dev/null; then
+        print_status "Configuring Starship prompt for Bash..."
+        mkdir -p "$HOME/.config"
+        cat > "$HOME/.config/starship.toml" << 'EOF'
+# Starship Configuration for HyprCandy
+format = """
+$username\
+$hostname\
+$time $directory\
+$git_branch\
+$git_state\
+$git_status\
+$git_metrics\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$php\
+$java\
+$kotlin\
+$haskell\
+$swift\
+$cmd_duration $jobs\
+$line_break\
+$character"""
+
+[fill]
+symbol = ""
+
+[username]
+style_user = "bold cyan"
+style_root = "bold red"
+format = "[󱞬](grey) [](red) [](cyan) [$user](grey) [](red) ($style)"
+show_always = true
+
+[directory]
+style = "cyan"
+read_only = " 🔒"
+truncation_length = 4
+truncate_to_repo = false
+
+[character]
+success_symbol = "[󱞪](grey) [](red)"
+error_symbol = "[󱞪](grey) [x](red)"
+vimcmd_symbol = "[󱞪](grey) [](green)"
+
+[git_branch]
+symbol = "[](red)  "
+truncation_length = 4
+truncation_symbol = ""
+style = "cyan"
+
+[git_status]
+ahead = "⇡${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+deleted = "x"
+
+[nodejs]
+symbol = "[](red) 💠 "
+style = "bold grey"
+
+[python]
+symbol = "[](red) 🐍 "
+style = "bold yellow"
+
+[rust]
+symbol = "[](red) ⚙️ "
+style = "bold red"
+
+[time]
+format = '[](cyan) [\[ $time \]](grey) [](red)($style)'#🕙
+time_format = "%T"
+disabled = false
+style = "bright-white"
+
+[cmd_duration]
+format = "[](red) ⏱️ [$duration]($style)"
+style = "grey"
+
+[jobs]
+symbol = "[](red) ⚡ "
+style = "bold cyan"
+EOF
+        print_success "Starship configured for Bash"
+    fi
+
+    # Login shells read ~/.bash_profile; have it source ~/.bashrc
+    cat > "$HOME/.bash_profile" << 'EOF'
+# HyprCandy Bash Profile
+if [ -f ~/.bashrc ]; then
+    . ~/.bashrc
+fi
+EOF
+
+    # Add useful Bash aliases and Starship init
+    cat > "$HOME/.bashrc" << 'EOF'
+# HyprCandy Bash Configuration
+
+# Set environment variables
+export HYPRLAND_LOG_WS=1
+export EDITOR=micro
+export BROWSER=firefox
+export TERMINAL=kitty
+
+# Add local bin to PATH
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+# Aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias update='sudo pacman -Syu'
+alias install='sudo pacman -S'
+alias search='pacman -Ss'
+alias remove='sudo pacman -R'
+alias c='clear'
+alias h='history'
+alias j='jobs -l'
+alias df='df -h'
+alias du='du -h'
+alias mkdir='mkdir -pv'
+alias wget='wget -c'
+alias ff='fastfetch'
+
+# Git aliases
+alias g='git clone --depth 1'
+alias ga='git add .'
+alias gc='git commit -m'
+gp() {
+    # Ensure .config/hypr are gitignored before every push
+    if ! grep -qF ".config/hypr" .gitignore 2>/dev/null; then
+        echo ".config/hypr/hyprviz.conf" >> .gitignore
+        echo ".config/hypr/monitors.conf" >> .gitignore
+        git add .gitignore
+        git commit -m "chore: ignore personal config dirs"
+    fi
+    git push
+}
+alias gl='git pull'
+alias gs='git status'
+alias gd='git diff'
+alias gco='git checkout'
+alias gb='git branch'
+alias glog='git log --oneline --graph --decorate'
+
+# System information
+alias sysinfo='fastfetch'
+alias weather='curl wttr.in'
+
+# Fun stuff
+alias matrix='cmatrix -a -b -r'
+alias pipes='pipes.sh'
+alias clock='tty-clock -s -c'
+alias sea='asciiquarium'
+
+# Larger, deduplicated history
+shopt -s histappend
+HISTSIZE=50000
+HISTFILESIZE=100000
+HISTCONTROL=ignoreboth:erasedups
+
+# Bash completion plugin
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# fzf key-bindings + completion
+if command -v fzf > /dev/null 2>&1; then
+  source <(fzf --bash 2>/dev/null) || { [ -f "$HOME/.fzf.bash" ] && . "$HOME/.fzf.bash"; }
+fi
+
+# Start HyprCandy fastfetch
+fastfetch
+
+# Initialize Starship prompt
+if command -v starship > /dev/null 2>&1; then
+    eval "$(starship init bash)"
+fi
+EOF
+
+    print_success "Bash shell configuration completed!"
 }
 
 # Function to setup Zsh configuration
@@ -1276,6 +1501,18 @@ if [ "$hc_noct_installed" -eq 0 ]; then
     else
         print_warning "No vendored noctalia-qs PKGBUILD at $HC_NOCT_SRC - skipping WebEngine install."
     fi
+fi
+
+### ✅ Enable pacman ILoveCandy download animation
+echo "🍬 Enabling pacman 'ILoveCandy' animation..."
+if grep -qE '^[[:space:]]*ILoveCandy([[:space:]]|$)' /etc/pacman.conf; then
+    echo "   • already enabled, nothing to do."
+elif grep -qE '^[[:space:]]*#[[:space:]]*ILoveCandy([[:space:]]|$)' /etc/pacman.conf; then
+    sudo sed -i -E 's/^([[:space:]]*)#[[:space:]]*(ILoveCandy[[:space:]]*)$/\1\2/' /etc/pacman.conf
+    echo "   • uncommented existing ILoveCandy entry."
+else
+    sudo sed -i '/^\[options\]/a ILoveCandy' /etc/pacman.conf
+    echo "   • added ILoveCandy to [options]."
 fi
 
 ### ✅ Setup mako config, hook scripts and needed services
@@ -6236,6 +6473,8 @@ main() {
         setup_fish
     elif [ "$SHELL_CHOICE" = "zsh" ]; then
         setup_zsh
+    elif [ "$SHELL_CHOICE" = "bash" ]; then
+        setup_bash
     fi
     
     # Automatically setup HyprCandy configuration
