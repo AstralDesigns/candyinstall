@@ -6065,7 +6065,7 @@ fi
 if [ ! -f "$CUSTOM_CONFIG_FILE" ]; then
     print_error "hyprviz.lua not found at $CUSTOM_CONFIG_FILE."
 else
-    sed -i "s/kb_layout = "",/kb_layout = "$KEYBOARD_LAYOUT",/g" "$CUSTOM_CONFIG_FILE"
+    sed -i "s/kb_layout = \"[^\"]*\"/kb_layout = \"$KEYBOARD_LAYOUT\"/" "$CUSTOM_CONFIG_FILE"
     print_status "Layout '$KEYBOARD_LAYOUT' applied."
 fi
 

@@ -1195,6 +1195,11 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:
+ Updated launcher agent-app with improved text
+  contrast, increased file-type linting and file
+  git statuc tracking.
+ Fixed media-playback resume from desktop sleep
+  state on the web-search tab browser.
  Updatd the HC+ workspace themeing and agentic
   logic: agents can create memories when prompted
   to remember something and that chat flow is
