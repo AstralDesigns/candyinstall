@@ -1194,7 +1194,15 @@ echo "📁 Updating HyprCandyPlus scripts..."
 	cat > "$USER_HOME/.config/hypr/scripts/notify.sh" << 'EOF'
 #!/bin/bash
 
-notify-send " HC+ Update Complete" "LATEST:
+notify-send " HC+ Update Complete" "LATEST:   
+ Added tooltips to bar modules where relevant.
+ New agent-app keybinds to toggle left & right
+  panels, open files and app-wide tooltips.
+ Shell type can now be changed by clicking the
+  interactive 'Shell' chip in the control-center
+  'System' tab which launches a shell-switcher
+  terminal instance with options for zsh, fish
+  and bash. 
  Updated launcher agent-app with improved text
   contrast, increased file-type linting and file
   git statuc tracking.
