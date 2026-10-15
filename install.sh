@@ -430,7 +430,6 @@ build_package_list() {
         # Customization
         "python-pillow"
         "rust"
-        "wallust"
         "matugen-bin"
 		"python-pywal16"
 		"python-colorthief"
@@ -599,6 +598,21 @@ build_package_list() {
 install_packages() {
     local conf="/etc/pacman.conf"
 
+    # Ensure the chaotic-aur repo is configured so prebuilt AUR packages resolve
+    # quickly for the rest of this install. Runs only when the repo is absent:
+    # fetch/sign the primary key, install the keyring + mirrorlist, append the
+    # repo as the LAST section of pacman.conf, then sync so it is usable now.
+    if ! grep -qE '^[[:space:]]*\[chaotic-aur\]' "$conf"; then
+        print_status "chaotic-aur not found — configuring keyring, mirrorlist and repo..."
+        sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+        sudo pacman-key --lsign-key 3056513887B78AEB
+        sudo pacman -U --noconfirm \
+            'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' \
+            'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+        printf '\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n' | sudo tee -a "$conf" >/dev/null
+        sudo pacman -Sy
+    fi
+
     # Uncomment Color if commented out
     grep -q "^#Color" "$conf" && sudo sed -i "s/^#Color/Color/" "$conf"
 
@@ -674,6 +688,9 @@ install_packages() {
             echo ""
         fi
     fi
+
+    $AUR_HELPER -S --noconfirm cargo
+    cargo install cargo-update wallust
     
     # Add flathub repo
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
@@ -815,6 +832,11 @@ set -x TERMINAL kitty
 # Add local bin to PATH
 if test -d ~/.local/bin
     set -x PATH ~/.local/bin $PATH
+end
+
+# HyprCandy: cargo bin on PATH
+if test -d ~/.cargo/bin
+    set -x PATH ~/.cargo/bin $PATH
 end
 
 # Aliases
@@ -1014,6 +1036,12 @@ export TERMINAL=kitty
 case ":$PATH:" in
   *":$HOME/.local/bin:"*) ;;
   *) [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+# HyprCandy: cargo bin on PATH
+case ":$PATH:" in
+  *":$HOME/.cargo/bin:"*) ;;
+  *) [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH" ;;
 esac
 
 # Aliases
@@ -1227,6 +1255,11 @@ export TERMINAL=kitty
 # Add local bin to PATH
 if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# HyprCandy: cargo bin on PATH
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
 # Initialize Starship prompt
@@ -2965,7 +2998,7 @@ update_config_background() {
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         pkill -f magick
         echo "🎨 Triggering color generation..."
-wallust -s run "$bg_path"
+"$HOME/.cargo/bin/wallust" -s run "$bg_path"
 wal -s -t -i "$bg_path" -n --cols16 foxify-darken --backend wal --contrast 1.5 --saturate 0.25 2>/dev/null
 matugen image "$bg_path" --type scheme-smart -m smart -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.15 2>/dev/null
         sleep 0.5

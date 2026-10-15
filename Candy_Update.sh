@@ -696,6 +696,11 @@ if test -d ~/.local/bin
     set -x PATH ~/.local/bin $PATH
 end
 
+# HyprCandy: cargo bin on PATH
+if test -d ~/.cargo/bin
+    set -x PATH ~/.cargo/bin $PATH
+end
+
 # Aliases
 #alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='Candy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' --ignore='transparent.png' --ignore='GJS' --ignore='Candy.desktop' --ignore='HyprCandy.png' --ignore='candy-daemon.js' --ignore='candy-launcher.sh' --ignore='toggle-control-center.sh' --ignore='toggle-media-player.sh' --ignore='toggle-system-monitor.sh' --ignore='toggle-weather-widget.sh' --ignore='toggle-hyprland-settings.sh' --ignore='candy-system-monitor.js' --ignore='resources' --ignore='src' --ignore='meson.build' --ignore='README.md' --ignore='run.log' --ignore='test_layout.js' --ignore='test_media_menu.js' --ignore='toggle.js' --ignore='toggle-main.js' --ignore='~' --ignore='candy-main.js' --ignore='gjs-media-player.desktop' --ignore='gjs-toggle-controls.desktop' --ignore='main.js' --ignore='media-main.js' --ignore='SEEK_FEATURE.md' --ignore='setup-custom-icon.sh' --ignore='weather-main.js' */"
 alias ll="ls -alF"
@@ -908,6 +913,11 @@ if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
+# HyprCandy: cargo bin on PATH
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 # Initialize Starship prompt
 if command -v starship > /dev/null 2>&1; then
     eval "$(starship init zsh)"
@@ -987,9 +997,48 @@ EOF
 }
     
 # Function to automatically setup Hyprcandy configuration
+# Retro-fit ~/.cargo/bin onto PATH for the invoking user's current login shell
+# when its rc predates that block. This updater runs as root under pkexec, so
+# resolve the user's real shell + home instead of $SHELL / $HOME.
+ensure_cargo_path() {
+    local _sh rc marker
+    marker="# HyprCandy: cargo bin on PATH"
+    _sh="$(basename "$(getent passwd "$USER_NAME" | cut -d: -f7)")"
+    case "$_sh" in
+        fish) rc="$USER_HOME/.config/fish/config.fish" ;;
+        zsh)  rc="$USER_HOME/.zshrc" ;;
+        bash) rc="$USER_HOME/.bashrc" ;;
+        *)    return 0 ;;
+    esac
+    [ -f "$rc" ] || return 0
+    grep -qF "$marker" "$rc" && return 0
+    if [ "$_sh" = "fish" ]; then
+        printf '\n%s\nif test -d ~/.cargo/bin\n    set -x PATH ~/.cargo/bin $PATH\nend\n' "$marker" >> "$rc"
+    else
+        printf '\n%s\ncase ":$PATH:" in\n  *":$HOME/.cargo/bin:"*) ;;\n  *) [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH" ;;\nesac\n' "$marker" >> "$rc"
+    fi
+    print_status "Added cargo bin to PATH in $rc"
+}
+
 setup_hyprcandy() {
 
     print_status "Setting up HyprCandy configuration..."
+
+    # Ensure the chaotic-aur repo is configured so prebuilt AUR packages resolve
+    # quickly during updates. Runs only when the repo is absent: fetch/sign the
+    # primary key, install the keyring + mirrorlist, append the repo as the LAST
+    # section of pacman.conf, then sync so it is usable for this run.
+    if ! grep -qE '^[[:space:]]*\[chaotic-aur\]' /etc/pacman.conf; then
+        print_status "chaotic-aur not found — configuring keyring, mirrorlist and repo..."
+        sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+        sudo pacman-key --lsign-key 3056513887B78AEB
+        sudo pacman -U --noconfirm \
+            'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' \
+            'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+        printf '\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n' | sudo tee -a /etc/pacman.conf >/dev/null
+        sudo pacman -Sy
+    fi
+
 	# Legacy desktop entry will be replaced later with a new version
 	rm -rf ~/.local/share/applications/Candy.desktop 
 
@@ -1089,7 +1138,9 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm qt6ct-kde
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
 			$AUR_HELPER -R --noconfirm noctalia-qs
-			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11 easyeffects easyeffects-bundy01-presets gpu-screen-recorder gpu-screen-recorder-qt
+            $AUR_HELPER -R --noconfirm wallust
+			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11 easyeffects easyeffects-bundy01-presets gpu-screen-recorder gpu-screen-recorder-qt cargo
+            cargo install cargo-update wallust
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -1107,6 +1158,10 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
             echo ""
         fi
     fi
+
+    # Cargo-installed binaries (cargo-update, wallust) need ~/.cargo/bin on the
+    # PATH of whichever login shell the user already runs.
+    ensure_cargo_path
 
     print_status "Updating HyprCandy configuration..."
 
@@ -1195,6 +1250,8 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:   
+Switched from wallust aur package to cargo
+  package with new cargo packages handling.
  Added tooltips to bar modules where relevant.
  New agent-app keybinds to toggle left & right
   panels, open files and app-wide tooltips.
@@ -2699,7 +2756,7 @@ update_config_background() {
     if [ -f "$bg_path" ] && [ -f "$MATUGEN_CONFIG" ]; then
         pkill -f magick
         echo "🎨 Triggering color generation..."
-wallust -s run "$bg_path"
+"$HOME/.cargo/bin/wallust" -s run "$bg_path"
 wal -s -t -i "$bg_path" -n --cols16 darken --backend wal --contrast 1.5 --saturate 0.25 2>/dev/null
 matugen image "$bg_path" --type scheme-fidelity -m dark -r nearest --base16-backend wal --lightness-dark -0.1 --source-color-index 0 --contrast 0.15 2>/dev/null
         sleep 0.5
@@ -3222,6 +3279,221 @@ bash -c "rm -rf ~/candyinstall ~/.hyprcandy/candyinstall"
 EOF
 
 chmod +x "$USER_HOME/.config/hyprcandy/hooks/complete.sh"
+
+# ═══════════════════════════════════════════════════════════════
+#               		    SYSTEM UPDATE
+# ═══════════════════════════════════════════════════════════════
+	cat > "$USER_HOME/.config/hyprcandy/scripts/system-update.sh" << 'EOF'
+#!/usr/bin/env bash
+
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+print_warning() { echo -e "${YELLOW}WARNING:${NC} $1"; }
+print_status() { echo "$1"; }
+
+# Check release
+if [ ! -f /etc/arch-release ]; then
+  exit 0
+fi
+
+pkg_installed() {
+  local pkg=$1
+  if pacman -Qi "${pkg}" &>/dev/null; then
+    return 0
+  elif pacman -Qi "flatpak" &>/dev/null && flatpak info "${pkg}" &>/dev/null; then
+    return 0
+  elif command -v "${pkg}" &>/dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+get_aur_helper() {
+  if pkg_installed yay; then
+    aur_helper="yay"
+  elif pkg_installed paru; then
+    aur_helper="paru"
+  fi
+}
+
+get_aur_helper
+export -f pkg_installed
+
+# Ensure ~/.cargo/bin is on PATH in the active login shell's rc, appending the
+# block only when it is missing. Mirrors Candy_Update so whichever update path
+# runs first retro-fits cargo PATH for existing HyprCandy+ installs.
+ensure_cargo_path() {
+  local sh rc marker
+  marker="# HyprCandy: cargo bin on PATH"
+  sh="$(basename "${SHELL:-$(getent passwd "$(id -u)" | cut -d: -f7)}")"
+  case "$sh" in
+    fish) rc="$HOME/.config/fish/config.fish" ;;
+    zsh)  rc="$HOME/.zshrc" ;;
+    bash) rc="$HOME/.bashrc" ;;
+    *)    return 0 ;;
+  esac
+  [ -f "$rc" ] || return 0
+  grep -qF "$marker" "$rc" && return 0
+  if [ "$sh" = "fish" ]; then
+    printf '\n%s\nif test -d ~/.cargo/bin\n    set -x PATH ~/.cargo/bin $PATH\nend\n' "$marker" >> "$rc"
+  else
+    printf '\n%s\ncase ":$PATH:" in\n  *":$HOME/.cargo/bin:"*) ;;\n  *) [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH" ;;\nesac\n' "$marker" >> "$rc"
+  fi
+  print_status "Added cargo bin to PATH in $rc"
+}
+
+clean_cache() {
+    echo
+    print_warning "Clearing the cache frees disk space but requires redownloading if you need to downgrade later."
+    echo -e "${YELLOW}󰩺 Would you like to clear your $aur_helper package cache? (n/Y)${NC}"
+    read -r clean_choice
+    case "$clean_choice" in
+        [nN][oO]|[nN])
+            print_status "Cache cleaning skipped."
+            ;;
+        *)
+            if [ -n "$aur_helper" ]; then
+                print_status "󰩺 Cleaning $aur_helper cache..."
+                $aur_helper -Scc
+                print_status "󰸞 $aur_helper cache cleared."
+            fi
+            ;;
+    esac
+}
+
+prompt_reboot() {
+    echo
+    print_warning "A reboot is recommended to ensure all changes take effect properly."
+    echo
+    echo -e "${YELLOW}󰜉 Would you like to reboot now? (n/Y)${NC}"
+    read -r reboot_choice
+    case "$reboot_choice" in
+        [nN][oO]|[nN])
+            print_status "Reboot skipped. Please reboot manually when convenient."
+            ;;
+        *)
+            print_status "󰜉 Rebooting system..."
+            sudo reboot
+            ;;
+    esac
+}
+
+# Trigger upgrade (legacy — via waybar/kitty self-spawn)
+if [ "$1" == "up" ]; then
+  trap 'pkill -RTMIN+20 waybar' EXIT
+  export -f prompt_reboot print_warning print_status clean_cache
+  export YELLOW NC aur_helper
+  command="
+    $0 upgrade
+    ${aur_helper} -Syu
+    command -v cargo >/dev/null && cargo install-update -a
+    if command -v checkrebuild >/dev/null; then
+        echo
+        print_status \"Checking for packages requiring a rebuild...\"
+        broken_pkgs=\$(checkrebuild | grep '^foreign' | awk '{print \$2}')
+        if [ -n \"\$broken_pkgs\" ]; then
+            print_warning \"Found broken packages: \$broken_pkgs\"
+            print_status \"Rebuilding them now...\"
+            ${aur_helper} -S --rebuild \$broken_pkgs
+        else
+            print_status \"No packages require rebuilding.\"
+        fi
+    fi
+    hyprctl reload
+    if pkg_installed flatpak; then flatpak update; fi
+    clean_cache
+    prompt_reboot
+    "
+  kitty --title "   System Update" sh -c "${command}"
+fi
+
+# Run upgrade inside terminal (launched directly by QML via kitty)
+if [ "$1" == "run" ]; then
+  # Keep window open on any error
+  trap 'echo; print_warning "An error occurred (exit code: $?)"; echo "Press Enter to close..."; read' ERR
+
+  if [ -z "$aur_helper" ]; then
+      print_warning "No AUR helper (yay/paru) found in PATH."
+      echo "PATH: $PATH"
+      echo "Press Enter to close..."
+      read
+      exit 1
+  fi
+
+  # Print update summary header
+  aur_updates_now=$(${aur_helper} -Qua 2>/dev/null | grep -c '^' || echo )
+  official_updates_now=$( (while pgrep -x checkupdates >/dev/null; do sleep 1; done); checkupdates 2>/dev/null | grep -c '^' || echo )
+  flatpak_updates_now=$(pkg_installed flatpak && flatpak remote-ls --updates 2>/dev/null | grep -c '^' || echo )
+  printf "Official:  %-10s\nAUR (%s): %-10s\nFlatpak:   %-10s\n\n" \
+    "$official_updates_now" "$aur_helper" "$aur_updates_now" "$flatpak_updates_now"
+
+  ${aur_helper} -Syu
+
+  command -v cargo >/dev/null && cargo install-update -a
+
+  ensure_cargo_path
+
+  if command -v checkrebuild >/dev/null; then
+      echo
+      print_status "Checking for packages requiring a rebuild..."
+      broken_pkgs=$(checkrebuild | grep '^foreign' | awk '{print $2}')
+      if [ -n "$broken_pkgs" ]; then
+          print_warning "Found broken packages: $broken_pkgs"
+          print_status "Rebuilding them now..."
+          ${aur_helper} -S --rebuild $broken_pkgs
+      else
+          print_status "No packages require rebuilding."
+      fi
+  fi
+
+  hyprctl reload
+  if pkg_installed flatpak; then flatpak update; fi
+
+  clean_cache
+  prompt_reboot
+  exit 0
+fi
+
+# Check for AUR updates
+if [ -n "$aur_helper" ]; then
+  aur_updates=$(${aur_helper} -Qua | grep -c '^')
+else
+  aur_updates=0
+fi
+
+# Check for official repository updates
+official_updates=$(
+  (while pgrep -x checkupdates >/dev/null; do sleep 1; done)
+  checkupdates | grep -c '^'
+)
+
+# Check for Flatpak updates
+if pkg_installed flatpak; then
+  flatpak_updates=$(flatpak remote-ls --updates | grep -c '^')
+else
+  flatpak_updates=0
+fi
+
+total_updates=$((official_updates + aur_updates + flatpak_updates))
+
+if [ "$aur_helper" == "yay" ]; then
+  [ "${1}" == upgrade ] && printf "Official:  %-10s\nAUR ($aur_helper): %-10s\nFlatpak:   %-10s\n\n" "$official_updates" "$aur_updates" "$flatpak_updates" && exit
+  tooltip="Official:  $official_updates\nAUR ($aur_helper): $aur_updates\nFlatpak:   $flatpak_updates"
+elif [ "$aur_helper" == "paru" ]; then
+  [ "${1}" == upgrade ] && printf "Official:   %-10s\nAUR ($aur_helper): %-10s\nFlatpak:    %-10s\n\n" "$official_updates" "$aur_updates" "$flatpak_updates" && exit
+  tooltip="Official:   $official_updates\nAUR ($aur_helper): $aur_updates\nFlatpak:    $flatpak_updates"
+fi
+
+if [ $total_updates -eq 0 ]; then
+  echo "{\"text\":\"󰏗\", \"tooltip\":\"Packages are up to date\"}"
+else
+  echo "{\"text\":\"󰏖\", \"tooltip\":\"${tooltip//\"/\\\"}\"}"
+fi
+EOF
+
+chmod +x "$USER_HOME/.config/hyprcandy/scripts/system-update.sh"
 
 find "$USER_HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
