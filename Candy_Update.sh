@@ -1140,7 +1140,6 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm noctalia-qs
             $AUR_HELPER -R --noconfirm wallust
 			$AUR_HELPER -S --noconfirm nm-connection-editor proton-vpn-gtk-app qt5ct qt6ct libsecret secrets docker python uv npm npm-check-updates nodejs python-pyqt6-webengine cli11 easyeffects easyeffects-bundy01-presets gpu-screen-recorder gpu-screen-recorder-qt cargo
-            cargo install cargo-update wallust
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -1162,6 +1161,17 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
     # Cargo-installed binaries (cargo-update, wallust) need ~/.cargo/bin on the
     # PATH of whichever login shell the user already runs.
     ensure_cargo_path
+    # `cargo install` must build into the INVOKING USER's ~/.cargo/bin — the
+    # spot ensure_cargo_path just added to their login PATH. This updater runs
+    # fully as root under pkexec, so a bare `cargo install` writes /root/.cargo
+    # and leaves root-owned binaries the session can't find (and pollutes shared
+    # dirs). Drop to $USER_NAME so HOME/CARGO_HOME resolve to the user, matching
+    # the su - pattern cleanup() uses. Falls back to inline when not root.
+    if [ "$(id -u)" = "0" ] && [ -n "$USER_NAME" ]; then
+        su - "$USER_NAME" -c 'cargo install cargo-update wallust'
+    else
+        cargo install cargo-update wallust
+    fi
 
     print_status "Updating HyprCandy configuration..."
 
