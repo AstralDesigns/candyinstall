@@ -187,8 +187,8 @@ choose_browser() {
 
 choose_hyprland() {
     echo -e "${CYAN}Choose your Hyprland package variant:${NC}"
-    echo "1) hyprland     — stable release (packaged stable releases, fixes recieved on next release)"
-    echo "2) hyprland-git — latest development build (bleeding edge, may have occasional instability but more rapid fixes)"
+    echo "1) hyprland     — stable release ('recommended' packaged stable releases, fixes recieved on next release)"
+    echo "2) hyprland-git — latest development build (bleeding edge, may have occasional instability but with frequent fixes)"
     read -rp "Enter 1 or 2: " hypr_choice
     case $hypr_choice in
         1) HYPR_CHOICE="1" ;;
@@ -4128,6 +4128,7 @@ hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 hl.env("GDK_DEBUG", "portals")
 hl.env("GDK_SCALE", "1")
 hl.env("GDK_BACKEND", "wayland")
+hl.env("GDK_WAYLAND_DISABLE", "ext_background_effect_manager_v1")
 hl.env("CLUTTER_BACKEND", "wayland")
 hl.env("MOZ_ENABLE_WAYLAND", "1")
 hl.env("OZONE_PLATFORM", "wayland")
@@ -6560,32 +6561,16 @@ main() {
     echo
     print_status "Extra pointers:"
     echo
-    echo -e "${PURPLE}📱 Display Configuration:${NC}"
-    print_status "• Use ${YELLOW}nwg-displays${NC} to configure monitor scaling, resolution, and positioning"
-    print_status "• Adjust scaling for HiDPI displays if needed"
-    echo
-    echo -e "${PURPLE}🐟 Fish Configuration:${NC}"
-    #print_status "• To personalize Fish, in the ${YELLOW}~/.config/fish${NC} directory edit the ${YELLOW}config.fish${NC} file"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Fish shell setup"
-    print_status "• You can also rerun the script to install Zsh shell"
-    print_status "• When both are installed switch by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
-    echo
-    echo -e "${PURPLE}🐚 Zsh Configuration:${NC}"
-    #print_status "• To personalize Zsh, in the ${CYAN}Home${NC} directory edit ${CYAN}.hyprcandy-zsh.zsh${NC} or ${CYAN}.zshrc${NC}"
-    print_status "• You can also rerun the script to switch from either one or regenerate HyprCandy's default Zsh shell setup"
-    print_status "• You can also rerun the script to install Fish shell"
-    print_status "• When both are installed switch at anytime by running ${CYAN}chsh -s /usr/bin/<name of shell>${NC} then reboot"
+    echo -e "${PURPLE}🖥️ Display Configuration:${NC}"
+    print_status "• Open controlcenter ${YELLOW}Display${NC} tab to configure monitor scaling, resolution, and positioning or use ${YELLOW}nwg-displays${NC}"
     echo
     echo -e "${PURPLE}🎨 Font, Icon And Cursor Theming:${NC}"
     print_status "• Open the application-finder with SUPER + A and search for ${YELLOW}GTK Settings${NC} application"
     print_status "• Prefered font to set through nwg-look is ${CYAN}CaskaydiaCove Nerd Font Mono Regular${NC} at size ${CYAN}10${NC}"
     print_status "• Use ${YELLOW}nwg-look${NC} to configure the system-font, tela-icons and cursor themes"
     echo
-    echo -e "${PURPLE}🔎 Browser Color Theming:${NC}"
-    print_status "• If you chose Brave, go to ${YELLOW}Appearance${NC} in Settings and set the 'Theme' to ${CYAN}GTK${NC} and Brave colors to Same as Linux"
-    print_status "• If you chose Firefox, install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC} in kitty"
-    print_status "• If you chose Zen Browser, for slight additional theming install the ${YELLOW}pywalfox${NC} extension and run ${YELLOW}pywalfox update${NC}"
-    print_status "• If you chose Librewolf, I bet you know what you're doing 😄"
+    echo -e "${PURPLE}🖥️ Shell Configuration:${NC}"
+    #print_status "• Change your system shell by clicking the controlcenter 'System' tab 'Shell' chip"
     echo
 	echo -e "${PURPLE}🪄 Enjoy the HyprCandyPlus setup 🙂 🪄${NC}"
 	echo
