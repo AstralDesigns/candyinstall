@@ -187,8 +187,8 @@ choose_browser() {
 
 choose_hyprland() {
     echo -e "${CYAN}Choose your Hyprland package variant:${NC}"
-    echo "1) hyprland     — stable release (recommended, well-tested and reliable)"
-    echo "2) hyprland-git — latest development build (bleeding edge, may have occasional instability)"
+    echo "1) hyprland     — stable release (packaged stable releases, fixes recieved on next release)"
+    echo "2) hyprland-git — latest development build (bleeding edge, may have occasional instability but more rapid fixes)"
     read -rp "Enter 1 or 2: " hypr_choice
     case $hypr_choice in
         1) HYPR_CHOICE="1" ;;
@@ -298,6 +298,7 @@ build_package_list() {
             "hyprutils-git"
             "hyprwayland-scanner-git"
             "hyprshutdown-git"
+            "hyprpm-git"
         )
     else
         hyprland_packages=(
@@ -316,6 +317,7 @@ build_package_list() {
             "hyprutils"
             "hyprwayland-scanner"
             "hyprshutdown"
+            "hyprpm"
         )
     fi
 	
