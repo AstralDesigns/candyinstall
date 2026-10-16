@@ -1250,11 +1250,12 @@ echo "📁 Updating HyprCandyPlus scripts..."
 #!/bin/bash
 
 notify-send " HC+ Update Complete" "LATEST:   
-Switched from wallust aur package to cargo
+ Switched from wallust aur package to cargo
   package with new cargo packages handling.
  Added tooltips to bar modules where relevant.
  New agent-app keybinds to toggle left & right
-  panels, open files and app-wide tooltips.
+  panels + open files, app-wide tooltips, file
+  and directory watching and other patches.
  Shell type can now be changed by clicking the
   interactive 'Shell' chip in the control-center
   'System' tab which launches a shell-switcher
@@ -5606,7 +5607,7 @@ local function expand_vars(cmd)
 end
 hl.bind("SUPER + Escape",hl.dsp.window.close(), { description = "Kill active window" })
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/rofi-menus.sh"), { description = "Launch utilities rofi-menu" })
-hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh"), { description = "Show/hide rofi application finder" })
+hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc -c bar call bar openLauncher"), { description = "Toggle launcher visibility" })
 hl.bind("SUPER + CTRL + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/animations.sh"), { description = "Select animations" })
 hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/cliphist.sh"), { description = "Open clipboard manager" })
 hl.bind("SUPER + CTRL + E", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/emojipicker.sh"), { description = "Open rofi emoji-picker" })
@@ -5617,12 +5618,38 @@ hl.bind("ALT + SHIFT + W", hl.dsp.exec_cmd("~/.config/quickshell/wallpaper/wallp
 hl.bind("ALT + SHIFT + R", hl.dsp.exec_cmd("~/.config/hyprcandy/hooks/wallpaper_integration.sh"), { description = "Reload system colors" })
 hl.bind("SUPER + B", hl.dsp.exec_cmd("xdg-open \"http://\""), { description = "Launch your default browser" })
 hl.bind("ALT + 1", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/bar.sh"), { description = "Hide/Show bar" })
-hl.bind("ALT + 2", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle.sh"), { description = "Hide/Show dock" })
-hl.bind("SUPER + R", hl.dsp.exec_cmd("bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f \"$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4\" $(slurp)'"), { description = "Start recording" })
-hl.bind("Alt + R", hl.dsp.exec_cmd("pkill -x wf-recorder"), { description = "Stop recording" })
 hl.bind("Shift + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma +10"), { description = "Increase gamma by 10%" })
 hl.bind("Alt + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma -10"), { description = "Reduce gamma by 10%" })
+-- Visuallypresent the Gamemode keybind in the CC 
 hl.bind("ALT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/gamemode.sh"), { description = "Toggle game-mode" })
+-- Toggle Gamemode Performance Profile directly in Lua
+hl.bind("ALT + G", function()
+    -- Check if animations are currently active
+    if hl.get_config("animations.enabled") == true then
+        -- Turn OFF eye candy for Max Performance
+        hl.config({
+            animations = { enabled = false },
+            decoration = {
+                blur = { enabled = false },
+                shadow = { enabled = false }
+            },
+            --general = { gaps_in = 0, gaps_out = 0, border_size = 1 }
+        })
+        hl.exec_cmd("notify-send \"Game-mode\" \"Activated\" -t 2000")
+    else
+        -- Restore eye candy
+        hl.config({
+            animations = { enabled = true },
+            decoration = {
+                blur = { enabled = true },
+                shadow = { enabled = true }
+            },
+            --general = { gaps_in = 0, gaps_out = 0, border_size = 1 }
+        })
+        hl.dsp.exec_cmd("hyprctl reload")
+        hl.exec_cmd("notify-send \"Game-mode\" \"Deactivated\" -t 2000")
+    end
+end)
 hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/loadconfig.sh"), { description = "Reload Hyprland configuration" })
 hl.bind("SUPER + PRINT", hl.dsp.exec_cmd("qs -p ~/.config/quickshell/bar ipc call bar toggleCaptureMenu"), { description = "Capture screen (Screenshot or Recorder)" })
 hl.bind("SUPER + V", hl.dsp.exec_cmd("cliphist wipe"), { description = "Clear cliphist database" })

@@ -330,6 +330,7 @@ build_package_list() {
         # Packages
         "pacman-contrib"
         "shelly"
+        "cargo"
         "rebuild-detector"
         "equibop-bin"
         "python"
@@ -402,7 +403,7 @@ build_package_list() {
        	"imagemagick"
         "awww"
         "grimblast-git"
-        "wob"
+        #"wob"
         "gpu-screen-recorder"
         "gpu-screen-recorder-qt"
         "slurp"
@@ -420,7 +421,7 @@ build_package_list() {
         "pipewire-alsa"
         "alsa-utils"
         "easyeffects"
-	"easyeffects-bundy01-presets"
+	    "easyeffects-bundy01-presets"
         
         # System monitoring
         "btop"
@@ -433,7 +434,7 @@ build_package_list() {
         "matugen-bin"
 		"python-pywal16"
 		"python-colorthief"
-        "hyprviz-bin"
+        #"hyprviz-bin"
         
         # Editors
         "gedit"
@@ -689,7 +690,6 @@ install_packages() {
         fi
     fi
 
-    $AUR_HELPER -S --noconfirm cargo
     cargo install cargo-update wallust
     
     # Add flathub repo
@@ -5951,7 +5951,7 @@ local function expand_vars(cmd)
 end
 hl.bind("SUPER + Escape",hl.dsp.window.close(), { description = "Kill active window" })
 hl.bind("SUPER + CTRL + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/rofi-menus.sh"), { description = "Launch utilities rofi-menu" })
-hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle-app-launcher.sh"), { description = "Show/hide rofi application finder" })
+hl.bind("SUPER + A", hl.dsp.exec_cmd("qs ipc -c bar call bar openLauncher"), { description = "Toggle launcher visibility" })
 hl.bind("SUPER + CTRL + A", hl.dsp.exec_cmd("~/.config/hypr/scripts/animations.sh"), { description = "Select animations" })
 hl.bind("SUPER + CTRL + V", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/cliphist.sh"), { description = "Open clipboard manager" })
 hl.bind("SUPER + CTRL + E", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/emojipicker.sh"), { description = "Open rofi emoji-picker" })
@@ -5962,9 +5962,6 @@ hl.bind("ALT + SHIFT + W", hl.dsp.exec_cmd("~/.config/quickshell/wallpaper/wallp
 hl.bind("ALT + SHIFT + R", hl.dsp.exec_cmd("~/.config/hyprcandy/hooks/wallpaper_integration.sh"), { description = "Reload system colors" })
 hl.bind("SUPER + B", hl.dsp.exec_cmd("xdg-open \"http://\""), { description = "Launch your default browser" })
 hl.bind("ALT + 1", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/bar.sh"), { description = "Hide/Show bar" })
-hl.bind("ALT + 2", hl.dsp.exec_cmd("~/.hyprcandy/GJS/hyprcandydock/toggle.sh"), { description = "Hide/Show dock" })
-hl.bind("SUPER + R", hl.dsp.exec_cmd("bash -c 'wf-recorder -g -a --audio=bluez_output.78_15_2D_0D_BD_B7.1.monitor -f \"$HOME/Videos/Recordings/recording-$(date +%Y%m%d-%H%M%S).mp4\" $(slurp)'"), { description = "Start recording" })
-hl.bind("Alt + R", hl.dsp.exec_cmd("pkill -x wf-recorder"), { description = "Stop recording" })
 hl.bind("Shift + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma +10"), { description = "Increase gamma by 10%" })
 hl.bind("Alt + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma -10"), { description = "Reduce gamma by 10%" })
 -- Visuallypresent the Gamemode keybind in the CC 
