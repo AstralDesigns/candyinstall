@@ -352,8 +352,8 @@ build_package_list() {
         #"gnome-control-center"
         #"gnome-tweaks"
         "gvfs"
-		"gjs"
-		"gtk4-layer-shell"
+		#"gjs"
+		#"gtk4-layer-shell"
         "gnome-disk-utility"
         "gnome-color-manager"
 		"gnome-software"
@@ -486,8 +486,8 @@ build_package_list() {
         "tela-circle-icon-theme-all"
         
         # Cursor themes
-        "bibata-cursor-theme-bin"
-        "qogir-cursor-theme"
+        #"bibata-cursor-theme-bin"
+        #"qogir-cursor-theme"
         
         # Entertainment
         "spotify-launcher"
@@ -3539,10 +3539,9 @@ startVar=$color4
 colorRegenEnabled=true
 
 [cc-license-v1]
-lastVerified=
 licenseKey=EB5AA4E7-F8F74BEC-984F1FDB-992FC1C6
 licenseStatus=active
-licensedEmail=hyprcandyplus@proton.me
+licensedEmail=contact@hyprcandy.slmail.me
 
 [cc-tabs-v1]
 activeBarSubTab=0
