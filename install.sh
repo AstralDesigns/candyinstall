@@ -6033,6 +6033,7 @@ hl.bind("ALT + SHIFT + W", hl.dsp.exec_cmd("~/.config/quickshell/wallpaper/wallp
 hl.bind("ALT + SHIFT + R", hl.dsp.exec_cmd("~/.config/hyprcandy/hooks/wallpaper_integration.sh"), { description = "Reload system colors" })
 hl.bind("SUPER + B", hl.dsp.exec_cmd("xdg-open \"http://\""), { description = "Launch your default browser" })
 hl.bind("ALT + 1", hl.dsp.exec_cmd("~/.config/hyprcandy/scripts/bar.sh"), { description = "Hide/Show bar" })
+hl.bind("ALT + 2", hl.dsp.exec_cmd("qs ipc -c bar call bar toggleDock"), { description = "Toggle dock visibility" })
 hl.bind("Shift + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma +10"), { description = "Increase gamma by 10%" })
 hl.bind("Alt + H", hl.dsp.exec_cmd("hyprctl hyprsunset gamma -10"), { description = "Reduce gamma by 10%" })
 -- Visuallypresent the Gamemode keybind in the CC 
