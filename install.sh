@@ -3373,12 +3373,12 @@ EOF
 chmod +x "$HOME/.config/hyprcandy/hooks/watch_gtk_font.sh"
 
 # ═══════════════════════════════════════════════════════════════
-#               Systemd Service: GTK Theme Syncer
+#                  Systemd Service: Theme Syncer
 # ═══════════════════════════════════════════════════════════════
 
 cat > "$HOME/.config/systemd/user/theme-watcher.service" << 'EOF'
 [Unit]
-Description=Auto-update GTK font changes via nwg-look
+Description=Auto-update detected changes from nwg-look
 After=graphical-session.target
 
 [Service]

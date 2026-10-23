@@ -3171,12 +3171,12 @@ EOF
 chmod +x "$USER_HOME/.config/hypr/scripts/power.sh"
 
 # ═══════════════════════════════════════════════════════════════
-#              Systemd Service: GTK Font Font Syncer
+#                  Systemd Service: Theme Syncer
 # ═══════════════════════════════════════════════════════════════
 
 cat > "$USER_HOME/.config/systemd/user/theme-watcher.service" << 'EOF'
 [Unit]
-Description=Auto-update GTK font changes via nwg-look
+Description=Auto-update detected changes FROM nwg-look
 After=graphical-session.target
 
 [Service]
