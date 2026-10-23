@@ -73,7 +73,6 @@ print_error() {
 
 # Function to choose display manager
 choose_display_manager() {
-    print_status "For old users remove rofi-wayland through 'sudo pacman -Rnsd rofi-wayland' then clear cache through 'sudo pacman -Scc'"
     echo -e "${CYAN}Choose your display manager:${NC}"
     echo "1) SDDM with Sugar Candy theme (HyprCandy automatic background set according to applied wallpaper)"
     echo "2) GDM with GDM settings app (GNOME Display Manager and customization app)"
@@ -317,11 +316,6 @@ build_package_list() {
         "blueman"
         "nwg-displays"
         "uwsm"
-        
-        # Application launchers and menus
-        "rofi"
-        "rofi-emoji"
-        "rofi-nerdy"
         
         # Wallpaper and screenshot tools
         "awww-bin"
@@ -2125,13 +2119,6 @@ cat > "$USER_HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 #set +e
 
-# Update ROFI background 
-ROFI_RASI="$HOME/.config/rofi/colors.rasi"
-
-if command -v sed >/dev/null; then
-    sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
-fi
-
 # Update local background.png
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
     magick "$HOME/.config/background[0]" "$HOME/.config/background.png"
@@ -2217,14 +2204,6 @@ else
 cat > "$USER_HOME/.config/hyprcandy/hooks/update_background.sh" << 'EOF'
 #!/bin/bash
 set +e
-
-# Update ROFI background 
-ROFI_RASI="$HOME/.config/rofi/colors.rasi"
-
-if command -v sed >/dev/null; then
-    sed -i "2s/, 1)/, 0.3)/" "$ROFI_RASI"
-    echo "Rofi color updated"
-fi
 
 # Update local background.png
 if command -v magick >/dev/null && [ -f "$HOME/.config/background" ]; then
@@ -3043,34 +3022,7 @@ EOF
 fi
 
 # ═══════════════════════════════════════════════════════════════
-#      Script: Update Rofi Font from GTK Settings Font Name
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh" << 'EOF'
-#!/bin/bash
-
-GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
-ROFI_RASI="$HOME/.config/hyprcandy/settings/rofi-font.rasi"
-
-# Get font name from GTK settings
-GTK_FONT=$(grep "^gtk-font-name=" "$GTK_FILE" | cut -d'=' -f2-)
-
-# Escape double quotes
-GTK_FONT_ESCAPED=$(echo "$GTK_FONT" | sed 's/"/\\"/g')
-
-# Update font line in rofi rasi config
-if [ -f "$ROFI_RASI" ]; then
-    sed -i "s|^.*font:.*|configuration { font: \"$GTK_FONT_ESCAPED\"; }|" "$ROFI_RASI"
-    echo "✅ Updated Rofi font to: $GTK_FONT_ESCAPED"
-else
-    echo "⚠️  Rofi font config not found at: $ROFI_RASI"
-fi
-EOF
-
-chmod +x "$USER_HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#                Sync GTK, QT and ROFI Icon Themes
+#                Sync GTK, QT and KDE Icon Themes
 # ═══════════════════════════════════════════════════════════════
 
 cat > "$USER_HOME/.config/hyprcandy/hooks/update_icon_theme.sh" << 'EOF'
@@ -3081,7 +3033,6 @@ QT6CT_CONF="$HOME/.config/qt6ct/qt6ct.conf"
 QT5CT_CONF="$HOME/.config/qt5ct/qt5ct.conf"
 KDEGLOBALS="$HOME/.config/kdeglobals"
 UC_COLORS="$HOME/.local/share/color-schemes/HyprCandy.colors"
-ROFI_MENU="$HOME/.config/rofi/config.rasi"
 
 ICON_THEME=$(grep "^gtk-icon-theme-name=" "$GTK_FILE" | cut -d'=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
@@ -3119,11 +3070,6 @@ for FILE in "$KDEGLOBALS" "$UC_COLORS"; do
     echo "✅ $(basename $FILE) icon theme → $ICON_THEME"
 done
 
-if [ -f "$ROFI_MENU" ]; then
-    sed -i "16s|^.*|    icon-theme:                 \"$ICON_THEME\";|" "$ROFI_MENU"
-    echo "✅ $(basename $ROFI_MENU) icon theme → $ICON_THEME"
-fi
-
 # Do not restart quickshell instances here.
 # They hot-reload config; this hook only synchronizes theme config and env for new launches.
 pkill -f "qs -c overview"
@@ -3147,26 +3093,17 @@ cat > "$USER_HOME/.config/hyprcandy/hooks/watch_gtk_font.sh" << 'EOF'
 #!/bin/bash
 
 GTK_FILE="$HOME/.config/gtk-3.0/settings.ini"
-FONT_HOOK="$HOME/.config/hyprcandy/hooks/update_rofi_font.sh"
 ICON_HOOK="$HOME/.config/hyprcandy/hooks/update_icon_theme.sh"
 
 while [ ! -f "$GTK_FILE" ]; do sleep 1; done
 
-"$FONT_HOOK"
 "$ICON_HOOK"
 
 # Track previous values to avoid redundant hook calls
-PREV_FONT=$(grep "^gtk-font-name=" "$GTK_FILE" | cut -d'=' -f2-)
 PREV_ICON=$(grep "^gtk-icon-theme-name=" "$GTK_FILE" | cut -d'=' -f2-)
 
 inotifywait -m -e modify "$GTK_FILE" | while read -r path event file; do
-    CUR_FONT=$(grep "^gtk-font-name=" "$GTK_FILE" | cut -d'=' -f2-)
     CUR_ICON=$(grep "^gtk-icon-theme-name=" "$GTK_FILE" | cut -d'=' -f2-)
-
-    if [ "$CUR_FONT" != "$PREV_FONT" ]; then
-        "$FONT_HOOK"
-        PREV_FONT="$CUR_FONT"
-    fi
 
     if [ "$CUR_ICON" != "$PREV_ICON" ]; then
         "$ICON_HOOK"
@@ -3234,12 +3171,12 @@ EOF
 chmod +x "$USER_HOME/.config/hypr/scripts/power.sh"
 
 # ═══════════════════════════════════════════════════════════════
-#      Systemd Service: GTK Font → Rofi Font Syncer
+#              Systemd Service: GTK Font Font Syncer
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/systemd/user/rofi-font-watcher.service" << 'EOF'
+cat > "$USER_HOME/.config/systemd/user/theme-watcher.service" << 'EOF'
 [Unit]
-Description=Auto-update Rofi font when GTK font changes via nwg-look
+Description=Auto-update GTK font changes via nwg-look
 After=graphical-session.target
 
 [Service]
@@ -4081,7 +4018,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'")
     hl.exec_cmd("gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
-    hl.exec_cmd("systemctl --user start rofi-font-watcher")
+    hl.exec_cmd("systemctl --user start theme-watcher")
     hl.exec_cmd("systemctl --user start cursor-theme-watcher")
     hl.exec_cmd("gjs ~/.hyprcandy/GJS/candy-daemon.js")
     hl.exec_cmd("gjs ~/.hyprcandy/GJS/hyprcandydock/daemon.js")
