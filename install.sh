@@ -397,9 +397,9 @@ build_package_list() {
         "docker"
         
         # Application launcher and menus
-        "rofi"
-        "rofi-emoji"
-        "rofi-nerdy"
+        #"rofi"
+        #"rofi-emoji"
+        #"rofi-nerdy"
         
         # Wallpaper and screenshot tools
        	"imagemagick"
@@ -3568,7 +3568,7 @@ licensedEmail=contact@hyprcandy.slmail.me
 [cc-tabs-v1]
 activeBarSubTab=0
 activeKbSubTab=0
-activeTab=1
+activeTab=9
 
 [cc-theme-v1]
 currentTheme=scheme-smart
@@ -3661,8 +3661,11 @@ cavaTransparentWhenInactive=true
 cavaWaveSmooth=true
 cavaWaveThickness=2
 cavaWidth=25
+ccCustomIconPath=
 ccGlyph=
 ccGlyphColorA=1
+ccIconMode=custom
+ccUseDistroIcon=true
 clockDateBgOpacity=0.5
 clockIconSize=32
 clockTextSize=38
@@ -3689,9 +3692,11 @@ dockPosition=bottom
 dockRadius=30
 dockReserveSpace=false
 dockStartIcon=
+dockStartIconScale=0.7999999999999999
 dockStartIconSize=20
 dockTopLeftRadius=30
 dockTopRightRadius=30
+dockTrashIconScale=0.75
 dockTrashIconSize=16
 dockVisible=true
 eqExpanded=false
