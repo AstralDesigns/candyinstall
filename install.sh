@@ -330,10 +330,10 @@ build_package_list() {
         
         # Packages
         "pacman-contrib"
-        "shelly"
+        #"shelly"
         "cargo"
         "rebuild-detector"
-        "equibop-bin"
+        #"equibop"
         "python"
         "uv"
         "npm"
@@ -3483,7 +3483,7 @@ winBgAlpha=1
 [cc-border-colors-v1]
 activeBorderColor=
 activeBorderMode=pywal
-activeBorderPywalVar=$color3
+activeBorderPywalVar=$color6
 activeBorderVar=$inverse_primary
 inactiveBorderColor=
 inactiveBorderMode=pywal
@@ -3502,6 +3502,7 @@ startVar=$primary
 colorRegenEnabled=true
 
 [cc-license-v1]
+lastVerified=
 licenseKey=EB5AA4E7-F8F74BEC-984F1FDB-992FC1C6
 licenseStatus=active
 licensedEmail=contact@hyprcandy.slmail.me
@@ -3509,7 +3510,7 @@ licensedEmail=contact@hyprcandy.slmail.me
 [cc-tabs-v1]
 activeBarSubTab=0
 activeKbSubTab=0
-activeTab=9
+activeTab=1
 
 [cc-theme-v1]
 currentTheme=scheme-smart
@@ -3529,8 +3530,8 @@ layer=top
 margin_from_edge=6
 
 [hyprland]
-active_border=$color3
-blur_passes=5
+active_border=$color6
+blur_passes=6
 blur_size=1
 gaps_out=20
 inactive_border=$background
@@ -3551,9 +3552,9 @@ barBorderMode=wallust
 barBorderSecondMode=matugen
 barBorderSecondVar=$outline_variant
 barBorderSecondWallustVar=$color15
-barBorderVar=$on_secondary
+barBorderVar=$source_color
 barBorderWallustVar=$color5
-barBorderWidth=2
+barBorderWidth=1
 barBottomLeftRadius=30
 barBottomRightRadius=30
 barEdgePaddingLeft=2
@@ -3597,7 +3598,7 @@ cavaStartMode=wallust
 cavaStartPywalVar=$color4
 cavaStartVar=$primary
 cavaStartWallustVar=$color5
-cavaStyle=dots
+cavaStyle=mirror
 cavaTransparentWhenInactive=true
 cavaWaveSmooth=true
 cavaWaveThickness=2
@@ -3605,7 +3606,7 @@ cavaWidth=25
 ccCustomIconPath=
 ccGlyph=
 ccGlyphColorA=1
-ccIconMode=custom
+ccIconMode=glyph
 ccUseDistroIcon=true
 clockDateBgOpacity=0.5
 clockIconSize=32
@@ -3659,12 +3660,12 @@ islandBorderSecondMode=matugen
 islandBorderSecondVar=$outline_variant
 islandBorderSecondWallustVar=$color15
 islandBorderVar=$surface
-islandBorderWallustVar=$color0
+islandBorderWallustVar=$color2
 islandRadius=30
 islandSpacing=6
 labelFontSize=10
 launcherBorderRadius=20
-launcherBorderWidth=2
+launcherBorderWidth=1
 launcherFixedTileHeight=78
 launcherFixedTileWidth=90
 launcherFrameHeight=640
