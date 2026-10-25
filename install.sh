@@ -357,7 +357,7 @@ build_package_list() {
         "gnome-color-manager"
 		"gnome-software"
         #"gnome-weather"
-        "gnome-calendar"
+        #"gnome-calendar"
         "gnome-system-monitor"
         "gnome-calculator"
         "evince"
