@@ -3409,6 +3409,17 @@ if [ "$1" == "run" ]; then
 
   ensure_cargo_path
 
+  # Keep the agent runtime venv's pip + declared packages current (skipped if
+  # the runtime isn't installed). requirements.txt has no version pins, so
+  # --upgrade safely moves the runtime deps to their latest releases only when
+  # an update exists; unrelated/transitive packages are left untouched.
+  agent_pip="$HOME/.hyprcandy/GJS/hyprcandydock/Agents/local_runtime/.venv/bin/python3"
+  agent_reqs="$HOME/.hyprcandy/GJS/hyprcandydock/Agents/requirements.txt"
+  if [ -x "$agent_pip" ]; then
+      "$agent_pip" -m pip install --upgrade pip
+      [ -f "$agent_reqs" ] && "$agent_pip" -m pip install --upgrade -r "$agent_reqs"
+  fi
+
   if command -v checkrebuild >/dev/null; then
       echo
       print_status "Checking for packages requiring a rebuild..."
