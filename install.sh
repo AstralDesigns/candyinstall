@@ -387,6 +387,7 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
+        "hostapd" #hotspot
 		"switcheroo-control"
         "nwg-displays"
         "uwsm"
@@ -3874,6 +3875,8 @@ SUDOERS_ENTRIES=(
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh"
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh *"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hotspot-toggle.sh"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hotspot-toggle.sh *"
 )
 
 # Add all entries to sudoers safely using visudo

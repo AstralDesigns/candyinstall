@@ -1133,7 +1133,7 @@ rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
 			$AUR_HELPER -R --noconfirm noctalia-qs
             $AUR_HELPER -R --noconfirm wallust
-			#$AUR_HELPER -S --noconfirm cargo
+			$AUR_HELPER -S --noconfirm hostapd
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -3861,6 +3861,8 @@ SUDOERS_ENTRIES=(
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh"
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hotspot-toggle.sh"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hotspot-toggle.sh *"
 )
 
 # Add all entries to sudoers safely using visudo
