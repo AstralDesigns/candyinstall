@@ -4545,7 +4545,7 @@ main() {
     #update_custom
 
     # Setup GJS
-    setup_gjs
+    #setup_gjs
     echo
     
     # Function to cleanup post update

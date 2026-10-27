@@ -4660,6 +4660,7 @@ select_layout() {
 
 # Function to setup keyboard layout
 select_keyboard_layout() {
+echo "✅ Files and Apps setup complete"
 CUSTOM_CONFIG_FILE="$HOME/.config/hypr/hyprviz.lua"
 
 KEYBOARD_LAYOUT=$(select_layout)
@@ -4881,7 +4882,7 @@ main() {
     #update_custom
 
     # Setup GJS
-    setup_gjs
+    #setup_gjs
 
     # Setup keyboard layout
     select_keyboard_layout
