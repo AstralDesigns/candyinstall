@@ -395,6 +395,7 @@ build_package_list() {
         "proton-vpn-gtk-app"
         "flatpak"
         "docker"
+        "ufw"
         
         # Wallpaper and screenshot tools
        	"imagemagick"
@@ -4703,6 +4704,8 @@ done
 
 echo "🔄 Setting up services..."
 systemctl --user daemon-reload
+
+sudo systemctl enable --now ufw
 
 if [ "$PANEL_CHOICE" = "waybar" ]; then
     systemctl --user restart theme-watcher.service cursor-theme-watcher.service lactd &>/dev/null
