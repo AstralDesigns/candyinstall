@@ -3837,9 +3837,11 @@ mkdir -p "$HOME/.cache/quickshell/wallpaper"
 
     # 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
-    sudo rm -f /etc/sudoers.d/hyprcandy-background
-    # Get the current username
+    # Get the current username. The drop-in is per-user (…-$USERNAME) so
+    # multiple HyprCandy accounts on one machine don't clobber each other's
+    # rules (the shared SDDM theme files are intentionally global).
 USERNAME=$(whoami)
+    sudo rm -f /etc/sudoers.d/hyprcandy-background-$USERNAME
 
 # Create the sudoers entries for background script and required commands
 SUDOERS_ENTRIES=(
@@ -3878,13 +3880,16 @@ SUDOERS_ENTRIES=(
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh *"
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hotspot-toggle.sh"
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hotspot-toggle.sh *"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/user-manager.py"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/user-manager.py *"
+    "Defaults env_keep += \"HC_PASS\""
 )
 
 # Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+printf '%s\n' "${SUDOERS_ENTRIES[@]}" | sudo EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background-$USERNAME > /dev/null 2>&1
 
 # Set proper permissions on the sudoers file
-sudo chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+sudo chmod 440 /etc/sudoers.d/hyprcandy-background-$USERNAME > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
 	

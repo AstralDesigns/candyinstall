@@ -3824,7 +3824,7 @@ find "$USER_HOME/.config/quickshell/wallpaper/" -name "*.sh" -exec chmod +x {} \
 
 	# 🔐 Add sudoers entry for background script
     echo "🔄 Adding sddm background auto-update settings..."
-    rm -f /etc/sudoers.d/hyprcandy-background
+    rm -f /etc/sudoers.d/hyprcandy-background-$USER_NAME
 
 # Create the sudoers entries for background script and required commands
 SUDOERS_ENTRIES=(
@@ -3863,13 +3863,16 @@ SUDOERS_ENTRIES=(
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh *"
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hotspot-toggle.sh"
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hotspot-toggle.sh *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/user-manager.py"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/user-manager.py *"
+    "Defaults env_keep += \"HC_PASS\""
 )
 
 # Add all entries to sudoers safely using visudo
-printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background  > /dev/null 2>&1
+printf '%s\n' "${SUDOERS_ENTRIES[@]}" | EDITOR='tee -a' visudo -f /etc/sudoers.d/hyprcandy-background-$USER_NAME  > /dev/null 2>&1
 
 # Set proper permissions on the sudoers file
-chmod 440 /etc/sudoers.d/hyprcandy-background > /dev/null 2>&1
+chmod 440 /etc/sudoers.d/hyprcandy-background-$USER_NAME > /dev/null 2>&1
 
     echo "✅ Added sddm background auto-update settings successfully"
 	
