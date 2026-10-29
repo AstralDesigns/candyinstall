@@ -1490,47 +1490,45 @@ bash build.sh
 cd
 echo "✅ Succesfully created HC+ workspace"
 
-# ── Patched noctalia-qs with QtWebEngine support (launcher browser) ─────────
-# The repo/CachyOS noctalia-qs builds Quickshell with QGuiApplication(argc=0),
-# which crashes QtWebEngine/Chromium (it reads argv[0] at startup). We install a
-# patched build (argc=1 + qt6-webengine). FAST PATH: download the prebuilt
-# .pkg.tar.zst the HyprCandy+ release ships -- via releases/latest/download so the
-# URL is version-agnostic forever (no future script edits). If that asset is
-# missing, or pacman refuses it on an unusual box (rare glibc/Qt ABI mismatch),
-# fall back to building from the vendored PKGBUILD under
-# ~/.config/quickshell/hyprcandy-qs. Vendored PKGBUILD source-build is the fallback
-# (the launcher browser simply won't load WebEngine).
-HC_NOCT_URL="https://github.com/AstralDesigns/candyinstall/releases/latest/download/noctalia-qs-webengine.pkg.tar.zst"
-HC_NOCT_PKG="$HOME/.cache/noctalia-qs-webengine.pkg.tar.zst"
-HC_NOCT_SRC="$HOME/.config/quickshell/hyprcandy-qs"
-HC_NOCT_BUILD="$HOME/.cache/noctalia-qs-build"
-hc_noct_installed=0
-print_status "Fetching prebuilt patched noctalia-qs (QtWebEngine)..."
+# ── Patched quickshell (hyprcandy-qs) with QtWebEngine support (launcher browser) ──
+# Stock quickshell (repo/CachyOS and Arch) builds QGuiApplication with argc=0, which
+# crashes QtWebEngine/Chromium (Chromium reads argv[0] at startup). We install a patched
+# build of UPSTREAM quickshell (src/launch/launch.cpp argc 0->1 plus the qt6-webengine
+# QML plugin). FAST PATH: download the prebuilt .pkg.tar.zst the HyprCandy+ release ships
+# via releases/latest/download, so the URL is version-agnostic forever (no future script
+# edits). If that asset is missing, or pacman refuses it (rare glibc/Qt ABI mismatch),
+# fall back to building from the vendored PKGBUILD under ~/.config/quickshell/hyprcandy-qs.
+HC_QS_URL="https://github.com/AstralDesigns/candyinstall/releases/latest/download/hyprcandy-qs.pkg.tar.zst"
+HC_QS_PKG="$HOME/.cache/hyprcandy-qs.pkg.tar.zst"
+HC_QS_SRC="$HOME/.config/quickshell/hyprcandy-qs"
+HC_QS_BUILD="$HOME/.cache/hyprcandy-qs-build"
+hc_qs_installed=0
+print_status "Fetching prebuilt patched quickshell (hyprcandy-qs, QtWebEngine)..."
 # Self-heal a stale/root-owned package left by a prior pkexec update so a
 # user-mode install never trips "permission denied" overwriting its own cache.
-mkdir -p "$(dirname "$HC_NOCT_PKG")" 2>/dev/null || true
-rm -f "$HC_NOCT_PKG" 2>/dev/null || true
-if curl -fL "$HC_NOCT_URL" -o "$HC_NOCT_PKG"; then
-    if sudo pacman -U --noconfirm --overwrite='*' "$HC_NOCT_PKG"; then
-        print_success "Patched noctalia-qs installed (prebuilt) - embedded browser enabled."
-        hc_noct_installed=1
+mkdir -p "$(dirname "$HC_QS_PKG")" 2>/dev/null || true
+rm -f "$HC_QS_PKG" 2>/dev/null || true
+if curl -fL "$HC_QS_URL" -o "$HC_QS_PKG"; then
+    if sudo pacman -U --noconfirm --overwrite='*' "$HC_QS_PKG"; then
+        print_success "hyprcandy-qs installed (prebuilt) - embedded browser enabled."
+        hc_qs_installed=1
     else
         print_warning "Prebuilt package failed to install (ABI/glibc mismatch) - building from source..."
     fi
 else
     print_warning "Prebuilt package unavailable - building from vendored PKGBUILD (slower)..."
 fi
-if [ "$hc_noct_installed" -eq 0 ]; then
-    if [ -f "$HC_NOCT_SRC/PKGBUILD" ]; then
-        rm -rf "$HC_NOCT_BUILD"; mkdir -p "$HC_NOCT_BUILD"
-        cp -f "$HC_NOCT_SRC/PKGBUILD" "$HC_NOCT_BUILD/PKGBUILD"
-        if ( cd "$HC_NOCT_BUILD" && makepkg -si --noconfirm ); then
-            print_success "Patched noctalia-qs installed (source build) - embedded browser enabled."
+if [ "$hc_qs_installed" -eq 0 ]; then
+    if [ -f "$HC_QS_SRC/PKGBUILD" ]; then
+        rm -rf "$HC_QS_BUILD"; mkdir -p "$HC_QS_BUILD"
+        cp -f "$HC_QS_SRC/PKGBUILD" "$HC_QS_BUILD/PKGBUILD"
+        if ( cd "$HC_QS_BUILD" && makepkg -si --noconfirm ); then
+            print_success "hyprcandy-qs installed (source build) - embedded browser enabled."
         else
-            print_warning "Patched noctalia-qs build FAILED - falling back to repo quickshell (launcher browser unavailable)."
+            print_warning "hyprcandy-qs build FAILED - launcher browser will not load WebEngine."
         fi
     else
-        print_warning "No vendored noctalia-qs PKGBUILD at $HC_NOCT_SRC - skipping WebEngine install."
+        print_warning "No vendored hyprcandy-qs PKGBUILD at $HC_QS_SRC - skipping WebEngine install."
     fi
 fi
 

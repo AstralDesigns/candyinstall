@@ -1,0 +1,75 @@
+name: build-hyprcandy-qs
+
+# Fully device-independent release build. Push a v* tag (or run manually) and CI
+# builds the patched quickshell (hyprcandy-qs: upstream quickshell + argc 0->1 for
+# QtWebEngine) inside a clean Arch container, then attaches it to that tag's GitHub
+# release under the STABLE name install.sh / Candy_Update.sh curl:
+#   releases/latest/download/hyprcandy-qs.pkg.tar.zst
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to (re)build + attach for, e.g. v1.2.21'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-qs-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need tags + the release scripts
+
+      - name: Build hyprcandy-qs in an Arch container
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$PWD:/src" -w /src \
+            ghcr.io/archlinux/archlinux:latest bash -euo pipefail -c '
+              rm -rf /etc/pacman.d/gnupg
+              pacman-key --init
+              pacman-key --populate archlinux
+              pacman -Syu --noconfirm --needed \
+                base-devel git cmake ninja pkgconf python cli11 \
+                qt6-base qt6-declarative qt6-svg qt6-wayland qt6-webengine \
+                qt6-shadertools spirv-tools glslang vulkan-headers \
+                jemalloc libdrm libglvnd libpipewire libxcb mesa pam polkit \
+                hicolor-icon-theme wayland
+              # makepkg refuses to run as root -> build as an unprivileged user.
+              useradd -mG wheel builder
+              mkdir -p /build
+              cp -r /src/hyprcandy-qs/. /build/
+              chown -R builder:builder /build
+              runuser -u builder -- bash -c "cd /build && makepkg --noconfirm --skippgpcheck"
+              cp /build/hyprcandy-qs-*.pkg.tar.zst /src/hyprcandy-qs.pkg.tar.zst
+              chmod 644 /src/hyprcandy-qs.pkg.tar.zst
+            '
+
+      - name: Publish release + attach asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          # Create the release from the repo scripts if it does not already exist,
+          # so a bare `git tag && git push` from any machine yields a complete release.
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" install.sh Candy_Update.sh \
+              --title "$TAG" --target "$(git rev-list -n1 "$TAG")" \
+              --notes "HyprCandy+ $TAG: hyprcandy-qs (patched upstream quickshell, QtWebEngine argc fix) built by CI."
+          fi
+          # Attach/overwrite the stable-named patched binary (idempotent re-runs ok).
+          gh release upload "$TAG" hyprcandy-qs.pkg.tar.zst --clobber
+          echo "Attached hyprcandy-qs.pkg.tar.zst to release $TAG."

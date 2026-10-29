@@ -1,0 +1,148 @@
+# Maintainer: AstralDesigns <ianomiruka@gmail.com>
+#
+# HyprCandy+ patched build of UPSTREAM Quickshell, packaged standalone as
+# hyprcandy-qs (a drop-in that replaces the repo quickshell / quickshell-git).
+#
+# WHY THIS EXISTS
+#   Upstream quickshell constructs QGuiApplication/QApplication with argc = 0
+#   (src/launch/launch.cpp: "auto qArgC = 0;" then new QGuiApplication(qArgC, argv)).
+#   Qt ignores argv when argc is 0, so the argument list is empty; QtWebEngine is
+#   Chromium, which reads argv[0] during early startup and aborts with
+#   "Argument list is empty, the program name is not passed to QCoreApplication.
+#   base::CommandLine cannot be properly initialized." -- crashing the whole shell
+#   the moment a WebEngineView loads. So the stock repo/CachyOS quickshell package
+#   cannot host an embedded WebEngineView. The fix is one line: argc 0 -> 1, so Qt
+#   registers argv[0] (the program name) and Chromium's CommandLine initializes.
+#   qt6-webengine is a runtime dep so the QtWebEngine QML plugin (QtWebEngine +
+#   libQt6WebEngineCore) exists; the plugin loads at runtime, so there is no WebEngine
+#   build flag to set. Required by the HyprCandy+ launcher's embedded browser tab.
+#
+#   HISTORY: this package previously forked noctalia-qs (a now-archived quickshell
+#   fork) purely to carry the same argc=1 commit. The HyprCandy bar imports only
+#   stock Quickshell.* QML modules (verified: zero noctalia-only qs.* / Pw* runtime
+#   types), so there is no reason to inherit a dead fork's shell-specific patches and
+#   release cadence. We now base directly on upstream quickshell and apply the one
+#   line fix in prepare() below.
+#
+#   The crash handler is disabled (-DCRASH_HANDLER=OFF) to keep the automated
+#   build lean: it would otherwise require cpptrace/libdwarf/libunwind (AUR /
+#   exotic) which complicates a one-command install. Functionally the bar/launcher
+#   are unaffected; the only loss is the auto-restart-on-crash watchdog.
+#
+#   Shipped under its own name (hyprcandy-qs) so it no longer trips the
+#   "local newer than repo quickshell" warning during -Syu. provides/conflicts
+#   still list quickshell so it stays a drop-in replacement.
+
+_pkg=quickshell
+pkgname=hyprcandy-qs
+pkgver=0.3.2
+pkgrel=1
+epoch=1
+pkgdesc="Quickshell rebuilt with the argc=1 QtWebEngine fix for the HyprCandy+ launcher"
+arch=('x86_64')
+url="https://github.com/quickshell-mirror/quickshell"
+license=('custom')
+
+depends=(
+    'gcc-libs' 'glibc' 'hicolor-icon-theme' 'jemalloc' 'libdrm' 'libglvnd'
+    'libpipewire' 'libxcb' 'mesa' 'pam' 'polkit'
+    'qt6-base' 'qt6-declarative' 'qt6-svg' 'qt6-wayland' 'qt6-webengine'
+    'wayland'
+)
+makedepends=(
+    'git' 'cmake' 'ninja' 'pkgconf' 'python' 'cli11'
+    'qt6-shadertools' 'spirv-tools' 'glslang' 'vulkan-headers'
+)
+provides=('quickshell' 'quickshell-git')
+conflicts=('quickshell' 'quickshell-git')
+# !lto: CachyOS's makepkg.conf enables full LTO (-flto=auto) whose link-time
+# relink of this large statically-linked Qt binary takes ~15+ min on low-core
+# CPUs and buys nothing for a QML shell. Disabling it cuts the build to minutes.
+options=('!lto' '!debug' 'strip')
+
+# Pinned upstream quickshell release tag (GitHub mirror of git.outfoxxed.me).
+_srctag="v0.3.2"
+source=("git+${url}.git#tag=${_srctag}")
+sha256sums=('SKIP')
+
+_distributor="HyprCandy+ (hyprcandy-qs: upstream quickshell + QtWebEngine argc fix)"
+
+prepare() {
+    cd "$_pkg"
+
+    # REQUIRED WebEngine fix: quickshell builds the application with argc = 0,
+    # leaving Qt's argument list empty; QtWebEngine's Chromium base::CommandLine
+    # then aborts at startup and crashes the shell whenever a WebEngineView loads.
+    # argc = 1 makes Qt register argv[0] (the program name). This is guarded so a
+    # future quickshell bump that relocates the line FAILS THE BUILD LOUDLY instead
+    # of silently shipping an unpatched (WebEngine-crashing) binary.
+    local f='src/launch/launch.cpp'
+    if ! grep -q 'auto qArgC = 1;' "$f"; then
+        sed -i 's/\bauto qArgC = 0;/auto qArgC = 1;/' "$f"
+    fi
+    grep -q 'auto qArgC = 1;' "$f" || {
+        echo "ERROR: quickshell argc anchor 'auto qArgC = 0;' not found in $f." >&2
+        echo "       The upstream layout changed; update this PKGBUILD's argc patch." >&2
+        exit 1
+    }
+    echo "hyprcandy-qs: patched $f argc 0->1 (QtWebEngine base::CommandLine fix)"
+
+    # Qt 6.12 + GCC 16 combined-AUTOMOC compat shim (toolchain-only, not a source
+    # defect). Several quickshell modules hold two mutually forward-declared QObjects
+    # that expose each other as a pointer Q_PROPERTY (e.g. HyprlandMonitor<->
+    # HyprlandWorkspace, I3Monitor<->I3Workspace, and the pipewire PwNodeIface/
+    # PwLinkIface<->PwNodePeakMonitor/PwAudioSpectrum pair). CMake's AUTOMOC compiles
+    # every header's moc into one shared mocs_compilation.cpp TU; there GCC 16 caches
+    # the earlier "incomplete in a SFINAE context" verdict from the forward-decl uses,
+    # so Qt's unconditional static_assert(TypeIsCompleteOrVoid<Self>) then hard-fails
+    # in each class's OWN moc: "error: Meta Types must be fully defined". On the
+    # Qt 6.11 / GCC 15 toolchain this was merely the -Wsfinae-incomplete warning, so
+    # it built fine. Self-including the moc in the matching .cpp pulls it out of the
+    # combined TU (each such .cpp already #includes the peer header, so the type is
+    # complete there) and the assert passes. Fully guarded: any module whose file
+    # layout differs on upstream is simply skipped.
+    local tu stem
+    for tu in \
+        src/wayland/hyprland/ipc/monitor.cpp \
+        src/wayland/hyprland/ipc/workspace.cpp \
+        src/x11/i3/ipc/monitor.cpp \
+        src/x11/i3/ipc/workspace.cpp \
+        src/services/pipewire/qml.cpp ; do
+        [ -f "$tu" ] || continue
+        stem="${tu##*/}"; stem="${stem%.cpp}"
+        grep -q "moc_${stem}\.cpp" "$tu" || printf '\n#include "moc_%s.cpp"\n' "$stem" >> "$tu"
+    done
+}
+
+build() {
+    cd "$_pkg"
+    # BUILD.md: a UTF-8 locale keeps real diagnostics from being buried by Qt warnings.
+    export LC_ALL=C.UTF-8 LANG=C.UTF-8
+    # Belt-and-suspenders: strip any LTO that a distro makepkg.conf injected into
+    # the flags (options=(!lto) alone doesn't always remove a literal -flto).
+    export CXXFLAGS="${CXXFLAGS/-flto=auto/} ${CXXFLAGS/-flto/}"
+    export CFLAGS="${CFLAGS/-flto=auto/} ${CFLAGS/-flto/}"
+    export LDFLAGS="${LDFLAGS/-flto=auto/} ${LDFLAGS/-flto/}"
+    # Portable binary for the prebuilt release asset: CachyOS makepkg.conf injects
+    # -march=native (or an x86-64-vN level) that ties the .pkg.tar.zst to the build
+    # box's CPU. Since this package is downloaded and installed directly on every
+    # user's machine, neutralize any arch/tuning flag down to the widely-safe
+    # x86-64-v2 baseline (SSE4.2 + POPCNT, ~2009+) so it never SIGILLs elsewhere.
+    CFLAGS=$(printf '%s' "$CFLAGS"   | sed -E 's/-march=[^[:space:]]+/-march=x86-64-v2/g; s/-mtune=[^[:space:]]+/-mtune=generic/g')
+    CXXFLAGS=$(printf '%s' "$CXXFLAGS" | sed -E 's/-march=[^[:space:]]+/-march=x86-64-v2/g; s/-mtune=[^[:space:]]+/-mtune=generic/g')
+    export CFLAGS CXXFLAGS
+    cmake -GNinja -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DDISTRIBUTOR="$_distributor" \
+        -DCRASH_HANDLER=OFF
+    cmake --build build
+}
+
+package() {
+    cd "$_pkg"
+    DESTDIR="$pkgdir" cmake --install build
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE" 2>/dev/null || true
+    [ -f LICENSE-GPL ] && install -Dm644 LICENSE-GPL "$pkgdir/usr/share/licenses/$pkgname/LICENSE-GPL" 2>/dev/null
+    return 0
+}
