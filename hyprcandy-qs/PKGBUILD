@@ -24,10 +24,10 @@
 #   release cadence. We now base directly on upstream quickshell and apply the one
 #   line fix in prepare() below.
 #
-#   The crash handler is disabled (-DCRASH_HANDLER=OFF) to keep the automated
-#   build lean: it would otherwise require cpptrace/libdwarf/libunwind (AUR /
-#   exotic) which complicates a one-command install. Functionally the bar/launcher
-#   are unaffected; the only loss is the auto-restart-on-crash watchdog.
+#   The crash reporter is disabled (-DCRASH_REPORTER=Off) to keep the build lean;
+#   the only loss is the auto-restart-on-crash watchdog and the bar/launcher are
+#   unaffected. quickshell still links libcpptrace unconditionally, so 'cpptrace'
+#   stays a runtime dep (matching the official Arch packaging) regardless of this.
 #
 #   Shipped under its own name (hyprcandy-qs) so it no longer trips the
 #   "local newer than repo quickshell" warning during -Syu. provides/conflicts
@@ -47,11 +47,12 @@ depends=(
     'gcc-libs' 'glibc' 'hicolor-icon-theme' 'jemalloc' 'libdrm' 'libglvnd'
     'libpipewire' 'libxcb' 'mesa' 'pam' 'polkit'
     'qt6-base' 'qt6-declarative' 'qt6-svg' 'qt6-wayland' 'qt6-webengine'
-    'wayland'
+    'wayland' 'cpptrace'
 )
 makedepends=(
     'git' 'cmake' 'ninja' 'pkgconf' 'python' 'cli11'
     'qt6-shadertools' 'spirv-tools' 'glslang' 'vulkan-headers'
+    'wayland-protocols'
 )
 provides=('quickshell' 'quickshell-git')
 conflicts=('quickshell' 'quickshell-git')
@@ -134,8 +135,9 @@ build() {
     cmake -GNinja -B build \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr \
+        -DINSTALL_QML_PREFIX=lib/qt6/qml \
         -DDISTRIBUTOR="$_distributor" \
-        -DCRASH_HANDLER=OFF
+        -DCRASH_REPORTER=Off
     cmake --build build
 }
 

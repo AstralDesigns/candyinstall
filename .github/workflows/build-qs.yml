@@ -45,8 +45,8 @@ jobs:
                 base-devel git cmake ninja pkgconf python cli11 \
                 qt6-base qt6-declarative qt6-svg qt6-wayland qt6-webengine \
                 qt6-shadertools spirv-tools glslang vulkan-headers \
-                jemalloc libdrm libglvnd libpipewire libxcb mesa pam polkit \
-                hicolor-icon-theme wayland
+                jemalloc libdrm libglvnd libpipewire libxcb mesa pam polkit cpptrace \
+                hicolor-icon-theme wayland wayland-protocols
               # makepkg refuses to run as root -> build as an unprivileged user.
               useradd -mG wheel builder
               mkdir -p /build
