@@ -24,7 +24,7 @@
 #   release cadence. We now base directly on upstream quickshell and apply the one
 #   line fix in prepare() below.
 #
-#   The crash reporter is disabled (-DCRASH_HANDLER=Off) to keep the build lean;
+#   The crash reporter is disabled (-DCRASH_REPORTER=Off) to keep the build lean;
 #   the only loss is the auto-restart-on-crash watchdog and the bar/launcher are
 #   unaffected. quickshell still links libcpptrace unconditionally, so 'cpptrace'
 #   stays a runtime dep (matching the official Arch packaging) regardless of this.
@@ -32,35 +32,13 @@
 #   Shipped under its own name (hyprcandy-qs) so it no longer trips the
 #   "local newer than repo quickshell" warning during -Syu. provides/conflicts
 #   still list quickshell so it stays a drop-in replacement.
-#
-#   SECOND patch (2026-10, revised): two unconditional C++ hooks in launch.cpp,
-#   applied just before QGuiApplication is constructed so they bind for EVERY
-#   shell in the process (bar, wallpaper, overview, ...) with no env pragma and
-#   no cross-process cascade worry:
-#
-#   (a) Force an 8-bit alpha plane on QSurfaceFormat::defaultFormat(). THIS is
-#       the real cause of the opaque-black windows. On Mesa / Intel Gen7 (Ivy
-#       Bridge) the EGL path comes up XRGB (log: "alphaBufferSize 0") because
-#       quickshell only calls QQuickWindow::setDefaultAlphaBuffer(true) AFTER
-#       the app/context already exists, so the flag never reaches EGL config
-#       selection. A surface with no alpha plane composites every transparent
-#       layer-shell pixel as opaque black, hiding the wallpaper underneath. The
-#       software backend avoided this because it uses ARGB32 shared-memory
-#       buffers; requesting alpha in the default format gives the GL path the
-#       same ARGB EGLConfig.
-#
-#   (b) Pin the OpenGL scene graph via QQuickWindow::setGraphicsApi(OpenGL).
-#       Qt6 treats QSG_RHI_BACKEND as advisory; QtWebEngine's Vulkan probing can
-#       otherwise flip the QML RHI. setGraphicsApi makes GL binding (skipped
-#       when QT_QUICK_BACKEND=software is requested). Verified the scene graph
-#       lands on OpenGL; libvulkan.so in maps is only WebEngine's GPU process.
 
 _pkg=quickshell
 pkgname=hyprcandy-qs
 pkgver=0.3.2
-pkgrel=3
+pkgrel=1
 epoch=1
-pkgdesc="Quickshell rebuilt with the argc=1 QtWebEngine fix + forced ARGB alpha surfaces + pinned-OpenGL RHI for HyprCandy+"
+pkgdesc="Quickshell rebuilt with the argc=1 QtWebEngine fix + pinned OpenGL scene graph for the HyprCandy+ launcher"
 arch=('x86_64')
 url="https://github.com/quickshell-mirror/quickshell"
 license=('custom')
@@ -110,47 +88,46 @@ prepare() {
     }
     echo "hyprcandy-qs: patched $f argc 0->1 (QtWebEngine base::CommandLine fix)"
 
-    # REQUIRED transparency+GL fix (see header note): two unconditional hooks
-    # applied just before QGuiApplication construction. Written as a python file
-    # (exact anchors, fails loudly if upstream relocates them) so transparent
-    # layer-shell windows get an ARGB surface and the scene graph stays on GL.
+    # Pin the Qt Quick scene graph to the OpenGL RHI. QtWebEngine (Chromium) only
+    # renders when the scene graph is on OpenGL; if Qt selects the Vulkan backend
+    # (incomplete on Ivy-Bridge-class GPUs) or the software backend, embedded
+    # WebEngine content fails to paint. Setting it here, before QGuiApplication is
+    # constructed, makes the choice binding and immune to a stray QSG_RHI_BACKEND.
+    # Guarded so a future quickshell that relocates the anchor FAILS THE BUILD
+    # LOUDLY instead of silently shipping an unpinned binary.
+    # NOTE: a previous revision also forced an 8-bit alpha plane (QSurfaceFormat
+    # setAlphaBufferSize) to fight the opaque-black transparent windows. That was a
+    # misdiagnosis: the black was a Hyprland 0.57 compositor regression (dmabuf
+    # layer surfaces losing alpha at composite time), fixed by holding Hyprland at
+    # 0.56.2, and is NOT a client-side surface-format problem. Alpha patch removed.
     if ! grep -q 'hyprcandy-qs: pin the OpenGL scene graph' "$f"; then
-        cat > "$srcdir/qs-gl-alpha.py" <<'QSPYEOF'
+        cat > "$srcdir/qs-gl.py" <<'QSPYEOF'
 import sys
 p = sys.argv[1]
 s = open(p).read()
-
 inc_anchor = '#include <qquickwindow.h>\n'
 assert s.count(inc_anchor) == 1, 'include anchor missing'
-if '#include <qsurfaceformat.h>' not in s:
-    s = s.replace(inc_anchor,
-        inc_anchor + '#include <qsgrendererinterface.h>\n#include <qsurfaceformat.h>\n')
-
+if '#include <qsgrendererinterface.h>' not in s:
+    s = s.replace(inc_anchor, inc_anchor + '#include <qsgrendererinterface.h>\n')
 code_anchor = '\tQGuiApplication* app = nullptr;\n'
 assert s.count(code_anchor) == 1, 'app-decl anchor missing'
 patch = (
-    '\t// hyprcandy-qs: pin the OpenGL scene graph so QtWebEngine Vulkan\n'
-    '\t// probing can never flip the QML RHI backend (env is advisory).\n'
+    '\t// hyprcandy-qs: pin the OpenGL scene graph so QtWebEngine renders\n'
+    '\t// and Qt never selects the Vulkan/software backend for the QML RHI.\n'
     '\tif (qEnvironmentVariable("QT_QUICK_BACKEND") != "software")\n'
     '\t\tQQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);\n\n'
-    '\t// hyprcandy-qs: force an 8-bit alpha plane on the default surface\n'
-    '\t// format so EGL picks an ARGB config; without this Mesa/Gen7 comes\n'
-    '\t// up XRGB and every transparent layer composites as opaque black.\n'
-    '\tQSurfaceFormat qsAlphaFormat = QSurfaceFormat::defaultFormat();\n'
-    '\tqsAlphaFormat.setAlphaBufferSize(8);\n'
-    '\tQSurfaceFormat::setDefaultFormat(qsAlphaFormat);\n\n'
 )
 s = s.replace(code_anchor, patch + code_anchor)
 open(p, 'w').write(s)
 QSPYEOF
-        if ! python3 "$srcdir/qs-gl-alpha.py" "$f"; then
-            echo "ERROR: quickshell GL/alpha anchors not found in $f (upstream layout changed)." >&2
+        if ! python3 "$srcdir/qs-gl.py" "$f"; then
+            echo "ERROR: quickshell GL anchors not found in $f (upstream layout changed)." >&2
             exit 1
         fi
-        echo "hyprcandy-qs: patched $f (pinned OpenGL RHI + forced ARGB alpha surface)"
+        echo "hyprcandy-qs: patched $f (pinned OpenGL scene graph)"
     fi
     grep -q 'hyprcandy-qs: pin the OpenGL scene graph' "$f" || {
-        echo "ERROR: pinned-OpenGL + alpha patch did not apply to $f." >&2
+        echo "ERROR: quickshell GL pin verification failed in $f." >&2
         exit 1
     }
 
@@ -203,7 +180,7 @@ build() {
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DINSTALL_QML_PREFIX=lib/qt6/qml \
         -DDISTRIBUTOR="$_distributor" \
-        -DCRASH_HANDLER=Off
+        -DCRASH_REPORTER=Off
     cmake --build build
 }
 
