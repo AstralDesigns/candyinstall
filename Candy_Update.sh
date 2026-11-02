@@ -1212,10 +1212,27 @@ if [ -d "$GREETER_THEMES" ]; then
     if [ -f "$USER_HOME/.config/quickshell/bar/scripts/greeter-sync.sh" ]; then
         HC_GREETER_HOME="$USER_HOME" bash "$USER_HOME/.config/quickshell/bar/scripts/greeter-sync.sh" || true
     fi
-    # First-run conf.d entry for machines installed before the greeter system
-    if [ ! -f /etc/sddm.conf.d/hyprcandy.conf ] && [ ! -f /etc/sddm.conf.d/sugar-candy.conf ]; then
-        printf '[Theme]\nCurrent=hyprcandy-1\nCursorTheme=geared-brass-32x\nCursorSize=18\n' > /etc/sddm.conf.d/hyprcandy.conf
+    # conf.d: make hyprcandy.conf the single source of truth. sddm merges
+    # conf.d alphabetically with last-wins, so a stale sugar-candy.conf would
+    # silently override ours; migrate the active selection and drop the legacy.
+    mkdir -p /etc/sddm.conf.d/
+    HC_CUR=""
+    for f in /etc/sddm.conf.d/hyprcandy.conf /etc/sddm.conf.d/sugar-candy.conf; do
+        [ -f "$f" ] || continue
+        v=$(sed -n 's/^Current=//p' "$f" | head -1)
+        v=${v//\"/}; v=${v//\'/}; v=${v// /}
+        [ -n "$v" ] && HC_CUR="$v" && break
+    done
+    if [ -z "$HC_CUR" ] || [ ! -d "/usr/share/sddm/themes/$HC_CUR" ]; then
+        if [ -d "$GREETER_THEMES/hyprcandy-1" ]; then HC_CUR=hyprcandy-1; else HC_CUR=sugar-candy; fi
     fi
+    # preserve any user-set cursor; only rewrite Current (create file if absent)
+    if [ -f /etc/sddm.conf.d/hyprcandy.conf ] && grep -q '^Current=' /etc/sddm.conf.d/hyprcandy.conf; then
+        sed -i "s|^Current=.*|Current=$HC_CUR|" /etc/sddm.conf.d/hyprcandy.conf
+    else
+        printf '[Theme]\nCurrent=%s\nCursorTheme=geared-brass-32x\nCursorSize=18\n' "$HC_CUR" > /etc/sddm.conf.d/hyprcandy.conf
+    fi
+    rm -f /etc/sddm.conf.d/sugar-candy.conf
 fi
 
 # ── Patched quickshell (hyprcandy-qs) with QtWebEngine support (launcher browser) ──
@@ -3916,15 +3933,60 @@ enable_display_manager() {
     
     # Additional SDDM configuration if selected
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
-        print_status "Configuring SDDM with Sugar Candy theme..."
+        print_status "Configuring SDDM with the HyprCandy greeter theme..."
         
-        #rm -rf /etc/sddm.conf.d/
-        #sleep 1
-        # Create SDDM config directory if it doesn't exist
+        # conf.d is owned by the post-rsync greeter block (cursor-preserving);
+        # here we only ensure the dir exists and drop the legacy drop-in so it
+        # can never override hyprcandy.conf.
         mkdir -p /etc/sddm.conf.d/
-        
-        # Configure SDDM to use Sugar Candy theme
-        if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
+        rm -f /etc/sddm.conf.d/sugar-candy.conf
+
+        # HyprCandy greeter theme tree: seed defaults, permit traverse, link, sync
+        GT_DIR="$USER_HOME/.hyprcandy/Greeter/themes"
+        HC_SCRIPTS="$USER_HOME/.config/quickshell/bar/scripts"
+        HC_CURRENT=""
+        if [ -d "$GT_DIR/hyprcandy-1" ]; then
+            if [ ! -f "$GT_DIR/hyprcandy-1/theme.conf" ]; then
+                cat > "$GT_DIR/hyprcandy-1/theme.conf" << EOF
+[General]
+Background="../hyprcandy-shared/Backgrounds/current.jpg"
+HeaderText="HyprCandy+"
+FormPosition="center"
+BlurRadius="55"
+RoundCorners="20"
+InterfaceShadowSize="6"
+Font="Noto Sans"
+FontSize=""
+ScreenWidth=""
+ScreenHeight=""
+MainColor=""
+AccentColor=""
+BackgroundColor=""
+HourFormat="HH:mm"
+DateFormat="dddd, d of MMMM"
+AllowEmptyPassword="false"
+ForcePasswordFocus="true"
+EOF
+            fi
+            chmod -R a+rX "$USER_HOME/.hyprcandy/Greeter" 2>/dev/null || true
+            HC_GREETER_HOME="$USER_HOME" bash "$HC_SCRIPTS/greeter-set.sh" permit 2>/dev/null || true
+            for th in "$GT_DIR"/*/; do
+                [ -d "$th" ] || continue
+                ln -sfn "${th%/}" "/usr/share/sddm/themes/$(basename "$th")" 2>/dev/null || true
+            done
+            if [ -f "$HC_SCRIPTS/greeter-sync.sh" ]; then
+                HC_GREETER_HOME="$USER_HOME" bash "$HC_SCRIPTS/greeter-sync.sh" 2>/dev/null || true
+            fi
+            HC_CURRENT="hyprcandy-1"
+        elif [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
+            HC_CURRENT="sugar-candy"
+        fi
+
+        # conf.d Current is applied by the post-rsync greeter block above
+        # (cursor-preserving); enable_display_manager only seeds theme files.
+
+        # Legacy sugar-candy fallback seed (only when it is the active theme)
+        if [ "$HC_CURRENT" = "sugar-candy" ] && [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
 #            tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
 #[Theme]
 #Current=sugar-candy
@@ -3995,8 +4057,11 @@ EOF
             fi
 
             print_success "SDDM configured to use Sugar Candy theme with custom auto-updating background"
-        else
-            print_warning "Sugar Candy theme not found. SDDM will use default theme."
+        fi
+        if [ "$HC_CURRENT" = "hyprcandy-1" ]; then
+            print_success "SDDM configured to use the HyprCandy greeter theme"
+        elif [ -z "$HC_CURRENT" ]; then
+            print_warning "No greeter theme found. SDDM will use default theme."
         fi
     fi
 }
@@ -4561,7 +4626,7 @@ main() {
     echo
 
     # Enable display manager
-    #enable_display_manager
+    enable_display_manager
 
     # Setup default custom config file
     #setup_custom_config

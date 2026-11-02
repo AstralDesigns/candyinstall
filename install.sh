@@ -3947,10 +3947,11 @@ enable_display_manager() {
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
         print_status "Configuring SDDM with the HyprCandy greeter theme..."
 
-        sudo rm -rf /etc/sddm.conf.d/
-        sleep 1
-        # Create SDDM config directory if it doesn't exist
+        # sddm merges conf.d alphabetically with last-wins; drop our own and the
+        # legacy drop-in so hyprcandy.conf is the single source of truth, without
+        # clobbering unrelated distro drop-ins.
         sudo mkdir -p /etc/sddm.conf.d/
+        sudo rm -f /etc/sddm.conf.d/hyprcandy.conf /etc/sddm.conf.d/sugar-candy.conf
 
         # HyprCandy greeter themes: seed defaults, link tree, sync runtime files
         GT_DIR="$HOME/.hyprcandy/Greeter/themes"
