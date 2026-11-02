@@ -1200,6 +1200,24 @@ rsync -a \
 
 echo "✅ Update merged"
 
+# ── HyprCandy greeter themes: link + runtime sync (this updater runs as root) ──
+GREETER_THEMES="$USER_HOME/.hyprcandy/Greeter/themes"
+if [ -d "$GREETER_THEMES" ]; then
+    chmod -R a+rX "$USER_HOME/.hyprcandy/Greeter" 2>/dev/null || true
+    setfacl -m u:sddm:--x "$USER_HOME" 2>/dev/null || true
+    for th in "$GREETER_THEMES"/*/; do
+        [ -d "$th" ] || continue
+        ln -sfn "${th%/}" "/usr/share/sddm/themes/$(basename "$th")" 2>/dev/null || true
+    done
+    if [ -f "$USER_HOME/.config/quickshell/bar/scripts/greeter-sync.sh" ]; then
+        HC_GREETER_HOME="$USER_HOME" bash "$USER_HOME/.config/quickshell/bar/scripts/greeter-sync.sh" || true
+    fi
+    # First-run conf.d entry for machines installed before the greeter system
+    if [ ! -f /etc/sddm.conf.d/hyprcandy.conf ] && [ ! -f /etc/sddm.conf.d/sugar-candy.conf ]; then
+        printf '[Theme]\nCurrent=hyprcandy-1\nCursorTheme=geared-brass-32x\nCursorSize=18\n' > /etc/sddm.conf.d/hyprcandy.conf
+    fi
+fi
+
 # ── Patched quickshell (hyprcandy-qs) with QtWebEngine support (launcher browser) ──
 # Stock quickshell (repo/CachyOS and Arch) builds QGuiApplication with argc=0, which
 # crashes QtWebEngine/Chromium (Chromium reads argv[0] at startup). We install a patched
@@ -1990,8 +2008,11 @@ update_hypr_cursor_env() {
     sed -i "s|^gtk-cursor-theme-size=.*|gtk-cursor-theme-size=$size|" "$GTK4_FILE" 
 
     # SDDM cursor update
-    sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/sugar-candy.conf"
-    sudo sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/sugar-candy.conf"
+    if ! sudo grep -q '^CursorTheme=' /etc/sddm.conf.d/hyprcandy.conf 2>/dev/null; then
+        printf '[Theme]\nCurrent=hyprcandy-1\nCursorTheme=%s\nCursorSize=%s\n' "$theme" "$size" | sudo tee /etc/sddm.conf.d/hyprcandy.conf > /dev/null
+    fi
+    sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/hyprcandy.conf"
+    sudo sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/hyprcandy.conf"
 
     # Apply changes immediately
     apply_cursor_changes "$theme" "$size"
@@ -2223,6 +2244,9 @@ else
     [[ ! -f "$WAYPAPER_CONFIG" ]] && echo "⚠️  waypaper config not found: $WAYPAPER_CONFIG"
     [[ ! -f "$SDDM_CONF" ]]      && echo "⚠️  SDDM config not found: $SDDM_CONF"
 fi
+
+# Refresh the HyprCandy greeter runtime (palettes + wallpaper -> hyprcandy-shared)
+sudo -n "$HOME/.config/quickshell/bar/scripts/greeter-sync.sh" >/dev/null 2>&1 || true
 EOF
 
 else
@@ -2336,6 +2360,9 @@ if [ -f "$COLORS_CSS" ] && [ -f "$MAKO_CONFIG" ]; then
 else
     echo "⚠️  $COLORS_CSS or $MAKO_CONFIG not found, skipping mako color update"
 fi
+
+# Refresh the HyprCandy greeter runtime (palettes + wallpaper -> hyprcandy-shared)
+sudo -n "$HOME/.config/quickshell/bar/scripts/greeter-sync.sh" >/dev/null 2>&1 || true
 EOF
 fi
 
@@ -3833,9 +3860,8 @@ SUDOERS_ENTRIES=(
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Background=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BackgroundColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^AccentColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/sugar-candy.conf"
-    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/sugar-candy.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/hyprcandy.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/hyprcandy.conf"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/mkdir -p /usr/local/share/gtk3-reload"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/gtk3-reload.c"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/.gtk3-version"
@@ -3851,12 +3877,6 @@ SUDOERS_ENTRIES=(
     "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/product_name"
     "$USER_NAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/address"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/readlink -f /sys/class/drm/card*/device/driver"
-	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^HeaderText=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^FormPosition=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BlurRadius=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenWidth=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenHeight=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh"
@@ -3865,6 +3885,10 @@ SUDOERS_ENTRIES=(
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/hotspot-toggle.sh *"
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/user-manager.py"
     "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/user-manager.py *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/greeter-set.sh *"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /home/$USER_NAME/.config/quickshell/bar/scripts/greeter-sync.sh"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/ln -sfn /home/$USER_NAME/.hyprcandy/Greeter/themes/* /usr/share/sddm/themes/*"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/install -m 644 /home/$USER_NAME/.config/hyprcandy/user-icon.png /usr/share/sddm/faces/$USER_NAME.face.icon"
     "Defaults env_keep += \"HC_PASS\""
 )
 

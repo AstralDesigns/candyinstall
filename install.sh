@@ -396,6 +396,8 @@ build_package_list() {
         "flatpak"
         "docker"
         "ufw"
+        "git"
+        "github-cli"
         
         # Wallpaper and screenshot tools
        	"imagemagick"
@@ -1283,7 +1285,7 @@ alias update="sudo pacman -Syu"
 alias install="sudo pacman -S"
 alias search="pacman -Ss"
 alias remove="sudo pacman -R"
-alias autoremove="sudo pacman -Rs $(pacman -Qtdq)"
+alias autoremove='sudo pacman -Rs $(pacman -Qtdq)'
 alias c="clear"
 alias h="history"
 alias j="jobs -l"
@@ -1434,7 +1436,7 @@ setup_hyprcandy() {
     config_dirs=(".config" ".icons" ".hyprcandy-zsh.zsh")
 
     # Add files/folders to exclude from deletion
-    preserve_items=("GJS" "Candy" "LICENSE" "README.md" ".git" ".gitignore")
+    preserve_items=("GJS" "Candy" "Greeter" "LICENSE" "README.md" ".git" ".gitignore")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
@@ -1465,16 +1467,27 @@ setup_hyprcandy() {
     done
 
 # Stow all configurations at once, ignoring Candy folder
-if stow -v -t "$HOME" --ignore='Candy' --ignore='GJS' . 2>/dev/null; then
+if stow -v -t "$HOME" --ignore='Candy' --ignore='GJS' --ignore='Greeter' . 2>/dev/null; then
     echo "✅ Successfully stowed all configurations"
 else
     echo "⚠️  Stow operation failed — attempting restow..."
-    if stow -R -v -t "$HOME" --ignore='Candy' --ignore='GJS' . 2>/dev/null; then
+    if stow -R -v -t "$HOME" --ignore='Candy' --ignore='GJS' --ignore='Greeter' . 2>/dev/null; then
         echo "✅ Successfully restowed all configurations"
     else
         echo "❌ Failed to stow configurations"
     fi
 fi
+
+# Greeter themes: never stowed - symlinked into SDDM's theme dir after stow
+echo "🔗 Linking HyprCandy greeter themes..."
+chmod -R a+rX "$HOME/.hyprcandy/Greeter" 2>/dev/null || true
+sudo -n "$HOME/.config/quickshell/bar/scripts/greeter-set.sh" permit 2>/dev/null || true
+for th in "$HOME/.hyprcandy/Greeter/themes/"*/; do
+    [ -d "$th" ] || continue
+    sudo -n ln -sfn "${th%/}" "/usr/share/sddm/themes/$(basename "$th")" 2>/dev/null || true
+done
+sudo -n "$HOME/.config/quickshell/bar/scripts/greeter-sync.sh" 2>/dev/null || true
+
     # Final summary
     echo
     echo "✅ Installation completed. Successfully installed: $stow_success"
@@ -2223,8 +2236,11 @@ update_hypr_cursor_env() {
     sed -i "s|^gtk-cursor-theme-size=.*|gtk-cursor-theme-size=$size|" "$GTK4_FILE" 
 
     # SDDM cursor update
-    sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/sugar-candy.conf"
-    sudo sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/sugar-candy.conf"
+    if ! sudo grep -q '^CursorTheme=' /etc/sddm.conf.d/hyprcandy.conf 2>/dev/null; then
+        printf '[Theme]\nCurrent=hyprcandy-1\nCursorTheme=%s\nCursorSize=%s\n' "$theme" "$size" | sudo tee /etc/sddm.conf.d/hyprcandy.conf > /dev/null
+    fi
+    sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/hyprcandy.conf"
+    sudo sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/hyprcandy.conf"
 
     # Apply changes immediately
     apply_cursor_changes "$theme" "$size"
@@ -2456,6 +2472,9 @@ else
     [[ ! -f "$WAYPAPER_CONFIG" ]] && echo "⚠️  waypaper config not found: $WAYPAPER_CONFIG"
     [[ ! -f "$SDDM_CONF" ]]      && echo "⚠️  SDDM config not found: $SDDM_CONF"
 fi
+
+# Refresh the HyprCandy greeter runtime (palettes + wallpaper -> hyprcandy-shared)
+sudo -n "$HOME/.config/quickshell/bar/scripts/greeter-sync.sh" >/dev/null 2>&1 || true
 EOF
 
 else
@@ -2569,6 +2588,9 @@ if [ -f "$COLORS_CSS" ] && [ -f "$MAKO_CONFIG" ]; then
 else
     echo "⚠️  $COLORS_CSS or $MAKO_CONFIG not found, skipping mako color update"
 fi
+
+# Refresh the HyprCandy greeter runtime (palettes + wallpaper -> hyprcandy-shared)
+sudo -n "$HOME/.config/quickshell/bar/scripts/greeter-sync.sh" >/dev/null 2>&1 || true
 EOF
 fi
 
@@ -3848,9 +3870,8 @@ SUDOERS_ENTRIES=(
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Background=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BackgroundColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^AccentColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/sugar-candy.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/sugar-candy.conf"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/hyprcandy.conf"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/hyprcandy.conf"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/mkdir -p /usr/local/share/gtk3-reload"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/gtk3-reload.c"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/.gtk3-version"
@@ -3866,12 +3887,6 @@ SUDOERS_ENTRIES=(
     "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/product_name"
     "$USERNAME ALL=(ALL) NOPASSWD: /bin/cat /sys/class/drm/card*/device/address"
     "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/readlink -f /sys/class/drm/card*/device/driver"
-	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^HeaderText=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^FormPosition=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^BlurRadius=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenWidth=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^ScreenHeight=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
-	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Font=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chmod 644 /usr/share/sddm/themes/sugar-candy/Backgrounds/*"
 	"$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/chvt"
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hyprcandy-docker.sh"
@@ -3880,6 +3895,10 @@ SUDOERS_ENTRIES=(
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/hotspot-toggle.sh *"
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/user-manager.py"
     "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/user-manager.py *"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/greeter-set.sh *"
+    "$USERNAME ALL=(ALL) NOPASSWD: /home/$USERNAME/.config/quickshell/bar/scripts/greeter-sync.sh"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/ln -sfn /home/$USERNAME/.hyprcandy/Greeter/themes/* /usr/share/sddm/themes/*"
+    "$USERNAME ALL=(ALL) NOPASSWD: /usr/bin/install -m 644 /home/$USERNAME/.config/hyprcandy/user-icon.png /usr/share/sddm/faces/$USERNAME.face.icon"
     "Defaults env_keep += \"HC_PASS\""
 )
 
@@ -3926,21 +3945,62 @@ enable_display_manager() {
     
     # Additional SDDM configuration if selected
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
-        print_status "Configuring SDDM with Sugar Candy theme..."
-        
+        print_status "Configuring SDDM with the HyprCandy greeter theme..."
+
         sudo rm -rf /etc/sddm.conf.d/
         sleep 1
         # Create SDDM config directory if it doesn't exist
         sudo mkdir -p /etc/sddm.conf.d/
-        
-        # Configure SDDM to use Sugar Candy theme
-        if [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
-            sudo tee /etc/sddm.conf.d/sugar-candy.conf > /dev/null << EOF
+
+        # HyprCandy greeter themes: seed defaults, link tree, sync runtime files
+        GT_DIR="$HOME/.hyprcandy/Greeter/themes"
+        HC_CURRENT=""
+        if [ -d "$GT_DIR/hyprcandy-1" ]; then
+            if [ ! -f "$GT_DIR/hyprcandy-1/theme.conf" ]; then
+                cat > "$GT_DIR/hyprcandy-1/theme.conf" << EOF
+[General]
+Background="../hyprcandy-shared/Backgrounds/current.jpg"
+HeaderText="HyprCandy+"
+FormPosition="center"
+BlurRadius="55"
+RoundCorners="20"
+InterfaceShadowSize="6"
+Font="Noto Sans"
+FontSize=""
+ScreenWidth=""
+ScreenHeight=""
+MainColor=""
+AccentColor=""
+BackgroundColor=""
+HourFormat="HH:mm"
+DateFormat="dddd, d of MMMM"
+AllowEmptyPassword="false"
+ForcePasswordFocus="true"
+EOF
+            fi
+            chmod -R a+rX "$HOME/.hyprcandy/Greeter" 2>/dev/null || true
+            sudo "$HOME/.config/quickshell/bar/scripts/greeter-set.sh" permit 2>/dev/null || true
+            for th in "$GT_DIR"/*/; do
+                [ -d "$th" ] || continue
+                sudo ln -sfn "${th%/}" "/usr/share/sddm/themes/$(basename "$th")" 2>/dev/null || true
+            done
+            sudo "$HOME/.config/quickshell/bar/scripts/greeter-sync.sh" 2>/dev/null || true
+            HC_CURRENT="hyprcandy-1"
+        elif [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
+            HC_CURRENT="sugar-candy"
+        fi
+
+        if [ -n "$HC_CURRENT" ]; then
+            sudo tee /etc/sddm.conf.d/hyprcandy.conf > /dev/null << EOF
 [Theme]
-Current=sugar-candy
+Current=$HC_CURRENT
 CursorTheme=geared-brass-32x
 CursorSize=18
 EOF
+        fi
+
+        # Legacy sugar-candy fallback seed (only when it is the active theme)
+        if [ "$HC_CURRENT" = "sugar-candy" ] && [ -d "/usr/share/sddm/themes/sugar-candy" ]; then
             # Write full theme config to the sugar-candy theme directory
             sudo tee /usr/share/sddm/themes/sugar-candy/theme.conf > /dev/null << EOF
 [General]
@@ -4005,8 +4065,11 @@ EOF
             fi
 
             print_success "SDDM configured to use Sugar Candy theme with custom auto-updating background"
-        else
-            print_warning "Sugar Candy theme not found. SDDM will use default theme."
+        fi
+        if [ "$HC_CURRENT" = "hyprcandy-1" ]; then
+            print_success "SDDM configured to use the HyprCandy greeter theme"
+        elif [ -z "$HC_CURRENT" ]; then
+            print_warning "No greeter theme found. SDDM will use default theme."
         fi
     fi
 }
@@ -4163,7 +4226,6 @@ hl.on("hyprland.start", function()
 end)
 
 -- Environment variables
-hl.env("PATH", "$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin")
 hl.env("XCURSOR_THEME", "geared-brass-32x")
 hl.env("XCURSOR_SIZE", "18")
 hl.env("HYPRCURSOR_THEME", "geared-brass-32x")
@@ -4534,106 +4596,6 @@ update_custom() {
         sed -i 's/layerrule = ignorezero,waybar/layerrule = ignorezero,bar-0/g' "$CUSTOM_CONFIG_FILE"
         echo -e "${GREEN}Updated custom config layer rules for hyprpanel${NC}"
     fi
-}
-
-setup_gjs() {
-# Create the GJS directory and files if they don't already exist
-if [ ! -d "$HOME/.hyprcandy/GJS/src" ]; then
-    mkdir -p "$HOME/.hyprcandy/GJS/src"
-    echo "📁 Created the GJS directory"
-fi
-
-cd "$HOME/.hyprcandy/GJS"
-rm -f toggle-control-center.sh toggle-media-player.sh toggle-system-monitor.sh toggle-weather-widget.sh
-cd "$HOME"
-
-cat > "$HOME/.hyprcandy/GJS/toggle-control-center.sh" << 'EOF'
-#!/bin/bash
-
-# Toggle Candy Utils - Fast launch (daemon stays running)
-# No killing - daemon persists for instant widget launches
-
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
-
-mkdir -p "$TOGGLE_DIR"
-
-# Start daemon if not running (0.3s sleep for faster launch)
-if ! [ -f "$PID_FILE" ] || ! kill -0 "$(cat "$PID_FILE" 2>/dev/null)" 2>/dev/null; then
-    gjs "$DAEMON_SCRIPT" &
-    sleep 0.3
-fi
-
-# Toggle widget
-touch "$TOGGLE_DIR/toggle-utils"
-EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-control-center.sh"
-
-cat > "$HOME/.hyprcandy/GJS/toggle-system-monitor.sh" << 'EOF'
-#!/bin/bash
-
-# Toggle System Monitor - Fast launch (daemon stays running)
-
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
-
-mkdir -p "$TOGGLE_DIR"
-
-if ! [ -f "$PID_FILE" ] || ! kill -0 "$(cat "$PID_FILE" 2>/dev/null)" 2>/dev/null; then
-    gjs "$DAEMON_SCRIPT" &
-    sleep 0.3
-fi
-
-touch "$TOGGLE_DIR/toggle-system"
-EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-system-monitor.sh"
-
-cat > "$HOME/.hyprcandy/GJS/toggle-media-player.sh" << 'EOF'
-#!/bin/bash
-
-# Toggle Media Player - Fast launch (daemon stays running)
-
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
-
-mkdir -p "$TOGGLE_DIR"
-
-if ! [ -f "$PID_FILE" ] || ! kill -0 "$(cat "$PID_FILE" 2>/dev/null)" 2>/dev/null; then
-    gjs "$DAEMON_SCRIPT" &
-    sleep 0.3
-fi
-
-touch "$TOGGLE_DIR/toggle-media"
-EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-media-player.sh"
-
-cat > "$HOME/.hyprcandy/GJS/toggle-weather-widget.sh" << 'EOF'
-#!/bin/bash
-
-# Toggle Weather Widget - Fast launch (daemon stays running)
-
-PID_FILE="$HOME/.cache/hyprcandy/pids/candy-daemon.pid"
-DAEMON_SCRIPT="$HOME/.hyprcandy/GJS/candy-daemon.js"
-TOGGLE_DIR="$HOME/.cache/hyprcandy/toggle"
-
-mkdir -p "$TOGGLE_DIR"
-
-if ! [ -f "$PID_FILE" ] || ! kill -0 "$(cat "$PID_FILE" 2>/dev/null)" 2>/dev/null; then
-    gjs "$DAEMON_SCRIPT" &
-    sleep 0.3
-fi
-
-touch "$TOGGLE_DIR/toggle-weather"
-EOF
-chmod +x "$HOME/.hyprcandy/GJS/toggle-weather-widget.sh"
-
-find "$HOME/.hyprcandy/GJS" -name "*.sh" -exec chmod +x {} \;
-chmod +x "$HOME/.hyprcandy/GJS/candy-daemon.js"
-
-echo "✅ Files and Apps setup complete"
 }
 
 select_layout() {
