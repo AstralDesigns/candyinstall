@@ -1207,7 +1207,10 @@ if [ -d "$GREETER_THEMES" ]; then
     setfacl -m u:sddm:--x "$USER_HOME" 2>/dev/null || true
     for th in "$GREETER_THEMES"/*/; do
         [ -d "$th" ] || continue
-        ln -sfn "${th%/}" "/usr/share/sddm/themes/$(basename "$th")" 2>/dev/null || true
+        _dst="/usr/share/sddm/themes/$(basename "$th")"
+        # drop a stale real-dir copy so the symlink can replace it
+        [ -d "$_dst" ] && [ ! -L "$_dst" ] && rm -rf "$_dst" 2>/dev/null || true
+        ln -sfn "${th%/}" "$_dst" 2>/dev/null || true
     done
     if [ -f "$USER_HOME/.config/quickshell/bar/scripts/greeter-sync.sh" ]; then
         HC_GREETER_HOME="$USER_HOME" bash "$USER_HOME/.config/quickshell/bar/scripts/greeter-sync.sh" || true
@@ -3982,7 +3985,10 @@ EOF
             HC_GREETER_HOME="$USER_HOME" bash "$HC_SCRIPTS/greeter-set.sh" permit 2>/dev/null || true
             for th in "$GT_DIR"/*/; do
                 [ -d "$th" ] || continue
-                ln -sfn "${th%/}" "/usr/share/sddm/themes/$(basename "$th")" 2>/dev/null || true
+                _dst="/usr/share/sddm/themes/$(basename "$th")"
+                # drop a stale real-dir copy so the symlink can replace it
+                [ -d "$_dst" ] && [ ! -L "$_dst" ] && rm -rf "$_dst" 2>/dev/null || true
+                ln -sfn "${th%/}" "$_dst" 2>/dev/null || true
             done
             if [ -f "$HC_SCRIPTS/greeter-sync.sh" ]; then
                 HC_GREETER_HOME="$USER_HOME" bash "$HC_SCRIPTS/greeter-sync.sh" 2>/dev/null || true
