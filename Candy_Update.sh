@@ -2031,6 +2031,12 @@ update_hypr_cursor_env() {
     sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/hyprcandy.conf"
     sudo sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/hyprcandy.conf"
 
+    # Sync the SYSTEM default cursor pointer (/usr/share/icons/default) so the
+    # SDDM greeter — which runs as the sddm user and cannot read ~/.icons —
+    # resolves the same theme instead of falling back to the old default.
+    [ -f /usr/share/icons/default/index.theme ] && \
+        sudo sed -i "s|^Inherits=.*|Inherits=$theme|" /usr/share/icons/default/index.theme
+
     # Apply changes immediately
     apply_cursor_changes "$theme" "$size"
 
@@ -3879,6 +3885,7 @@ SUDOERS_ENTRIES=(
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^AccentColor=*|* /usr/share/sddm/themes/sugar-candy/theme.conf"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorTheme=*|* /etc/sddm.conf.d/hyprcandy.conf"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^CursorSize=*|* /etc/sddm.conf.d/hyprcandy.conf"
+    "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/sed -i s|^Inherits=*|* /usr/share/icons/default/index.theme"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/mkdir -p /usr/local/share/gtk3-reload"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/gtk3-reload.c"
     "$USER_NAME ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/local/share/gtk3-reload/.gtk3-version"
