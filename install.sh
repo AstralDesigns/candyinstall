@@ -2235,9 +2235,12 @@ update_hypr_cursor_env() {
     sed -i "s|^gtk-cursor-theme-name=.*|gtk-cursor-theme-name=$theme|" "$GTK4_FILE"
     sed -i "s|^gtk-cursor-theme-size=.*|gtk-cursor-theme-size=$size|" "$GTK4_FILE" 
 
-    # SDDM cursor update
-    if ! sudo grep -q '^CursorTheme=' /etc/sddm.conf.d/hyprcandy.conf 2>/dev/null; then
-        printf '[Theme]\nCurrent=hyprcandy-1\nCursorTheme=%s\nCursorSize=%s\n' "$theme" "$size" | sudo tee /etc/sddm.conf.d/hyprcandy.conf > /dev/null
+    # SDDM cursor update. The conf is seeded world-readable (644), so probe it
+    # WITHOUT sudo — an unmatched sudo read hits PAM every login and trips
+    # pam_faillock (deny=3, unlock_time=600 -> a 10-min account lockout).
+    if ! grep -q '^CursorTheme=' /etc/sddm.conf.d/hyprcandy.conf 2>/dev/null; then
+        printf '[Theme]\nCurrent=hyprcandy-1\nCursorTheme=%s\nCursorSize=%s\n' "$theme" "$size" \
+            | sudo -n tee /etc/sddm.conf.d/hyprcandy.conf > /dev/null 2>&1 || true
     fi
     sudo sed -i "s|^CursorTheme=.*|CursorTheme=$theme|" "/etc/sddm.conf.d/hyprcandy.conf"
     sudo sed -i "s|^CursorSize=.*|CursorSize=$size|" "/etc/sddm.conf.d/hyprcandy.conf"
