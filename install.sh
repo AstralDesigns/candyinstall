@@ -4688,6 +4688,7 @@ if [ "$PANEL_CHOICE" = "waybar" ]; then
 else
     systemctl --user restart hyprpanel-idle-monitor.service background-watcher.service theme-watcher.service cursor-theme-watcher.service lactd &>/dev/null
 fi
+sudo systemctl enable power-profiles-daemon
 sudo systemctl enable switcheroo-control
 sudo systemctl enable bluetooth
 echo "✅ Services set..."

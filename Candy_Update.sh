@@ -1036,89 +1036,6 @@ setup_hyprcandy() {
 	# Legacy desktop entry will be replaced later with a new version
 	rm -rf ~/.local/share/applications/Candy.desktop 
 
-	cat > "$USER_HOME/.config/starship.toml" << 'EOF'
-# Starship Configuration for HyprCandy
-format = """
-$username\
-$hostname\
-$time $directory\
-$git_branch\
-$git_state\
-$git_status\
-$git_metrics\
-$fill\
-$nodejs\
-$python\
-$rust\
-$golang\
-$php\
-$java\
-$kotlin\
-$haskell\
-$swift\
-$cmd_duration $jobs\
-$line_break\
-$character"""
-
-[fill]
-symbol = ""
-
-[username]
-style_user = "bold cyan"
-style_root = "bold red"
-format = "[󱞬](grey) [](red) [](cyan) [$user](grey) [](red) ($style)"
-show_always = true
-
-[directory]
-style = "cyan"
-read_only = " 🔒"
-truncation_length = 4
-truncate_to_repo = false
-
-[character]
-success_symbol = "[󱞪](grey) [](red)"
-error_symbol = "[󱞪](grey) [x](red)"
-vimcmd_symbol = "[󱞪](grey) [](green)"
-
-[git_branch]
-symbol = "[](red) 🌱 "
-truncation_length = 4
-truncation_symbol = ""
-style = "cyan"
-
-[git_status]
-ahead = "⇡${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-behind = "⇣${count}"
-deleted = "x"
-
-[nodejs]
-symbol = "[](red) 💠 "
-style = "bold grey"
-
-[python]
-symbol = "[](red) 🐍 "
-style = "bold yellow"
-
-[rust]
-symbol = "[](red) ⚙️ "
-style = "bold red"
-
-[time]
-format = '[](cyan) [\[ $time \]](grey) [](red)($style)'#🕙
-time_format = "%T"
-disabled = false
-style = "bright-white"
-
-[cmd_duration]
-format = "[](red) ⏱️ [$duration]($style)"
-style = "grey"
-
-[jobs]
-symbol = "[](red) ⚡ "
-style = "bold cyan"
-EOF
-
 # Remove previous cached installer
 rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
     
@@ -4569,6 +4486,8 @@ cleanup() {
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
     [ -z "$USER_NAME" ] && USER_NAME="$USER"
     
+    systemctl enable --now power-profiles-daemon
+
     ### ✅ Setup mako config, hook scripts and needed services
     echo "📁 Creating background hook scripts..."
     bash "$USER_HOME/.config/quickshell/bar/scripts/webproxy/hcproxy enable"
