@@ -3532,9 +3532,9 @@ barBorderMode=wallust
 barBorderSecondMode=matugen
 barBorderSecondVar=$outline_variant
 barBorderSecondWallustVar=$color15
-barBorderVar=$on_secondary
+barBorderVar=$primary
 barBorderWallustVar=$color5
-barBorderWidth=2
+barBorderWidth=0
 barBottomLeftRadius=30
 barBottomRightRadius=30
 barEdgePaddingLeft=2
@@ -3547,7 +3547,7 @@ barPosition=top
 barRectBgStyle=glass
 barTopLeftRadius=14
 barTopRightRadius=14
-batteryRadialSize=16
+batteryRadialSize=20
 batteryRadialVisible=true
 batteryRadialWidth=2
 borderCava=false
@@ -3578,23 +3578,27 @@ cavaStartMode=wallust
 cavaStartPywalVar=$color4
 cavaStartVar=$primary
 cavaStartWallustVar=$color5
-cavaStyle=dots
+cavaStyle=mirror
 cavaTransparentWhenInactive=true
 cavaWaveSmooth=true
 cavaWaveThickness=2
 cavaWidth=25
+ccCustomIconPath=
 ccGlyph=
 ccGlyphColorA=1
+ccIconMode=glyph
+ccUseDistroIcon=true
 clockDateBgOpacity=0.5
 clockIconSize=32
 clockTextSize=38
+clockWorldCities="[{\"city\":\"London\",\"timezone\":\"Europe/London\"},{\"city\":\"New York\",\"timezone\":\"America/New_York\"},{\"city\":\"Tokyo\",\"timezone\":\"Asia/Tokyo\"},{\"city\":\"Dubai\",\"timezone\":\"Asia/Dubai\"}]"
 desktopIconSize=56
 desktopLabelRadius=10
 desktopLabelSize=10
 desktopVisible=true
 distroBgOpacity=1
 dockAutoHide=false
-dockAutoHideDelay=5
+dockAutoHideDelay=1
 dockBackgroundStyle=glass
 dockBorderAlpha=0.45
 dockBorderColorVar=on_secondary
@@ -3611,41 +3615,43 @@ dockPosition=bottom
 dockRadius=30
 dockReserveSpace=false
 dockStartIcon=
+dockStartIconScale=0.7999999999999999
 dockStartIconSize=20
 dockTopLeftRadius=30
 dockTopRightRadius=30
+dockTrashIconScale=0.75
 dockTrashIconSize=16
 dockVisible=true
-eqExpanded=false
-eqGains="[0,0,0,0,0,0,0,0,0,0]"
-eqPreset=Flat
+eqExpanded=true
+eqGains="[6,4,0,-2,1,3,4,5,4,3]"
+eqPreset=Cinema
 glyphSize=12
 groupedBgOpacity=0
 groupedSpacing=0
 infoFontSize=12
 infoGlyphSize=14
 islandBgOpacityIsland=1
-islandBgStyle=flat
-islandBorder=1
+islandBgStyle=gradient
+islandBorder=2
 islandBorderAlpha=1
 islandBorderAngle=45
 islandBorderGradient=false
-islandBorderMode=matugen
+islandBorderMode=wallust
 islandBorderSecondMode=matugen
 islandBorderSecondVar=$outline_variant
 islandBorderSecondWallustVar=$color15
 islandBorderVar=$surface
-islandBorderWallustVar=$color0
+islandBorderWallustVar=$color5
 islandRadius=30
 islandSpacing=6
 labelFontSize=10
 launcherBorderRadius=20
-launcherBorderWidth=2
+launcherBorderWidth=0
 launcherFixedTileHeight=78
 launcherFixedTileWidth=90
 launcherFrameHeight=640
 launcherFrameHeightVert=680
-launcherFrameWidth=1335
+launcherFrameWidth=1330
 launcherFrameWidthVert=1285
 launcherIconSize=48
 launcherInnerBorderWidth=1
@@ -3722,13 +3728,13 @@ trayIconSz=24
 trayItemPadH=3
 trayItemSpacing=2
 triCenterAutoHide=false
-triCenterAutoHideDelay=5
+triCenterAutoHideDelay=1
 triCenterBottomLeftRadius=20
 triCenterBottomRightRadius=20
 triCenterTopLeftRadius=20
 triCenterTopRightRadius=20
 triLeftAutoHide=false
-triLeftAutoHideDelay=5
+triLeftAutoHideDelay=1
 triLeftBottomLeftRadius=30
 triLeftBottomRightRadius=10
 triLeftTopLeftRadius=14
@@ -3736,7 +3742,7 @@ triLeftTopRightRadius=30
 triModuleSideMargin=6
 triPopupSideMargin=6
 triRightAutoHide=false
-triRightAutoHideDelay=5
+triRightAutoHideDelay=1
 triRightBottomLeftRadius=10
 triRightBottomRightRadius=30
 triRightTopLeftRadius=30
@@ -4101,7 +4107,6 @@ hl.on("hyprland.start", function()
 end)
 
 -- Environment variables
-hl.env("PATH", "$PATH:/usr/local/bin:/usr/bin:/bin:/home/$USERNAME/.cargo/bin")
 hl.env("XCURSOR_THEME", "geared-brass-32x")
 hl.env("XCURSOR_SIZE", "18")
 hl.env("HYPRCURSOR_THEME", "geared-brass-32x")
@@ -4251,7 +4256,7 @@ hl.config({
 
 -- Gestures
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
-hl.gesture({ fingers = 4, direction = "swipe", action = "move," })
+hl.gesture({ fingers = 4, direction = "swipe", action = "move" })
 hl.gesture({ fingers = 2, direction = "pinch", action = "float" })
 
 -- Keybindings
@@ -4367,7 +4372,6 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { description = "Aud
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { description = "Audio previous" })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("pactl set-source-mute @DEFAULT_SOURCE@ toggle"), { description = "Toggle microphone" })
 hl.bind("XF86Calculator", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/calculator.sh"), { description = "Open calculator" })
-hl.bind("XF86Lock", hl.dsp.exec_cmd("hyprlock"), { description = "Open screenlock" })
 hl.bind("code:236", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s +10 && notify-send \"Keyboard Backlight\" \"$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)\" -t 1000"), { description = "Keyboard brghtness up" })
 hl.bind("code:237", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s 10- && notify-send \"Keyboard Backlight\" \"$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)\" -t 1000"), { description = "Keyboard brghtness down" })
 

@@ -840,7 +840,6 @@ if test -d ~/.cargo/bin
 end
 
 # Aliases
-#alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='Candy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' --ignore='transparent.png' --ignore='GJS' --ignore='Candy.desktop' --ignore='HyprCandy.png' --ignore='candy-daemon.js' --ignore='candy-launcher.sh' --ignore='toggle-control-center.sh' --ignore='toggle-media-player.sh' --ignore='toggle-system-monitor.sh' --ignore='toggle-weather-widget.sh' --ignore='toggle-hyprland-settings.sh' --ignore='candy-system-monitor.js' --ignore='resources' --ignore='src' --ignore='meson.build' --ignore='README.md' --ignore='run.log' --ignore='test_layout.js' --ignore='test_media_menu.js' --ignore='toggle.js' --ignore='toggle-main.js' --ignore='~' --ignore='candy-main.js' --ignore='gjs-media-player.desktop' --ignore='gjs-toggle-controls.desktop' --ignore='main.js' --ignore='media-main.js' --ignore='SEEK_FEATURE.md' --ignore='setup-custom-icon.sh' --ignore='weather-main.js' */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
@@ -1271,8 +1270,6 @@ fi
 source $ZSH/oh-my-zsh.sh
 
 # Aliases
-
-#alias hyprcandy="cd .hyprcandy && git pull && stow --ignore='Candy' --ignore='Candy-Images' --ignore='Dock-SVGs' --ignore='Gifs' --ignore='Logo' --ignore='transparent.png' --ignore='GJS' --ignore='Candy.desktop' --ignore='HyprCandy.png' --ignore='candy-daemon.js' --ignore='candy-launcher.sh' --ignore='toggle-control-center.sh' --ignore='toggle-media-player.sh' --ignore='toggle-system-monitor.sh' --ignore='toggle-weather-widget.sh' --ignore='toggle-hyprland-settings.sh' --ignore='candy-system-monitor.js' --ignore='resources' --ignore='src' --ignore='meson.build' --ignore='README.md' --ignore='run.log' --ignore='test_layout.js' --ignore='test_media_menu.js' --ignore='toggle.js' --ignore='toggle-main.js' --ignore='~' --ignore='candy-main.js' --ignore='gjs-media-player.desktop' --ignore='gjs-toggle-controls.desktop' --ignore='main.js' --ignore='media-main.js' --ignore='SEEK_FEATURE.md' --ignore='setup-custom-icon.sh' --ignore='weather-main.js' */"
 alias ll="ls -alF"
 alias la="ls -A"
 alias l="ls -CF"
@@ -1413,13 +1410,9 @@ setup_hyprcandy() {
     # Go to the home directory
     cd "$HOME"
 
-    # Safely remove existing .zshrc, .hyprcandy-zsh.zsh and .icons files (only if they exist)
-    # [ -f "$HOME/.zshrc" ] && rm -f "$HOME/.zshrc"
-    [ -f "$HOME/.face.icon" ] && rm -f "$HOME/.face.icon"
+    # Safely remove existing .hyprcandy-zsh.zsh and .icons files (only if they exist)
     [ -f "$HOME/.hyprcandy-zsh.zsh" ] && rm -f "$HOME/.hyprcandy-zsh.zsh"
     [ -f "$HOME/.icons" ] && rm -f "$HOME/.icons"
-    [ -f "$HOME/Candy" ] && rm -f "$HOME/Candy"
-    [ -f "$HOME/GJS" ] && rm -f "$HOME/GJS"
 
     # 📁 Create Screenshots and Recordings directories if they don't exist
     echo "📁 Ensuring directories for screenshots and recordings exist..."
@@ -1436,7 +1429,7 @@ setup_hyprcandy() {
     config_dirs=(".config" ".icons" ".hyprcandy-zsh.zsh")
 
     # Add files/folders to exclude from deletion
-    preserve_items=("GJS" "Candy" "Greeter" "LICENSE" "README.md" ".git" ".gitignore")
+    preserve_items=("GIFS" "GJS" "Greeter" "Wallhaen" "LICENSE" "README.md" "transparent.png" ".git" ".gitignore")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
@@ -1466,12 +1459,12 @@ setup_hyprcandy() {
         rm -rf "$item"
     done
 
-# Stow all configurations at once, ignoring Candy folder
-if stow -v -t "$HOME" --ignore='Candy' --ignore='GJS' --ignore='Greeter' . 2>/dev/null; then
+# Stow all configurations at once, ignoring specific folders
+if stow -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' . 2>/dev/null; then
     echo "✅ Successfully stowed all configurations"
 else
     echo "⚠️  Stow operation failed — attempting restow..."
-    if stow -R -v -t "$HOME" --ignore='Candy' --ignore='GJS' --ignore='Greeter' . 2>/dev/null; then
+    if stow -R -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' . 2>/dev/null; then
         echo "✅ Successfully restowed all configurations"
     else
         echo "❌ Failed to stow configurations"
@@ -3476,8 +3469,8 @@ mkdir -p "$HOME/.config/wallpaper"
 # ═══════════════════════════════════════════════════════════════
 	cat > "$HOME/.config/wallpaper/wallpaper.ini" << 'EOF'
 [Settings]
-wallpaper = ~/Pictures/Candy/Candy-Images/Wallpaper/brown-map5.webp
-folder = ~/Pictures/Candy/Candy-Images/Wallpaper
+wallpaper = ~/Pictures/Wallhaven/1350454.png
+folder = ~/Pictures/Wallhaven
 monitors = All
 fill = fill
 sort = name
@@ -3533,7 +3526,6 @@ startVar=$primary
 colorRegenEnabled=true
 
 [cc-license-v1]
-lastVerified=
 licenseKey=EB5AA4E7-F8F74BEC-984F1FDB-992FC1C6
 licenseStatus=active
 licensedEmail=contact@hyprcandy.slmail.me
@@ -3583,9 +3575,9 @@ barBorderMode=wallust
 barBorderSecondMode=matugen
 barBorderSecondVar=$outline_variant
 barBorderSecondWallustVar=$color15
-barBorderVar=$source_color
+barBorderVar=$primary
 barBorderWallustVar=$color5
-barBorderWidth=1
+barBorderWidth=0
 barBottomLeftRadius=30
 barBottomRightRadius=30
 barEdgePaddingLeft=2
@@ -3598,7 +3590,7 @@ barPosition=top
 barRectBgStyle=glass
 barTopLeftRadius=14
 barTopRightRadius=14
-batteryRadialSize=16
+batteryRadialSize=20
 batteryRadialVisible=true
 batteryRadialWidth=2
 borderCava=false
@@ -3642,13 +3634,14 @@ ccUseDistroIcon=true
 clockDateBgOpacity=0.5
 clockIconSize=32
 clockTextSize=38
+clockWorldCities="[{\"city\":\"London\",\"timezone\":\"Europe/London\"},{\"city\":\"New York\",\"timezone\":\"America/New_York\"},{\"city\":\"Tokyo\",\"timezone\":\"Asia/Tokyo\"},{\"city\":\"Dubai\",\"timezone\":\"Asia/Dubai\"}]"
 desktopIconSize=56
 desktopLabelRadius=10
 desktopLabelSize=10
 desktopVisible=true
 distroBgOpacity=1
 dockAutoHide=false
-dockAutoHideDelay=5
+dockAutoHideDelay=1
 dockBackgroundStyle=glass
 dockBorderAlpha=0.45
 dockBorderColorVar=on_secondary
@@ -3672,36 +3665,36 @@ dockTopRightRadius=30
 dockTrashIconScale=0.75
 dockTrashIconSize=16
 dockVisible=true
-eqExpanded=false
-eqGains="[0,0,0,0,0,0,0,0,0,0]"
-eqPreset=Flat
+eqExpanded=true
+eqGains="[6,4,0,-2,1,3,4,5,4,3]"
+eqPreset=Cinema
 glyphSize=12
 groupedBgOpacity=0
 groupedSpacing=0
 infoFontSize=12
 infoGlyphSize=14
 islandBgOpacityIsland=1
-islandBgStyle=flat
-islandBorder=1
+islandBgStyle=gradient
+islandBorder=2
 islandBorderAlpha=1
 islandBorderAngle=45
 islandBorderGradient=false
-islandBorderMode=matugen
+islandBorderMode=wallust
 islandBorderSecondMode=matugen
 islandBorderSecondVar=$outline_variant
 islandBorderSecondWallustVar=$color15
 islandBorderVar=$surface
-islandBorderWallustVar=$color2
+islandBorderWallustVar=$color5
 islandRadius=30
 islandSpacing=6
 labelFontSize=10
 launcherBorderRadius=20
-launcherBorderWidth=1
+launcherBorderWidth=0
 launcherFixedTileHeight=78
 launcherFixedTileWidth=90
 launcherFrameHeight=640
 launcherFrameHeightVert=680
-launcherFrameWidth=1335
+launcherFrameWidth=1330
 launcherFrameWidthVert=1285
 launcherIconSize=48
 launcherInnerBorderWidth=1
@@ -3778,13 +3771,13 @@ trayIconSz=24
 trayItemPadH=3
 trayItemSpacing=2
 triCenterAutoHide=false
-triCenterAutoHideDelay=5
+triCenterAutoHideDelay=1
 triCenterBottomLeftRadius=20
 triCenterBottomRightRadius=20
 triCenterTopLeftRadius=20
 triCenterTopRightRadius=20
 triLeftAutoHide=false
-triLeftAutoHideDelay=5
+triLeftAutoHideDelay=1
 triLeftBottomLeftRadius=30
 triLeftBottomRightRadius=10
 triLeftTopLeftRadius=14
@@ -3792,7 +3785,7 @@ triLeftTopRightRadius=30
 triModuleSideMargin=6
 triPopupSideMargin=6
 triRightAutoHide=false
-triRightAutoHideDelay=5
+triRightAutoHideDelay=1
 triRightBottomLeftRadius=10
 triRightBottomRightRadius=30
 triRightTopLeftRadius=30
@@ -3850,18 +3843,20 @@ mkdir -p "$HOME/.cache/quickshell/wallpaper"
         echo "⚠️  'gsettings' not found. Skipping GNOME button layout configuration."
     fi
     
-    # 📁 Copy Candy folder to ~/Pictures
+    # 📁 Copy background images to ~/Pictures
     echo
-    echo "📁 Attempting to copy 'Candy' images folder to ~/Pictures..."
-    if [ -d "$hyprcandy_dir/Candy" ]; then
+    echo "📁 Copying background images to ~/Pictures..."
+    if [ -d "$hyprcandy_dir/Wallhaven" ]; then
         if [ -d "$HOME/Pictures" ]; then
-            cp -r "$hyprcandy_dir/Candy" "$HOME/Pictures/"
-            echo "✅ 'Candy' copied successfully to ~/Pictures"
+            cp -r "$hyprcandy_dir/Wallhaven" "$HOME/Pictures/"
+            cp -r "$hyprcandy_dir/Gifs" "$HOME/Pictures/"
+            cp -r "$hyprcandy_dir/transparent.png" "$HOME/Pictures/"
+            echo "✅ Backgrounds copied successfully to ~/Pictures"
         else
             echo "⚠️  Skipped copy: '$HOME/Pictures' directory does not exist."
         fi
     else
-        echo "⚠️  'Candy' folder not found in $hyprcandy_dir"
+        echo "⚠️  'Wallhaven' folder not found in $hyprcandy_dir"
     fi
 
     # 🔐 Add sudoers entry for background script
@@ -4386,7 +4381,7 @@ hl.config({
 
 -- Gestures
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
-hl.gesture({ fingers = 4, direction = "swipe", action = "move," })
+hl.gesture({ fingers = 4, direction = "swipe", action = "move" })
 hl.gesture({ fingers = 2, direction = "pinch", action = "float" })
 
 -- Keybindings
@@ -4502,7 +4497,6 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { description = "Aud
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { description = "Audio previous" })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("pactl set-source-mute @DEFAULT_SOURCE@ toggle"), { description = "Toggle microphone" })
 hl.bind("XF86Calculator", hl.dsp.exec_cmd("~/.config/hyprcandy/settings/calculator.sh"), { description = "Open calculator" })
-hl.bind("XF86Lock", hl.dsp.exec_cmd("hyprlock"), { description = "Open screenlock" })
 hl.bind("code:236", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s +10 && notify-send \"Keyboard Backlight\" \"$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)\" -t 1000"), { description = "Keyboard brghtness up" })
 hl.bind("code:237", hl.dsp.exec_cmd("brightnessctl -d smc::kbd_backlight s 10- && notify-send \"Keyboard Backlight\" \"$(brightnessctl -d smc::kbd_backlight | grep -o '[0-9]*%' | head -1)\" -t 1000"), { description = "Keyboard brghtness down" })
 
