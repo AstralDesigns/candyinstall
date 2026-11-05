@@ -1624,7 +1624,9 @@ fi
 
 set -euo pipefail
 
-CONFDIR="$HOME/.config/quickshell"
+CONFDIR="$HOME/.config/quickshell/lockscreens"
+# Active lockscreen theme (folder under CONFDIR), chosen by the CC Lockscreen tab.
+CURRENT="$(cat "$CONFDIR/lockscreens-current" 2>/dev/null || echo candylock)"
 # Pre-seed active wallpaper path so candylock renders wallpaper synchronously on frame 0
 if [ -f "$HOME/.config/wallpaper/wallpaper.ini" ]; then
     WP=$(sed -n 's/^wallpaper[[:space:]]*=[[:space:]]*//p' "$HOME/.config/wallpaper/wallpaper.ini" | head -n1 | sed "s|^~|$HOME|")
@@ -1635,14 +1637,14 @@ fi
 touch /tmp/qs-candylock-trans.lock 2>/dev/null || true
 
 # Rebuild pam_auth if source is newer than binary or binary missing
-if [ "$CONFDIR/candylock/pam_auth.c" -nt "$CONFDIR/candylock/pam_auth" ] 2>/dev/null || \
-   [ ! -x "$CONFDIR/candylock/pam_auth" ]; then
-    gcc -O2 -o "$CONFDIR/candylock/pam_auth" "$CONFDIR/candylock/pam_auth.c" -lpam
+if [ "$CONFDIR/$CURRENT/pam_auth.c" -nt "$CONFDIR/$CURRENT/pam_auth" ] 2>/dev/null || \
+   [ ! -x "$CONFDIR/$CURRENT/pam_auth" ]; then
+    gcc -O2 -o "$CONFDIR/$CURRENT/pam_auth" "$CONFDIR/$CURRENT/pam_auth.c" -lpam
 fi
 
 # Kill any stale instance
-if pgrep -f "qs -c candylock$" >/dev/null 2>&1; then
-    pkill -f "qs -c candylock$" 2>/dev/null || true
+if pgrep -f "qs -p .*lockscreens/" >/dev/null 2>&1; then
+    pkill -f "qs -p .*lockscreens/" 2>/dev/null || true
     sleep 0.05
 fi
 
@@ -1658,7 +1660,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Start (blocks until unlocked)
-qs -c candylock
+qs -p "$CONFDIR/$CURRENT"
 EOF
 
 chmod +x "$HOME/.config/hyprcandy/scripts/candylock.sh"
@@ -3819,6 +3821,7 @@ wsSeparators=true
 wsSpacing=4
 EOF
 
+find "$HOME/.config/hypr/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;

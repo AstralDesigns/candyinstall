@@ -1036,8 +1036,11 @@ setup_hyprcandy() {
 	# Legacy desktop entry will be replaced later with a new version
 	rm -rf ~/.local/share/applications/Candy.desktop 
 
-# Remove previous cached installer
-rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
+    # Remove previous cached installer
+    rm -rf "$USER_HOME/.cache/paru/clone/hyprcandy-plus/"
+
+    # Remove legacy lockscreen
+    rm -rf "$USER_HOME/.hyprcandy/.config/quickshell/candylock/"
     
     # Install display manager packages
     if [ "$DISPLAY_MANAGER" = "sddm" ]; then
@@ -1346,7 +1349,9 @@ fi
 
 set -euo pipefail
 
-CONFDIR="$HOME/.config/quickshell"
+CONFDIR="$HOME/.config/quickshell/lockscreens"
+# Active lockscreen theme (folder under CONFDIR), chosen by the CC Lockscreen tab.
+CURRENT="$(cat "$CONFDIR/lockscreens-current" 2>/dev/null || echo candylock)"
 # Pre-seed active wallpaper path so candylock renders wallpaper synchronously on frame 0
 if [ -f "$HOME/.config/wallpaper/wallpaper.ini" ]; then
     WP=$(sed -n 's/^wallpaper[[:space:]]*=[[:space:]]*//p' "$HOME/.config/wallpaper/wallpaper.ini" | head -n1 | sed "s|^~|$HOME|")
@@ -1357,14 +1362,14 @@ fi
 touch /tmp/qs-candylock-trans.lock 2>/dev/null || true
 
 # Rebuild pam_auth if source is newer than binary or binary missing
-if [ "$CONFDIR/candylock/pam_auth.c" -nt "$CONFDIR/candylock/pam_auth" ] 2>/dev/null || \
-   [ ! -x "$CONFDIR/candylock/pam_auth" ]; then
-    gcc -O2 -o "$CONFDIR/candylock/pam_auth" "$CONFDIR/candylock/pam_auth.c" -lpam
+if [ "$CONFDIR/$CURRENT/pam_auth.c" -nt "$CONFDIR/$CURRENT/pam_auth" ] 2>/dev/null || \
+   [ ! -x "$CONFDIR/$CURRENT/pam_auth" ]; then
+    gcc -O2 -o "$CONFDIR/$CURRENT/pam_auth" "$CONFDIR/$CURRENT/pam_auth.c" -lpam
 fi
 
 # Kill any stale instance
-if pgrep -f "qs -c candylock$" >/dev/null 2>&1; then
-    pkill -f "qs -c candylock$" 2>/dev/null || true
+if pgrep -f "qs -p .*lockscreens/" >/dev/null 2>&1; then
+    pkill -f "qs -p .*lockscreens/" 2>/dev/null || true
     sleep 0.05
 fi
 
@@ -1380,7 +1385,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Start (blocks until unlocked)
-qs -c candylock
+qs -p "$CONFDIR/$CURRENT"
 EOF
 
 chmod +x "$USER_HOME/.config/hyprcandy/scripts/candylock.sh"
@@ -3454,328 +3459,100 @@ EOF
 chmod +x "$USER_HOME/.config/hyprcandy/scripts/system-update.sh"
 
 # ═══════════════════════════════════════════════════════════════
-#             		      Config
+#             		     Hypridle Config
 # ═══════════════════════════════════════════════════════════════
+    cat > "$USER_HOME/.config/hypr/hypridle.conf" << 'EOF'
+general {
+    # Pause all players and avoid starting multiple candylock instances
+    lock_cmd = playerctl --all-players pause && pidof qs || qs -p "$HOME/.config/quickshell/lockscreens/$(cat "$HOME/.config/quickshell/lockscreens/lockscreens-current" 2>/dev/null || echo candylock)"
+    before_sleep_cmd = loginctl lock-session    # lock before suspend.
+    after_sleep_cmd = hyprctl dispatch dpms on  # to avoid having to press a key twice to turn on the display.
+}
 
-cat > "$HOME/.hyprcandy/.config/hyprcandy/hyprcandy-bar.conf" << 'EOF'
-[cc-appearance-v1]
-winBgAlpha=1
+listener {
+    timeout = 40                                                        # ~40s dim
+    on-timeout = { brightnessctl -s && brightnessctl s 60% ;}          # dim monitor; avoid 0 on OLED
+    on-resume = brightnessctl -r                                        # restore brightness
+}
 
-[cc-border-colors-v1]
-activeBorderColor=
-activeBorderMode=pywal
-activeBorderPywalVar=$color3
-activeBorderVar=$inverse_primary
-inactiveBorderColor=
-inactiveBorderMode=pywal
-inactiveBorderPywalVar=$background
-inactiveBorderVar=$background
+# Uncomment if you have keyboard backlight
+# listener {
+#     timeout = 480
+#     on-timeout = brightnessctl -sd rgb:kbd_backlight set 0
+#     on-resume = brightnessctl -rd rgb:kbd_backlight
+# }
 
-[cc-cava-colors-v1]
-endMode=matugen
-endVar=$primary
-glyphMode=wallust
-glyphVar=$primary
-startMode=wallust
-startVar=$primary
+listener {
+    timeout = 60                                                        # 1min
+    on-timeout = loginctl lock-session                                  # triggers lock_cmd above
+}
 
-[cc-color-regen-v1]
-colorRegenEnabled=true
+listener {
+    timeout = 85                                                        # ~1m25s
+    on-timeout = hyprctl dispatch dpms off                              # screen off
+    on-resume = hyprctl dispatch dpms on && brightnessctl -r            # screen on + brightness restore
+}
 
-[cc-license-v1]
-licenseKey=EB5AA4E7-F8F74BEC-984F1FDB-992FC1C6
-licenseStatus=active
-licensedEmail=contact@hyprcandy.slmail.me
-
-[cc-tabs-v1]
-activeBarSubTab=0
-activeKbSubTab=0
-activeTab=1
-
-[cc-theme-v1]
-currentTheme=scheme-smart
-
-[cc-weather-loc-v1]
-pinnedLat=
-pinnedLon=
-pinnedName=
-
-[cc-wp-picker-v1]
-wallpaperDir=
-
-[dock]
-autohide=false
-autohide_delay=1
-layer=top
-margin_from_edge=6
-
-[hyprland]
-active_border=$color3
-blur_passes=5
-blur_size=1
-gaps_out=20
-inactive_border=$background
-kb_layout=
-opacity=0.90
-rounding=10
-xray=true
-
-[qs-bar-config-v1]
-activeWindowBgOpacity=0
-activeWindowMinWidth=23
-barAutoHide=false
-barAutoHideDelay=5
-barBorderAlpha=0.25
-barBorderAngle=45
-barBorderGradient=false
-barBorderMode=wallust
-barBorderSecondMode=matugen
-barBorderSecondVar=$outline_variant
-barBorderSecondWallustVar=$color15
-barBorderVar=$primary_fixed_dim
-barBorderWallustVar=$color0
-barBorderWidth=1
-barBottomLeftRadius=30
-barBottomRightRadius=30
-barEdgePaddingLeft=2
-barEdgePaddingRight=2
-barHeight=34
-barMode=shell
-barMonitors=[0]
-barPad=8
-barPosition=top
-barRectBgStyle=glass
-barTopLeftRadius=14
-barTopRightRadius=14
-batteryRadialSize=16
-batteryRadialVisible=true
-batteryRadialWidth=2
-borderCava=false
-borderClockDate=false
-borderDistro=true
-borderLeftGroup=false
-borderMedia=false
-borderRightGroup=false
-borderStartMenu=true
-borderStartTrash=true
-borderWeatherBat=false
-borderWs=true
-cavaActiveOpacity=0.85
-cavaAutoHide=true
-cavaBarSpacing=0
-cavaBgOpacity=0.5
-cavaEndCustomColor=@Variant(\0\0\0\x43\x1\xff\xff\0\0\0\0\0\0\0\0)
-cavaEndMode=matugen
-cavaEndPywalVar=$color1
-cavaEndVar=$primary
-cavaEndWallustVar=$color0
-cavaGlyphCustomColor=@Variant(\0\0\0\x43\x1\xff\xff\xff\xff\xff\xff\xff\xff\0\0)
-cavaGradientEnabled=true
-cavaGradientSplit=0.5
-cavaInactiveOpacity=0
-cavaStartCustomColor=@Variant(\0\0\0\x43\x1\xff\xff\xff\xff\xff\xff\xff\xff\0\0)
-cavaStartMode=wallust
-cavaStartPywalVar=$color4
-cavaStartVar=$primary
-cavaStartWallustVar=$color5
-cavaStyle=mirror
-cavaTransparentWhenInactive=true
-cavaWaveSmooth=true
-cavaWaveThickness=2
-cavaWidth=25
-ccCustomIconPath=
-ccGlyph=
-ccGlyphColorA=1
-ccIconMode=glyph
-ccUseDistroIcon=true
-clockDateBgOpacity=0.5
-clockIconSize=32
-clockTextSize=38
-clockWorldCities="[{\"city\":\"London\",\"timezone\":\"Europe/London\"},{\"city\":\"New York\",\"timezone\":\"America/New_York\"},{\"city\":\"Tokyo\",\"timezone\":\"Asia/Tokyo\"},{\"city\":\"Dubai\",\"timezone\":\"Asia/Dubai\"}]"
-desktopIconSize=56
-desktopLabelRadius=10
-desktopLabelSize=10
-desktopVisible=true
-distroBgOpacity=1
-dockAutoHide=false
-dockAutoHideDelay=1
-dockBackgroundStyle=glass
-dockBorderAlpha=0.45
-dockBorderColorVar=on_secondary
-dockBorderWidth=1
-dockBottomLeftRadius=30
-dockBottomRightRadius=30
-dockButtonSpacing=0
-dockIconSize=24
-dockInnerPadding=8
-dockLayer=top
-dockMargin=6
-dockPadding=4
-dockPosition=bottom
-dockRadius=30
-dockReserveSpace=false
-dockStartIcon=
-dockStartIconScale=0.7999999999999999
-dockStartIconSize=20
-dockTopLeftRadius=30
-dockTopRightRadius=30
-dockTrashIconScale=0.75
-dockTrashIconSize=16
-dockVisible=true
-eqExpanded=true
-eqGains="[6,4,0,-2,1,3,4,5,4,3]"
-eqPreset=Cinema
-glyphSize=12
-groupedBgOpacity=0
-groupedSpacing=0
-infoFontSize=12
-infoGlyphSize=14
-islandBgOpacityIsland=1
-islandBgStyle=gradient
-islandBorder=1
-islandBorderAlpha=1
-islandBorderAngle=45
-islandBorderGradient=false
-islandBorderMode=matugen
-islandBorderSecondMode=matugen
-islandBorderSecondVar=$outline_variant
-islandBorderSecondWallustVar=$color15
-islandBorderVar=$source_color
-islandBorderWallustVar=$color5
-islandRadius=30
-islandSpacing=6
-labelFontSize=10
-launcherBorderRadius=20
-launcherBorderWidth=1
-launcherFixedTileHeight=78
-launcherFixedTileWidth=90
-launcherFrameHeight=640
-launcherFrameHeightVert=680
-launcherFrameWidth=1330
-launcherFrameWidthVert=1285
-launcherIconSize=48
-launcherInnerBorderWidth=1
-launcherInnerPadding=10
-launcherListRadius=12
-launcherSearchRadius=12
-launcherSearchWidth=0.2
-launcherTextFontSize=11
-leftGroupBgOpacity=0.5
-mediaBgOpacity=1
-mediaCtlSize=11
-mediaGlyphSize=10
-mediaInfoFontSize=10
-mediaPadBottom=2
-mediaPadLeft=0
-mediaPadRight=0
-mediaPadTop=2
-mediaThumbSize=22
-modPadH=4
-modPadV=2
-moduleBgOpacity=0.5
-moduleHeight=24
-outerMarginBottom=0
-outerMarginSide=6
-outerMarginTop=6
-rightGroupBgOpacity=0.5
-shellArmThickness=8
-shellCenterJunctionRadius=20
-shellInnerRadius=20
-shellModuleAutoHide=false
-shellModuleAutoHideDelay=5
-shellModuleSideMargin=6
-shellPopupSideMargin=6
-showBattery=true
-showBluetooth=true
-showCava=true
-showClock=true
-showDate=true
-showDistro=true
-showIdleInhibitor=true
-showMediaPlayer=true
-showNotifications=true
-showOverview=true
-showPowerProfiles=true
-showTray=true
-showUpdates=true
-showWallpaper=true
-showWeather=true
-showWorkspaces=true
-startMenuBgOpacity=1
-tipBattery=true
-tipClock=true
-tipControlCenter=true
-tipCpu=true
-tipDate=true
-tipDistro=true
-tipGpu=true
-tipIdleInhibitor=true
-tipMedia=true
-tipNetwork=true
-tipNotifications=true
-tipOverview=true
-tipPower=true
-tipPowerProfiles=true
-tipRam=true
-tipStartMenu=true
-tipSystemTray=true
-tipUpdates=true
-tipVolume=true
-tipWallpaper=true
-tipWeather=true
-trayBgOpacity=0
-trayIconSz=24
-trayItemPadH=3
-trayItemSpacing=2
-triCenterAutoHide=false
-triCenterAutoHideDelay=1
-triCenterBottomLeftRadius=20
-triCenterBottomRightRadius=20
-triCenterTopLeftRadius=20
-triCenterTopRightRadius=20
-triLeftAutoHide=false
-triLeftAutoHideDelay=1
-triLeftBottomLeftRadius=30
-triLeftBottomRightRadius=10
-triLeftTopLeftRadius=14
-triLeftTopRightRadius=30
-triModuleSideMargin=6
-triPopupSideMargin=6
-triRightAutoHide=false
-triRightAutoHideDelay=1
-triRightBottomLeftRadius=10
-triRightBottomRightRadius=30
-triRightTopLeftRadius=30
-triRightTopRightRadius=14
-ungroupedBgOpacity=0
-weatherBatBgOpacity=1
-weatherIconSize=18
-wsActiveOpacity=1
-wsBgOpacity=1
-wsCount=2
-wsDotActive=󰮯
-wsDotEmpty=󰮯
-wsDotPersistent=󰮯
-wsEmptyOpacity=1
-wsGlyphSize=14
-wsIconMode=icon
-wsIcons="[\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]"
-wsMarginLeft=0
-wsMarginRight=0
-wsPadBottom=2
-wsPadLeft=0
-wsPadRight=0
-wsPadTop=2
-wsPersistentOpacity=1
-wsSeparatorGlyph=
-wsSeparatorOpacity=1
-wsSeparatorPadLeft=0
-wsSeparatorPadRight=3
-wsSeparatorSize=14
-wsSeparators=true
-wsSpacing=4
+listener {
+    timeout = 90                                                        # 1m30s
+    on-timeout = systemctl suspend                                      # suspend
+}
 EOF
 
+# ═══════════════════════════════════════════════════════════════
+#             		        Power Script
+# ═══════════════════════════════════════════════════════════════
+    cat > "$USER_HOME/.config/hypr/power.sh" << 'EOF'
+#!/bin/bash
+#    ___                    
+#   / _ \___ _    _____ ____
+#  / ___/ _ \ |/|/ / -_) __/
+# /_/   \___/__,__/\__/_/   
+#                           
+
+USERNAME=$(whoami)
+
+if [[ "$1" == "exit" ]]; then
+  echo ":: Exit"
+  hyprshutdown -t 'Logging out...' --post-cmd "hyprctl dispatch hl.dsp.exit()" > /dev/null 2>&1
+fi
+
+if [[ "$1" == "lock" ]]; then
+  echo ":: Lock"
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+fi
+
+if [[ "$1" == "reboot" ]]; then
+  echo ":: Reboot"
+  hyprshutdown -t 'Restarting...' --post-cmd 'reboot' > /dev/null 2>&1
+fi
+
+if [[ "$1" == "shutdown" ]]; then
+  echo ":: Shutdown"
+  hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0' > /dev/null 2>&1
+fi
+
+if [[ "$1" == "suspend" ]]; then
+  echo ":: Suspend"
+  # Marker carries the action so candylock sleeps with the RIGHT method AFTER
+  # the session is locked (see suspendIfFlagged in candylock/shell.qml).
+  echo suspend > /tmp/.qs-candylock-sleep
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+  rm -f /tmp/.qs-candylock-sleep
+fi
+
+if [[ "$1" == "hibernate" ]]; then
+  echo ":: Hibernate"
+  # Mirror suspend: lock first, then suspend-to-disk once secured, so the
+  # session is never exposed on resume. Only reachable when the Hibernate
+  # button is shown, i.e. logind CanHibernate=yes (swap+resume configured).
+  echo hibernate > /tmp/.qs-candylock-sleep
+  "$HOME/.config/hyprcandy/scripts/candylock.sh"
+  rm -f /tmp/.qs-candylock-sleep
+fi
+EOF
+
+find "$USER_HOME/.config/hypr/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
