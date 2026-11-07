@@ -3821,6 +3821,33 @@ wsSeparators=true
 wsSpacing=4
 EOF
 
+# ═══════════════════════════════════════════════════════════════
+#             		     Fastfetch Wrapper
+# ═══════════════════════════════════════════════════════════════
+    cat > "$HOME/.local/bin/fastfetch" << 'EOF'
+#!/usr/bin/env bash
+# HyprCandy fastfetch smart graphics wrapper
+has_logo_flag=0
+for arg in "$@"; do
+    case "$arg" in
+        --logo-type*|--kitty*|--iterm*|--sixel*|--chafa*|--file*|--raw*|-l|--logo)
+            has_logo_flag=1
+            break
+            ;;
+    esac
+done
+
+if [ "$has_logo_flag" -eq 0 ]; then
+    if [ -n "$HYPRCANDY_WORKSPACE_TERM" ]; then
+        exec /usr/bin/fastfetch --logo-type iterm "$@"
+    elif [ -n "$KITTY_WINDOW_ID" ] || [ -n "$KITTY_PID" ] || [[ "${TERM:-}" == *"kitty"* ]]; then
+        exec /usr/bin/fastfetch --logo-type kitty "$@"
+    fi
+fi
+
+exec /usr/bin/fastfetch "$@"
+EOF
+
 find "$HOME/.config/hypr/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/hooks/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
