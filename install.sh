@@ -387,7 +387,8 @@ build_package_list() {
         "nwg-look"
         
         # System utilities
-        "hostapd" #hotspot
+        "hostapd"
+        "openssh"
 		"switcheroo-control"
         "nwg-displays"
         "uwsm"
