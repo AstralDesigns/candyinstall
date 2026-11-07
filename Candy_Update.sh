@@ -4830,6 +4830,18 @@ cleanup() {
     
     # Clear persisted update state; sentinels are cleaned up by Quickshell after agent build
     rm -f "$USER_HOME/.config/hyprcandy/hc-update-state"
+
+    # Rebuild agent-app frontend so new npm dependencies (e.g. @xterm/xterm) are
+    # bundled into dist/. Runs as the invoking user so node_modules aren't root-owned.
+    _AGENT_APP="$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app"
+    if [ -f "$_AGENT_APP/build.sh" ]; then
+        echo "🔨 Rebuilding agent-app frontend..."
+        if [ "$(id -u)" = "0" ] && [ -n "$USER_NAME" ]; then
+            su - "$USER_NAME" -c "cd '$_AGENT_APP' && bash build.sh" || echo "⚠️  agent-app build failed — workspace will use previous dist"
+        else
+            (cd "$_AGENT_APP" && bash build.sh) || echo "⚠️  agent-app build failed — workspace will use previous dist"
+        fi
+    fi
     # This script runs fully as ROOT under pkexec, so files it wrote into the
     # user home are root-owned and break the next user-mode run (e.g. install.sh
     # "curl -o ~/.cache/hyprcandy-qs.pkg.tar.zst" -> permission denied)
