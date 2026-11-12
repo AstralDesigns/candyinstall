@@ -4031,7 +4031,7 @@ EOF
             sudo tee /etc/sddm.conf.d/hyprcandy.conf > /dev/null << EOF
 [Theme]
 Current=$HC_CURRENT
-CursorTheme=geared-brass-32x
+CursorTheme=geared-steel-32x
 CursorSize=18
 EOF
         fi
@@ -4263,9 +4263,9 @@ hl.on("hyprland.start", function()
 end)
 
 -- Environment variables
-hl.env("XCURSOR_THEME", "geared-brass-32x")
+hl.env("XCURSOR_THEME", "geared-steel-32x")
 hl.env("XCURSOR_SIZE", "18")
-hl.env("HYPRCURSOR_THEME", "geared-brass-32x")
+hl.env("HYPRCURSOR_THEME", "geared-steel-32x")
 hl.env("HYPRCURSOR_SIZE", "18")
 hl.env("GTK_THEME", "adw-gtk3-dark")
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")

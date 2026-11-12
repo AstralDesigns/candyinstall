@@ -1153,7 +1153,7 @@ if [ -d "$GREETER_THEMES" ]; then
     if [ -f /etc/sddm.conf.d/hyprcandy.conf ] && grep -q '^Current=' /etc/sddm.conf.d/hyprcandy.conf; then
         sed -i "s|^Current=.*|Current=$HC_CUR|" /etc/sddm.conf.d/hyprcandy.conf
     else
-        printf '[Theme]\nCurrent=%s\nCursorTheme=geared-brass-32x\nCursorSize=18\n' "$HC_CUR" > /etc/sddm.conf.d/hyprcandy.conf
+        printf '[Theme]\nCurrent=%s\nCursorTheme=geared-steel-32x\nCursorSize=18\n' "$HC_CUR" > /etc/sddm.conf.d/hyprcandy.conf
     fi
     rm -f /etc/sddm.conf.d/sugar-candy.conf
 fi
@@ -4466,9 +4466,9 @@ hl.on("hyprland.start", function()
 end)
 
 -- Environment variables
-hl.env("XCURSOR_THEME", "geared-brass-32x")
+hl.env("XCURSOR_THEME", "geared-steel-32x")
 hl.env("XCURSOR_SIZE", "18")
-hl.env("HYPRCURSOR_THEME", "geared-brass-32x")
+hl.env("HYPRCURSOR_THEME", "geared-steel-32x")
 hl.env("HYPRCURSOR_SIZE", "18")
 hl.env("GTK_THEME", "adw-gtk3-dark")
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
