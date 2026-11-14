@@ -3860,7 +3860,7 @@ hl.window_rule({
 hl.window_rule({
     name = "windowrule-38",
     match = {
-        class = "^(Nm-connection-editor)$",
+        title = "^(Network Connections)$",
     },
     float = true,
 })
