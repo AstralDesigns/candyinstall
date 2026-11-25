@@ -3134,7 +3134,12 @@ USERNAME=$(whoami)
 
 if [[ "$1" == "exit" ]]; then
   echo ":: Exit"
-  hyprshutdown -t 'Logging out...' --post-cmd "hyprctl dispatch hl.dsp.exit()" > /dev/null 2>&1
+  # Direct logout: hyprshutdown closes apps (qs bar / awww included) as part
+  # of its sequence, so cancelling its dialog can leave a half-dead session
+  # (and it forks, so the cancel is not detectable via exit status). Exiting
+  # Hyprland outright returns to SDDM (autologin on live), which rebuilds the
+  # whole session via the normal autostarts - no stuck state possible.
+  hyprctl dispatch 'hl.dsp.exit()'
 fi
 
 if [[ "$1" == "lock" ]]; then
@@ -3144,12 +3149,15 @@ fi
 
 if [[ "$1" == "reboot" ]]; then
   echo ":: Reboot"
-  hyprshutdown -t 'Restarting...' --post-cmd 'reboot' > /dev/null 2>&1
+  # Direct logind action (same rationale as Exit): hyprshutdown pre-closes
+  # apps and forks, so a cancelled dialog could leave a half-dead session.
+  # logind tears all sessions down cleanly and proceeds unconditionally.
+  systemctl reboot
 fi
 
 if [[ "$1" == "shutdown" ]]; then
   echo ":: Shutdown"
-  hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0' > /dev/null 2>&1
+  systemctl poweroff
 fi
 
 if [[ "$1" == "suspend" ]]; then
