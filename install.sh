@@ -1506,9 +1506,15 @@ sudo -n "$HOME/.config/quickshell/bar/scripts/greeter-sync.sh" 2>/dev/null || tr
 echo "✅ Setting up HC+ workspace"
 cd "$HOME/.hyprcandy/GJS/hyprcandydock/agent-app/"
 chmod +x hc-agent-build.sh
-bash build.sh
-cd
-echo "✅ Succesfully created HC+ workspace"
+# Report the real outcome: build.sh runs under set -e (venv/npm/tsc/vite can
+# fail on low-RAM or offline machines) — don't claim success unconditionally.
+if bash build.sh; then
+    cd
+    echo "✅ Succesfully created HC+ workspace"
+else
+    cd
+    echo "⚠️  HC+ workspace build failed — retry with: bash ~/.hyprcandy/GJS/hyprcandydock/agent-app/build.sh"
+fi
 
 # ── Patched quickshell (hyprcandy-qs) with QtWebEngine support (launcher browser) ──
 # Stock quickshell (repo/CachyOS and Arch) builds QGuiApplication with argc=0, which
