@@ -1187,8 +1187,17 @@ hc_qs_installed=0
 print_status "Fetching prebuilt patched quickshell (hyprcandy-qs, QtWebEngine)..."
 if curl -fL "$HC_QS_URL" -o "$HC_QS_PKG"; then
     if sudo pacman -U --noconfirm --overwrite='*' "$HC_QS_PKG"; then
-        print_success "hyprcandy-qs installed (prebuilt) - embedded browser enabled."
-        hc_qs_installed=1
+        # pacman -U cannot see Qt ABI drift: the PKGBUILD deps are unversioned,
+        # so a prebuilt from an older Qt installs cleanly and then dies at
+        # runtime ("symbol lookup error ... undefined symbol ... version Qt_6",
+        # e.g. QMenu::resizeEvent dropped in qt6-base 6.12). Resolve every
+        # symbol before trusting it; on drift, rebuild against the installed Qt.
+        if ldd -r /usr/bin/qs 2>&1 | grep -q 'undefined symbol'; then
+            print_warning "Prebuilt hyprcandy-qs doesn't match installed Qt (ABI drift) - rebuilding from source..."
+        else
+            print_success "hyprcandy-qs installed (prebuilt) - embedded browser enabled."
+            hc_qs_installed=1
+        fi
     else
         print_warning "Prebuilt package failed to install (ABI/glibc mismatch) - rebuilding from source..."
     fi
@@ -1199,7 +1208,11 @@ if [ "$hc_qs_installed" -eq 0 ]; then
     if [ -f "$HC_QS_SRC/PKGBUILD" ]; then
         rm -rf "$HC_QS_BUILD"; mkdir -p "$HC_QS_BUILD"
         cp -f "$HC_QS_SRC/PKGBUILD" "$HC_QS_BUILD/PKGBUILD"
-        if ( cd "$HC_QS_BUILD" && makepkg -si --noconfirm ); then
+        # makepkg refuses root and this script runs under pkexec: hand the
+        # build dir to the invoking user and build as them (same pattern as
+        # the cargo pass above).
+        chown -R "$USER_NAME:$USER_NAME" "$HC_QS_BUILD" 2>/dev/null || true
+        if su - "$USER_NAME" -c "cd '$HC_QS_BUILD' && makepkg -si --noconfirm"; then
             print_success "hyprcandy-qs installed (source build) - embedded browser enabled."
         else
             print_warning "hyprcandy-qs build FAILED - launcher browser will not load WebEngine."
