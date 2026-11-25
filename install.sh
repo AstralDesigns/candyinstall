@@ -3882,7 +3882,7 @@ find "$HOME/.config/hyprcandy/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/quickshell/candylock/" -name "*.sh" -exec chmod +x {} \;
+find "$HOME/.config/quickshell/lockscreens/" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.config/quickshell/wallpaper/" -name "*.sh" -exec chmod +x {} \;
 mkdir -p "$HOME/.cache/quickshell/overview"
 mkdir -p "$HOME/.cache/quickshell/wallpaper"

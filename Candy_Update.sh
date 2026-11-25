@@ -4173,7 +4173,7 @@ find "$USER_HOME/.config/quickshell/bar/" -maxdepth 1 -name "*.sh" -exec chmod +
 find "$USER_HOME/.config/quickshell/bar/scripts/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.hyprcandy/GJS/hyprcandydock/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.hyprcandy/GJS/hyprcandydock/agent-app/" -name "*.sh" -exec chmod +x {} \;
-find "$USER_HOME/.config/quickshell/candylock/" -name "*.sh" -exec chmod +x {} \;
+find "$USER_HOME/.config/quickshell/lockscreens/" -name "*.sh" -exec chmod +x {} \;
 find "$USER_HOME/.config/quickshell/wallpaper/" -name "*.sh" -exec chmod +x {} \;
 #mkdir -p "$USER_HOME/.cache/quickshell/overview"
 #mkdir -p "$USER_HOME/.cache/quickshell/wallpaper"
