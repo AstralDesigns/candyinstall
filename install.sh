@@ -1408,7 +1408,10 @@ setup_hyprcandy() {
     # Ensure ~/.config exists, then remove specified subdirectories
     [ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
     cd "$HOME/.config" || exit 1
-    rm -rf background background.png btop cava dolphinrc fastfetch gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct quickshell swaync wal wallust waybar waypaper wlogout xsettingsd
+    # fish / starship.toml / systemd are repo-managed now: real copies left by
+    # older installs (fisher bootstrap + heredocs) are not symlinks, so stow
+    # refuses to link over them ("cannot stow ... over existing target").
+    rm -rf background background.png btop cava dolphinrc fastfetch fish gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct quickshell starship.toml systemd swaync wal wallust waybar waypaper wlogout xsettingsd
 
     # Go to the home directory
     cd "$HOME"
@@ -1464,17 +1467,23 @@ setup_hyprcandy() {
         rm -rf "$item"
     done
 
-# Stow all configurations at once, ignoring specific folders
-if stow -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='iso-seeds' --ignore='ISO' --ignore='transparent.png' . 2>/dev/null; then
+# Stow all configurations at once, ignoring specific folders.
+# Keep stderr in a log so conflict reasons ("cannot stow ... over existing
+# target") are visible on failure instead of being swallowed by 2>/dev/null.
+stow_log="/tmp/hc-stow-$$.log"
+if stow -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='iso-seeds' --ignore='ISO' --ignore='transparent.png' . 2>"$stow_log"; then
     echo "✅ Successfully stowed all configurations"
 else
     echo "⚠️  Stow operation failed — attempting restow..."
-    if stow -R -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='iso-seeds' --ignore='ISO' --ignore='transparent.png' . 2>/dev/null; then
+    cat "$stow_log" >&2
+    if stow -R -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='iso-seeds' --ignore='ISO' --ignore='transparent.png' . 2>>"$stow_log"; then
         echo "✅ Successfully restowed all configurations"
     else
         echo "❌ Failed to stow configurations"
+        cat "$stow_log" >&2
     fi
 fi
+rm -f "$stow_log"
 
 # Greeter themes: never stowed - symlinked into SDDM's theme dir after stow
 echo "🔗 Linking HyprCandy greeter themes..."
