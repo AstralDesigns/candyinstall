@@ -1428,11 +1428,13 @@ setup_hyprcandy() {
     # Change to the HyprCandy dotfiles directory
     cd "$hyprcandy_dir" || { echo "❌ Error: Could not find HyprCandy directory"; exit 1; }
 
-    # Define only the configs to be stowed
-    config_dirs=(".config" ".icons" ".hyprcandy-zsh.zsh")
+    # Define only the configs to be stowed (.firstboot.sh is the ISO/first-login
+    # setup script — kept and stowed like the other root dots)
+    config_dirs=(".config" ".icons" ".hyprcandy-zsh.zsh" ".firstboot.sh")
 
-    # Add files/folders to exclude from deletion
-    preserve_items=("GIFS" "GJS" "Greeter" "Wallhaen" "LICENSE" "README.md" "transparent.png" ".git" ".gitignore")
+    # Add files/folders to exclude from deletion (iso-seeds/ and ISO/ are
+    # packaging-only: preserved in the repo but never stowed into $HOME)
+    preserve_items=("Gifs" "GJS" "Greeter" "Wallhaven" "iso-seeds" "ISO" "LICENSE" "README.md" "transparent.png" ".git" ".gitignore")
 
     if [ ${#config_dirs[@]} -eq 0 ]; then
         echo "❌ No configuration directories specified."
@@ -1463,11 +1465,11 @@ setup_hyprcandy() {
     done
 
 # Stow all configurations at once, ignoring specific folders
-if stow -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='transparent.png' . 2>/dev/null; then
+if stow -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='iso-seeds' --ignore='ISO' --ignore='transparent.png' . 2>/dev/null; then
     echo "✅ Successfully stowed all configurations"
 else
     echo "⚠️  Stow operation failed — attempting restow..."
-    if stow -R -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='transparent.png' . 2>/dev/null; then
+    if stow -R -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='iso-seeds' --ignore='ISO' --ignore='transparent.png' . 2>/dev/null; then
         echo "✅ Successfully restowed all configurations"
     else
         echo "❌ Failed to stow configurations"

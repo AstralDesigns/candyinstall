@@ -1120,6 +1120,17 @@ rsync -a \
 
 echo "✅ Update merged"
 
+# ── New root-level dots: parity with fresh installs ──
+# The rsync merge refreshes EXISTING stowed trees in place, but root entries
+# added upstream after the original install (e.g. .firstboot.sh, the ISO /
+# first-login setup script) have no home symlink yet on older installations.
+# Link them once so updated installs match fresh ones; never clobber a real
+# file. Packaging-only dirs (iso-seeds/, ISO/) are merged for repo parity but
+# must never be stowed into $HOME (install.sh and .firstboot.sh ignore them).
+if [ -f "$HYPRCANDY_DIR/.firstboot.sh" ] && [ ! -e "$USER_HOME/.firstboot.sh" ] && [ ! -L "$USER_HOME/.firstboot.sh" ]; then
+    ln -s "$HYPRCANDY_DIR/.firstboot.sh" "$USER_HOME/.firstboot.sh"
+fi
+
 # ── HyprCandy greeter themes: link + runtime sync (this updater runs as root) ──
 GREETER_THEMES="$USER_HOME/.hyprcandy/Greeter/themes"
 if [ -d "$GREETER_THEMES" ]; then
