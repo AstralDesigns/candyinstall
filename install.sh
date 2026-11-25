@@ -4877,16 +4877,16 @@ main() {
     enable_display_manager
     
     # SDDM logout for NVIDIA
-    echo -e "${YELLOW}Is NVIDIA your iGPU/default GPU? (n/Y)${NC}"
-    read -r response
-    case "$response" in
-        [nN][oO]|[nN])
-            print_status "Skipping NVIDIA SDDM setup."
-            ;;
-        *)
-            sddm_nvidia
-            ;;
-    esac
+    #echo -e "${YELLOW}Is NVIDIA your iGPU/default GPU? (n/Y)${NC}"
+    #read -r response
+    #case "$response" in
+        #[nN][oO]|[nN])
+            #print_status "Skipping NVIDIA SDDM setup."
+            #;;
+        #*)
+            #sddm_nvidia
+            #;;
+    #esac
 
     # Setup default custom config file
     setup_custom_config
