@@ -1100,7 +1100,7 @@ if [ ! -d "$UPDATE_DIR" ]; then
 fi
 
 # Folders with user-specific changes — never overwritten on update > "hyprcandydock"
-SKIP_DIRS=("background" "background.png" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
+SKIP_DIRS=("background" "background.png" "custom" "fastfetch" "gtk-3.0" "gtk-4.0" "hypr" "hyprcandy" "qt5ct" "qt6ct")
 
 echo "📦 Merging update into ~/.hyprcandy (skipping: ${SKIP_DIRS[*]})..."
 
@@ -1129,6 +1129,20 @@ echo "✅ Update merged"
 # must never be stowed into $HOME (install.sh and .firstboot.sh ignore them).
 if [ -f "$HYPRCANDY_DIR/.firstboot.sh" ] && [ ! -e "$USER_HOME/.firstboot.sh" ] && [ ! -L "$USER_HOME/.firstboot.sh" ]; then
     ln -s "$HYPRCANDY_DIR/.firstboot.sh" "$USER_HOME/.firstboot.sh"
+fi
+
+# ── custom lua: link shipped files once on older real-dir installs ──
+# ~/.config/custom predates the repo shipping it, so older homes hold a REAL
+# dir (possibly with a real custom.lua full of user binds). Never clobber a
+# real file; only link what is absent. Stowed installs already see the repo
+# files through the directory symlink and skip both links.
+if [ -d "$HYPRCANDY_DIR/.config/custom" ]; then
+    mkdir -p "$USER_HOME/.config/custom"
+    for f in custom.lua user-settings.lua; do
+        if [ -f "$HYPRCANDY_DIR/.config/custom/$f" ] && [ ! -e "$USER_HOME/.config/custom/$f" ] && [ ! -L "$USER_HOME/.config/custom/$f" ]; then
+            ln -s "$HYPRCANDY_DIR/.config/custom/$f" "$USER_HOME/.config/custom/$f"
+        fi
+    done
 fi
 
 # ── HyprCandy greeter themes: link + runtime sync (this updater runs as root) ──
@@ -1311,6 +1325,21 @@ chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
 
+if [ ! -f "$USER_HOME/.config/custom/user-settings.lua" ]; then
+    mkdir -p "$USER_HOME/.config/custom"
+    cat > "$USER_HOME/.config/custom/user-settings.lua" << 'EOF'
+-- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+-- ┃                          User Settings                      ┃
+-- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+-- [NOTE!!] Your personal settings added here are sourced in hyprland.lua.
+-- Personal overrides (env, binds, rules) belong here; the shipped HyprCandy
+-- defaults live in custom.lua. This file is sourced after custom.lua, so
+-- your settings take precedence.
+
+return true
+EOF
+fi
+
 if [ ! -f "$USER_HOME/.config/custom/custom.lua" ]; then
     cat > "$USER_HOME/.config/custom/custom.lua" << 'EOF'
 --  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
@@ -1319,10 +1348,6 @@ if [ ! -f "$USER_HOME/.config/custom/custom.lua" ]; then
 -- ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
 -- ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
 --  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
--- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
--- ┃                          User Settings                      ┃
--- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
--- [NOTE!!] Your personal settings added here are sourced in hyprland.lua.
 
 hl.bind("SUPER + S", hl.dsp.exec_cmd("spotify-launcher"), { description = "Launch Spotify" })
 hl.bind("SUPER + D", hl.dsp.exec_cmd("equibop"), { description = "Launch the Discord app" })
@@ -4434,6 +4459,7 @@ optional_dofile(home .. "/.config/hypr/hyprviz-state.lua", "HyprCandyPlus mutabl
 
 -- Custom settings file for user-preferences.
 optional_dofile(home .. "/.config/custom/custom.lua", "HyprCandyPlus custom user-preferences file")
+optional_dofile(home .. "/.config/custom/user-settings.lua", "HyprCandyPlus personal user-settings file")
 
 -- Animation preset selected by ~/.config/hypr/scripts/animations.sh.
 optional_dofile(home .. "/.config/hypr/animations.lua", "HyprCandyPlus animation preset")

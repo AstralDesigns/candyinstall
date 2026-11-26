@@ -1416,6 +1416,15 @@ setup_hyprcandy() {
     # older installs (fisher bootstrap + heredocs) are not symlinks, so stow
     # refuses to link over them ("cannot stow ... over existing target").
     rm -rf background background.png btop cava dolphinrc fastfetch fish gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct quickshell starship.toml systemd swaync wal wallust waybar waypaper wlogout xsettingsd
+    # custom/ may be a REAL dir from older installs (user binds predate the
+    # repo shipping it): drop only real lua files that would block stow, and
+    # never descend into a stowed symlink dir (that would delete repo files).
+    # Unrelated real files (e.g. legacy custom.conf) are preserved.
+    if [ -d "$HOME/.config/custom" ] && [ ! -L "$HOME/.config/custom" ]; then
+        for f in custom.lua user-settings.lua; do
+            [ -f "$HOME/.config/custom/$f" ] && [ ! -L "$HOME/.config/custom/$f" ] && rm -f "$HOME/.config/custom/$f"
+        done
+    fi
 
     # Go to the home directory
     cd "$HOME"
@@ -1595,6 +1604,21 @@ mkdir -p "$HOME/.config/custom" "$HOME/.config/hyprcandy/hooks" "$HOME/.config/s
 #                    	User Settings File
 # ═══════════════════════════════════════════════════════════════
 
+if [ ! -f "$HOME/.config/custom/user-settings.lua" ]; then
+    mkdir -p "$HOME/.config/custom"
+    cat > "$HOME/.config/custom/user-settings.lua" << 'EOF'
+-- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+-- ┃                          User Settings                      ┃
+-- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+-- [NOTE!!] Your personal settings added here are sourced in hyprland.lua.
+-- Personal overrides (env, binds, rules) belong here; the shipped HyprCandy
+-- defaults live in custom.lua. This file is sourced after custom.lua, so
+-- your settings take precedence.
+
+return true
+EOF
+fi
+
 if [ ! -f "$HOME/.config/custom/custom.lua" ]; then
     cat > "$HOME/.config/custom/custom.lua" << 'EOF'
 --  ██████╗ █████╗ ███╗   ██╗██████╗ ██╗   ██╗
@@ -1603,10 +1627,6 @@ if [ ! -f "$HOME/.config/custom/custom.lua" ]; then
 -- ██║     ██╔══██║██║╚██╗██║██║  ██║  ╚██╔╝  
 -- ╚██████╗██║  ██║██║ ╚████║██████╔╝   ██║   
 --  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   
--- ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
--- ┃                          User Settings                      ┃
--- ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
--- [NOTE!!] Your personal settings added here are sourced in hyprland.lua.
 
 hl.bind("SUPER + S", hl.dsp.exec_cmd("spotify-launcher"), { description = "Launch Spotify" })
 hl.bind("SUPER + D", hl.dsp.exec_cmd("equibop"), { description = "Launch the Discord app" })
@@ -4230,6 +4250,7 @@ optional_dofile(home .. "/.config/hypr/hyprviz-state.lua", "HyprCandyPlus mutabl
 
 -- Custom settings file for user-preferences.
 optional_dofile(home .. "/.config/custom/custom.lua", "HyprCandyPlus custom user-preferences file")
+optional_dofile(home .. "/.config/custom/user-settings.lua", "HyprCandyPlus personal user-settings file")
 
 -- Animation preset selected by ~/.config/hypr/scripts/animations.sh.
 optional_dofile(home .. "/.config/hypr/animations.lua", "HyprCandyPlus animation preset")
