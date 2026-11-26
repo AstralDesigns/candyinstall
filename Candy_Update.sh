@@ -1053,7 +1053,7 @@ setup_hyprcandy() {
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
 			$AUR_HELPER -R --noconfirm noctalia-qs 2>/dev/null || true   # purge legacy fork pkg (superseded by hyprcandy-qs)
             $AUR_HELPER -R --noconfirm wallust
-			$AUR_HELPER -S --noconfirm hostapd
+			$AUR_HELPER -S --noconfirm hostapd ollama
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else
@@ -2763,6 +2763,10 @@ matugen image "$bg_path" --type scheme-fidelity -m dark -r nearest --base16-back
         magick "$bg_path" "$HOME/.config/background"
         sleep 1
         "$HOOKS_DIR/update_background.sh"
+        # matugen just rewrote colors.lua; Hyprland only picks it up on reload.
+        # Without this the fresh palette stays pending until a manual reload
+        # (e.g. a Control Center slider nudge) - first-boot colors never apply.
+        hyprctl reload 2>/dev/null || true
         #echo "✅ Updated ~/.config/background to point to: $bg_path"
         return 0
     else
