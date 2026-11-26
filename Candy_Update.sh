@@ -1053,7 +1053,7 @@ setup_hyprcandy() {
 			$AUR_HELPER -R --noconfirm hyprcandy-plus
 			$AUR_HELPER -R --noconfirm noctalia-qs 2>/dev/null || true   # purge legacy fork pkg (superseded by hyprcandy-qs)
             $AUR_HELPER -R --noconfirm wallust
-			$AUR_HELPER -S --noconfirm hostapd ollama
+			$AUR_HELPER -S --noconfirm hostapd ollama bubblewrap
             #$AUR_HELPER -S --noconfirm quickshell-git --rebuild
             print_status "Dependencies are up to date"
         else

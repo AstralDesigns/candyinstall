@@ -391,6 +391,7 @@ build_package_list() {
         "hostapd"
         "openssh"
 		"switcheroo-control"
+        "bubblewrap"
         "nwg-displays"
         "uwsm"
         "nm-connection-editor"
