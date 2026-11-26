@@ -1505,163 +1505,149 @@ chmod +x "$USER_HOME/.config/hyprcandy/scripts/hc-update-check.sh"
 #                    Gaps OUT Increase Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-
-CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
-NEW_GAPS_OUT=$((CURRENT_GAPS_OUT + 1))
-sed -i "s/^\(\s*gaps_out\s*=\s*\)[0-9]*/\1$NEW_GAPS_OUT/" "$CONFIG_FILE"
-
-hyprctl keyword general:gaps_out $NEW_GAPS_OUT
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust gaps_out +1)
 hyprctl reload
 
-echo "🔼 Gaps OUT increased: gaps_out=$NEW_GAPS_OUT"
-notify-send "Gaps OUT Increased" "gaps_out: $NEW_GAPS_OUT" -t 2000
+echo "🔼 Gaps OUT increased: gaps_out=$NEW_VALUE"
+notify-send "Gaps OUT Increased" "gaps_out: $NEW_VALUE" -t 2000
 EOF
 
-chmod +x "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
+chmod +x "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_increase.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps OUT Decrease Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_out_decrease.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-
-CURRENT_GAPS_OUT=$(grep -E "^\s*gaps_out\s*=" "$CONFIG_FILE" | sed 's/.*gaps_out\s*=\s*\([0-9]*\).*/\1/')
-NEW_GAPS_OUT=$((CURRENT_GAPS_OUT > 0 ? CURRENT_GAPS_OUT - 1 : 0))
-sed -i "s/^\(\s*gaps_out\s*=\s*\)[0-9]*/\1$NEW_GAPS_OUT/" "$CONFIG_FILE"
-hyprctl keyword general:gaps_out $NEW_GAPS_OUT
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust gaps_out -1)
 hyprctl reload
 
-echo "🔽 Gaps OUT decreased: gaps_out=$NEW_GAPS_OUT"
-notify-send "Gaps OUT Decreased" "gaps_out: $NEW_GAPS_OUT" -t 2000
+echo "🔽 Gaps OUT decreased: gaps_out=$NEW_VALUE"
+notify-send "Gaps OUT Decreased" "gaps_out: $NEW_VALUE" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps IN Increase Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_increase.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
-NEW_GAPS_IN=$((CURRENT_GAPS_IN + 1))
-sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
-hyprctl keyword general:gaps_in $NEW_GAPS_IN
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust gaps_in +1)
 hyprctl reload
 
-echo "🔼 Gaps IN increased: gaps_in=$NEW_GAPS_IN"
-notify-send "Gaps IN Increased" "gaps_in: $NEW_GAPS_IN" -t 2000
+echo "🔼 Gaps IN increased: gaps_in=$NEW_VALUE"
+notify-send "Gaps IN Increased" "gaps_in: $NEW_VALUE" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps IN Decrease Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gaps_in_decrease.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-CURRENT_GAPS_IN=$(grep -E "^\s*gaps_in\s*=" "$CONFIG_FILE" | sed 's/.*gaps_in\s*=\s*\([0-9]*\).*/\1/')
-NEW_GAPS_IN=$((CURRENT_GAPS_IN > 0 ? CURRENT_GAPS_IN - 1 : 0))
-sed -i "s/^\(\s*gaps_in\s*=\s*\)[0-9]*/\1$NEW_GAPS_IN/" "$CONFIG_FILE"
-hyprctl keyword general:gaps_in $NEW_GAPS_IN
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust gaps_in -1)
 hyprctl reload
 
-echo "🔽 Gaps IN decreased: gaps_in=$NEW_GAPS_IN"
-notify-send "Gaps IN Decreased" "gaps_in: $NEW_GAPS_IN" -t 2000
+echo "🔽 Gaps IN decreased: gaps_in=$NEW_VALUE"
+notify-send "Gaps IN Decreased" "gaps_in: $NEW_VALUE" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                Border Increase Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_increase.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
-NEW_BORDER=$((CURRENT_BORDER + 1))
-sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
-hyprctl keyword general:border_size $NEW_BORDER
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust border_size +1)
 hyprctl reload
 
-echo "🔼 Border increased: border_size=$NEW_BORDER"
-notify-send "Border Increased" "border_size: $NEW_BORDER" -t 2000
+echo "🔼 Border increased: border_size=$NEW_VALUE"
+notify-send "Border Increased" "border_size: $NEW_VALUE" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                Border Decrease Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_border_decrease.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-
-CURRENT_BORDER=$(grep -E "^\s*border_size\s*=" "$CONFIG_FILE" | sed 's/.*border_size\s*=\s*\([0-9]*\).*/\1/')
-NEW_BORDER=$((CURRENT_BORDER > 0 ? CURRENT_BORDER - 1 : 0))
-sed -i "s/^\(\s*border_size\s*=\s*\)[0-9]*/\1$NEW_BORDER/" "$CONFIG_FILE"
-
-hyprctl keyword general:border_size $NEW_BORDER
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust border_size -1)
 hyprctl reload
 
-echo "🔽 Border decreased: border_size=$NEW_BORDER"
-notify-send "Border Decreased" "border_size: $NEW_BORDER" -t 2000
+echo "🔽 Border decreased: border_size=$NEW_VALUE"
+notify-send "Border Decreased" "border_size: $NEW_VALUE" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                Rounding Increase Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_increase.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
-NEW_ROUNDING=$((CURRENT_ROUNDING + 1))
-sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
-
-hyprctl keyword decoration:rounding $NEW_ROUNDING
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust rounding +1)
 hyprctl reload
 
-echo "🔼 Rounding increased: rounding=$NEW_ROUNDING"
-notify-send "Rounding Increased" "rounding: $NEW_ROUNDING" -t 2000
+echo "🔼 Rounding increased: rounding=$NEW_VALUE"
+notify-send "Rounding Increased" "rounding: $NEW_VALUE" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                Rounding Decrease Script with Force Options
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_rounding_decrease.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.conf"
-CURRENT_ROUNDING=$(grep -E "^\s*rounding\s*=" "$CONFIG_FILE" | sed 's/.*rounding\s*=\s*\([0-9]*\).*/\1/')
-NEW_ROUNDING=$((CURRENT_ROUNDING > 0 ? CURRENT_ROUNDING - 1 : 0))
-sed -i "s/^\(\s*rounding\s*=\s*\)[0-9]*/\1$NEW_ROUNDING/" "$CONFIG_FILE"
-
-hyprctl keyword decoration:rounding $NEW_ROUNDING
+# Lua-aware visual adjust: persist through the CC state helper (hyprcandy-bar.conf
+# + hyprviz-state.lua), then reload. The legacy hyprviz.conf + `hyprctl keyword`
+# path never persisted on Hyprland 0.55+ Lua configs (file absent, keyword invalid).
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
+NEW_VALUE=$("$HELPER" adjust rounding -1)
 hyprctl reload
 
-echo "🔽 Rounding decreased: rounding=$NEW_ROUNDING"
-notify-send "Rounding Decreased" "rounding: $NEW_ROUNDING" -t 2000
+echo "🔽 Rounding decreased: rounding=$NEW_VALUE"
+notify-send "Rounding Decreased" "rounding: $NEW_VALUE" -t 2000
 EOF
 
 # ═══════════════════════════════════════════════════════════════
 #                    Gaps + Border Presets Script
 # ═══════════════════════════════════════════════════════════════
 
-cat > "$USER_HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
+cat > "$HOME/.config/hyprcandy/hooks/hyprland_gap_presets.sh" << 'EOF'
 #!/bin/bash
-
-CONFIG_FILE="$HOME/.config/hypr/hyprviz.lua"
+# Lua-aware presets: persist through the CC state helper so the hyprviz-state.lua
+# overrides (loaded after hyprviz.lua) don't revert the preset on the next reload.
+HELPER="$HOME/.config/quickshell/bar/scripts/hyprland-lua-state.sh"
 
 case "$1" in
     "minimal")
@@ -1694,15 +1680,11 @@ case "$1" in
         ;;
 esac
 
-# Apply all settings to hyprviz.lua
-# Note: In Lua, these are inside hl.config({ general = { ... }, decoration = { ... } })
-sed -i "s/\(gaps_out\s*=\s*\)[0-9]*/\1$GAPS_OUT/" "$CONFIG_FILE"
-sed -i "s/\(gaps_in\s*=\s*\)[0-9]*/\1$GAPS_IN/" "$CONFIG_FILE"
-sed -i "s/\(border_size\s*=\s*\)[0-9]*/\1$BORDER/" "$CONFIG_FILE"
-sed -i "s/\(rounding\s*=\s*\)[0-9]*/\1$ROUNDING/" "$CONFIG_FILE"
-
-# Apply immediately using new Lua dispatch syntax via hyprctl
-hyprctl eval "hl.config({ general = { gaps_out = $GAPS_OUT, gaps_in = $GAPS_IN, border_size = $BORDER }, decoration = { rounding = $ROUNDING } })"
+"$HELPER" set gaps_out "$GAPS_OUT" >/dev/null
+"$HELPER" set gaps_in "$GAPS_IN" >/dev/null
+"$HELPER" set border_size "$BORDER" >/dev/null
+"$HELPER" set rounding "$ROUNDING" >/dev/null
+hyprctl reload
 
 echo "🎨 Applied $1 preset: gaps_out=$GAPS_OUT, gaps_in=$GAPS_IN, border=$BORDER, rounding=$ROUNDING"
 notify-send "Visual Preset Applied" "$1: OUT=$GAPS_OUT IN=$GAPS_IN BORDER=$BORDER ROUND=$ROUNDING" -t 3000
