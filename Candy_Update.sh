@@ -4898,8 +4898,6 @@ cleanup() {
     
     [ -z "$USER_HOME" ] && USER_HOME="$HOME"
     [ -z "$USER_NAME" ] && USER_NAME="$USER"
-    
-    systemctl enable --now power-profiles-daemon
 
     ### ✅ Setup mako config, hook scripts and needed services
     echo "📁 Creating background hook scripts..."
