@@ -464,6 +464,7 @@ build_package_list() {
         "bc"
         "libnotify"
         "pyprland"
+        "pkgfile"
         
         # Fonts and emojis
         "ttf-dejavu-sans-code"
@@ -1415,7 +1416,7 @@ setup_hyprcandy() {
     # fish / starship.toml / systemd are repo-managed now: real copies left by
     # older installs (fisher bootstrap + heredocs) are not symlinks, so stow
     # refuses to link over them ("cannot stow ... over existing target").
-    rm -rf background background.png btop cava dolphinrc fastfetch fish gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look qt5ct qt6ct quickshell starship.toml systemd swaync wal wallust waybar waypaper wlogout xsettingsd
+    rm -rf background background.png btop cava dolphinrc fastfetch fish gtk-3.0 gtk-4.0 htop hypr hyprcandy hyprpanel kitty matugen micro nvtop nwg-dock-hyprland nwg-look pypr qt5ct qt6ct quickshell starship.toml systemd swaync wal wallust waybar waypaper wlogout xsettingsd
     # custom/ may be a REAL dir from older installs (user binds predate the
     # repo shipping it): drop only real lua files that would block stow, and
     # never descend into a stowed symlink dir (that would delete repo files).
@@ -4773,6 +4774,7 @@ sudo systemctl enable coolercontrold
 sudo systemctl enable power-profiles-daemon
 sudo systemctl enable switcheroo-control
 sudo systemctl enable bluetooth
+sudo systemctl enable pkgfile-update.timer
 echo "✅ Services set..."
 
 if timeout 2 awww query >/dev/null; then
