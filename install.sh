@@ -1483,6 +1483,9 @@ setup_hyprcandy() {
 # Stow all configurations at once, ignoring specific folders.
 # Keep stderr in a log so conflict reasons ("cannot stow ... over existing
 # target") are visible on failure instead of being swallowed by 2>/dev/null.
+# Older installs stowed transparent.png into $HOME; it ships only as the real
+# Pictures/ copy now. Drop the stray symlink (never a real file).
+if [ -L "$HOME/transparent.png" ]; then rm -f "$HOME/transparent.png"; fi
 stow_log="/tmp/hc-stow-$$.log"
 if stow -v -t "$HOME" --ignore='Gifs' --ignore='GJS' --ignore='Greeter' --ignore='Wallhaven' --ignore='iso-seeds' --ignore='ISO' --ignore='transparent.png' . 2>"$stow_log"; then
     echo "✅ Successfully stowed all configurations"

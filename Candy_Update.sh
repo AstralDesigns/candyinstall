@@ -1131,6 +1131,10 @@ if [ -f "$HYPRCANDY_DIR/.firstboot.sh" ] && [ ! -e "$USER_HOME/.firstboot.sh" ] 
     ln -s "$HYPRCANDY_DIR/.firstboot.sh" "$USER_HOME/.firstboot.sh"
 fi
 
+# transparent.png must never live in $HOME (only the real Pictures/ copy);
+# older firstboot stows linked it. Drop the stray symlink, never a real file.
+if [ -L "$USER_HOME/transparent.png" ]; then rm -f "$USER_HOME/transparent.png"; fi
+
 # ── custom lua: link shipped files once on older real-dir installs ──
 # ~/.config/custom predates the repo shipping it, so older homes hold a REAL
 # dir (possibly with a real custom.lua full of user binds). Never clobber a
