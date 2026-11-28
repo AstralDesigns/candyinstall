@@ -2832,83 +2832,6 @@ EOF
 if [ "$PANEL_CHOICE" = "waybar" ]; then
 
 # ═══════════════════════════════════════════════════════════════
-#         	Weather script reload on session resume
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/hypr/scripts/lock-watcher.sh" << 'EOF'
-#!/bin/bash
-# lock-watcher.sh - Watches for candylock unlock and refreshes the bar
-
-WEATHER_CACHE_FILE="/tmp/astal-weather-cache.json"
-
-# Wait for Hyprland to start
-while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
-    sleep 1
-done
-
-echo "candylock watcher started"
-
-# Continuously monitor for candylock
-while true; do
-    # Wait for candylock to start
-    while ! pgrep -f "qs -c candylock" >/dev/null 2>&1; do
-        sleep 1
-    done
-    
-    echo "candylock detected - waiting for unlock..."
-    
-    # Wait for candylock to end (unlock)
-    while pgrep -f "qs -c candylock" >/dev/null 2>&1; do
-        sleep 0.5
-    done
-    
-    echo "Unlocked! Checking waybar status..."
-    
-    # Only refresh waybar if it was running before lock
-    if pgrep -x waybar >/dev/null 2>&1; then
-        echo "Waybar is running - refreshing..."
-        
-        # Remove cached weather file
-        rm -f "$WEATHER_CACHE_FILE"
-        rm -f "${WEATHER_CACHE_FILE}.tmp"
-        
-        # Wait a moment for system to fully resume
-        sleep 0.5
-        
-        # Quick waybar restart
-        killall -SIGUSR2 waybar
-    else
-        echo "Waybar was hidden before session lock - skipping refresh"
-    fi
-    
-    # Wait a bit before checking for next lock
-    sleep 3
-done
-EOF
-chmod +x "$HOME/.config/hypr/scripts/lock-watcher.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#            			   Hyprlock Service
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$HOME/.config/systemd/user/lock-watcher.service" << 'EOF'
-[Unit]
-Description=Candylock Unlock Watcher - Refreshes bar on Resume
-PartOf=graphical-session.target
-After=graphical-session.target
-Requisite=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=%h/.config/hypr/scripts/lock-watcher.sh
-Restart=on-failure
-RestartSec=3
-
-[Install]
-WantedBy=graphical-session.target
-EOF
-
-# ═══════════════════════════════════════════════════════════════
 #         waybar_idle_monitor.sh — Auto Toggle Inhibitor
 # ═══════════════════════════════════════════════════════════════
 
@@ -3496,26 +3419,6 @@ else
 	echo ""
 fi
 
-# ═══════════════════════════════════════════════════════════════
-#               		  	   XRAY
-# ═══════════════════════════════════════════════════════════════
-	cat > "$HOME/.config/hypr/scripts/xray.sh" << 'EOF'
-#!/bin/bash
-HYPR="$HOME/.config/hypr/hyprviz.conf"
-XRAY="$HOME/.config/hyprcandy/settings/xray-on"
-if [ ! -f "$XRAY" ]; then
-    sed -i "s/xray = false/xray = true/" "$HYPR"
-    sed -i "s/xray off/xray on/" "$HYPR"
-    hyprctl reload
-    touch "$XRAY"
-else
-    sed -i "s/xray = true/xray = false/" "$HYPR"
-    sed -i "s/xray on/xray off/" "$HYPR"
-    hyprctl reload
-    rm "$XRAY"
-fi
-EOF
-
 mkdir -p "$HOME/.config/wallpaper"
 # ═══════════════════════════════════════════════════════════════
 #               		  	WALLPAPER
@@ -3535,8 +3438,6 @@ awww_transition_angle = 0
 awww_transition_duration = 2
 awww_transition_fps = 60
 EOF
-
-chmod +x "$HOME/.config/hypr/scripts/xray.sh"
 
 # ═══════════════════════════════════════════════════════════════
 #               	POST SETUP CLEANUP
@@ -3614,7 +3515,7 @@ inactive_border=$background
 kb_layout=
 opacity=0.90
 rounding=10
-xray=true
+xray=false
 
 [qs-bar-config-v1]
 activeWindowBgOpacity=0
@@ -4438,7 +4339,7 @@ hl.config({
             passes = 5,
             new_optimizations = true,
             ignore_opacity = true,
-            xray = trua,
+            xray = 'false',
             vibrancy = 0.24999999999999933,
             noise = 0,
             popups = true,

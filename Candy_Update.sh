@@ -1127,7 +1127,10 @@ echo "✅ Update merged"
 # Link them once so updated installs match fresh ones; never clobber a real
 # file. Packaging-only dirs (iso-seeds/, ISO/) are merged for repo parity but
 # must never be stowed into $HOME (install.sh and .firstboot.sh ignore them).
-if [ -f "$HYPRCANDY_DIR/.firstboot.sh" ] && [ ! -e "$USER_HOME/.firstboot.sh" ] && [ ! -L "$USER_HOME/.firstboot.sh" ]; then
+# firstboot-done marks a machine that already ran the ISO first-login pass,
+# whose §11 retires the home-side link on purpose (the unit ExecStarts the
+# repo path) - respect that and do not re-link it.
+if [ -f "$HYPRCANDY_DIR/.firstboot.sh" ] && [ ! -e "$USER_HOME/.firstboot.sh" ] && [ ! -L "$USER_HOME/.firstboot.sh" ] && [ ! -f "$USER_HOME/.local/state/hyprcandy/firstboot-done" ]; then
     ln -s "$HYPRCANDY_DIR/.firstboot.sh" "$USER_HOME/.firstboot.sh"
 fi
 
@@ -1324,6 +1327,30 @@ RECENT:
 EOF
 
 chmod +x "$USER_HOME/.config/hypr/scripts/notify.sh"
+
+# ── Drop pre-Lua x-ray leftovers ─────────────────────────────────────────────
+# X-ray state now lives in hyprcandy-bar.conf and reaches Hyprland through
+# bar/scripts/hyprland-lua-state.sh -> hyprviz-state.lua. The retired
+# hypr/scripts/xray.sh sedded a ~/.config/hypr/hyprviz.conf that no longer
+# exists (and its layer-rule/OR behaviour is what made the Control Center pill
+# look dead), so remove the script and both historical sentinel paths.
+rm -f "$USER_HOME/.config/hypr/scripts/xray.sh" \
+      "$USER_HOME/.config/hyprcandy/settings/xray-on" \
+      "$USER_HOME/.config/hyprcandy/xray.state"
+
+# ── Retire lock-watcher.service ──────────────────────────────────────────────
+# Its only action was a SIGUSR2 waybar refresh after a candylock unlock; this is
+# a Quickshell-only shell (waybar is neither packaged nor configured), and the
+# unit's ExecStart script came solely from install.sh's PANEL_CHOICE=waybar
+# branch while the stowed .service shipped for everyone. Installed sessions
+# therefore re-started a unit with a missing executable (203/EXEC, retried by
+# Restart=on-failure) on every graphical session. Disable it before deleting so
+# the wants symlink does not dangle, then drop unit, script and symlink.
+systemctl --user disable --now lock-watcher.service >/dev/null 2>&1 || true
+rm -f "$USER_HOME/.config/systemd/user/lock-watcher.service" \
+      "$USER_HOME/.config/hypr/scripts/lock-watcher.sh" \
+      "$USER_HOME/.config/systemd/user/graphical-session.target.wants/lock-watcher.service"
+systemctl --user daemon-reload >/dev/null 2>&1 || true
 
 # ═══════════════════════════════════════════════════════════════
 #                    	User Settings File
@@ -2547,83 +2574,6 @@ EOF
 if [ "$PANEL_CHOICE" = "waybar" ]; then
 
 # ═══════════════════════════════════════════════════════════════
-#         	Weather script reload on session resume
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$USER_HOME/.config/hypr/scripts/lock-watcher.sh" << 'EOF'
-#!/bin/bash
-# lock-watcher.sh - Watches for candylock unlock and refreshes the bar
-
-WEATHER_CACHE_FILE="/tmp/astal-weather-cache.json"
-
-# Wait for Hyprland to start
-while [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; do
-    sleep 1
-done
-
-echo "candylock watcher started"
-
-# Continuously monitor for candylock
-while true; do
-    # Wait for candylock to start
-    while ! pgrep -f "qs -c candylock" >/dev/null 2>&1; do
-        sleep 1
-    done
-    
-    echo "candylock detected - waiting for unlock..."
-    
-    # Wait for candylock to end (unlock)
-    while pgrep -f "qs -c candylock" >/dev/null 2>&1; do
-        sleep 0.5
-    done
-    
-    echo "Unlocked! Checking waybar status..."
-    
-    # Only refresh waybar if it was running before lock
-    if pgrep -x waybar >/dev/null 2>&1; then
-        echo "Waybar is running - refreshing..."
-        
-        # Remove cached weather file
-        rm -f "$WEATHER_CACHE_FILE"
-        rm -f "${WEATHER_CACHE_FILE}.tmp"
-        
-        # Wait a moment for system to fully resume
-        sleep 0.5
-        
-        # Quick waybar restart
-        killall -SIGUSR2 waybar
-    else
-        echo "Waybar was hidden before session lock - skipping refresh"
-    fi
-    
-    # Wait a bit before checking for next lock
-    sleep 3
-done
-EOF
-chmod +x "$USER_HOME/.config/hypr/scripts/lock-watcher.sh"
-
-# ═══════════════════════════════════════════════════════════════
-#            			   Hyprlock Service
-# ═══════════════════════════════════════════════════════════════
-
-cat > "$USER_HOME/.config/systemd/user/lock-watcher.service" << 'EOF'
-[Unit]
-Description=Candylock Unlock Watcher - Refreshes bar on Resume
-PartOf=graphical-session.target
-After=graphical-session.target
-Requisite=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=%h/.config/hypr/scripts/lock-watcher.sh
-Restart=on-failure
-RestartSec=3
-
-[Install]
-WantedBy=graphical-session.target
-EOF
-
-# ═══════════════════════════════════════════════════════════════
 #         waybar_idle_monitor.sh — Auto Toggle Inhibitor
 # ═══════════════════════════════════════════════════════════════
 
@@ -3329,6 +3279,69 @@ get_aur_helper() {
 get_aur_helper
 export -f pkg_installed
 
+# ── Update counters (shared by the `run` header and the bar tooltip) ─────────
+# Diagnostics go to stderr so the JSON line this script finally prints on stdout
+# (the waybar/QML tooltip payload) can never be polluted by them - and they are
+# narrated only for a human reader: the bar polls this script hourly, where a
+# note would be pure log noise.
+diag() {
+  [ -t 2 ] || [ -n "${SYSTEM_UPDATE_VERBOSE:-}" ] || return 0
+  echo -e "${YELLOW}note:${NC} $1" >&2
+}
+
+# Line count of a possibly-empty string (a bare `grep -c '^'` on one empty line
+# would report 1, which is how "0 updates" used to turn into "1 update").
+line_count() {
+  local s="$1"
+  if [ -z "$s" ]; then echo 0; else printf '%s\n' "$s" | grep -c '^' || true; fi
+}
+
+# checkupdates exits 0 with lines, 2 when genuinely up to date and 1 on ANY
+# error (missing fakeroot/pacman-contrib, dead mirror, unreadable keyring). The
+# old `checkupdates | grep -c '^'` collapsed all three into "0", so a broken
+# pacman path was indistinguishable from an up-to-date system and the reason
+# (stderr was swallowed) never surfaced. Retries once against a clean temp db -
+# a stale /tmp/checkup-db-$UID left behind by a killed run is the common cause.
+official_updates() {
+  local out rc
+  if ! command -v checkupdates >/dev/null 2>&1; then
+    diag "checkupdates not found - install pacman-contrib to scan the official repos."
+    echo 0; return
+  fi
+  if ! command -v fakeroot >/dev/null 2>&1; then
+    diag "fakeroot not found - checkupdates cannot run (install fakeroot)."
+    echo 0; return
+  fi
+  out=$(checkupdates 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then line_count "$out"; return; fi
+  if [ "$rc" -eq 2 ]; then echo 0; return; fi
+  diag "checkupdates failed ($out) - retrying with a clean temp database."
+  rm -rf "${TMPDIR:-/tmp}/checkup-db-$(id -u)"
+  out=$(checkupdates 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then line_count "$out"; return
+  elif [ "$rc" -eq 2 ]; then echo 0; return
+  fi
+  diag "Official repositories could not be queried: $out"
+  diag "Fix it with: sudo pacman-key --init && sudo pacman-key --populate && sudo pacman -Sy"
+  echo 0
+}
+
+# `flatpak remote-ls --updates` only reports installed apps/runtimes, so a
+# machine with no flatpak apps legitimately shows 0. Say so once instead of
+# looking like the scanner skipped flatpak. (The flathub remote itself ships
+# with Arch's flatpak package as /usr/share/flatpak/remotes.d/flathub.flatpakrepo;
+# .firstboot.sh adds it if-not-exists for install.sh parity.)
+flatpak_updates() {
+  local n
+  if ! pkg_installed flatpak; then echo 0; return; fi
+  n=$(flatpak list --app 2>/dev/null | grep -c '^' || true)
+  if [ "${n:-0}" -eq 0 ]; then
+    diag "No flatpak apps installed - nothing for flatpak to update."
+    echo 0; return
+  fi
+  line_count "$(flatpak remote-ls --updates 2>/dev/null)"
+}
+
 # Ensure ~/.cargo/bin is on PATH in the active login shell's rc, appending the
 # block only when it is missing. Mirrors Candy_Update so whichever update path
 # runs first retro-fits cargo PATH for existing HyprCandy+ installs.
@@ -3432,8 +3445,8 @@ if [ "$1" == "run" ]; then
 
   # Print update summary header
   aur_updates_now=$(${aur_helper} -Qua 2>/dev/null | grep -c '^' || echo )
-  official_updates_now=$( (while pgrep -x checkupdates >/dev/null; do sleep 1; done); checkupdates 2>/dev/null | grep -c '^' || echo )
-  flatpak_updates_now=$(pkg_installed flatpak && flatpak remote-ls --updates 2>/dev/null | grep -c '^' || echo )
+  official_updates_now=$(SYSTEM_UPDATE_VERBOSE=1 official_updates)
+  flatpak_updates_now=$(SYSTEM_UPDATE_VERBOSE=1 flatpak_updates)
   printf "Official:  %-10s\nAUR (%s): %-10s\nFlatpak:   %-10s\n\n" \
     "$official_updates_now" "$aur_helper" "$aur_updates_now" "$flatpak_updates_now"
 
@@ -3483,26 +3496,19 @@ else
 fi
 
 # Check for official repository updates
-official_updates=$(
-  (while pgrep -x checkupdates >/dev/null; do sleep 1; done)
-  checkupdates | grep -c '^'
-)
+official_updates_count=$(official_updates)
 
 # Check for Flatpak updates
-if pkg_installed flatpak; then
-  flatpak_updates=$(flatpak remote-ls --updates | grep -c '^')
-else
-  flatpak_updates=0
-fi
+flatpak_updates=$(flatpak_updates)
 
-total_updates=$((official_updates + aur_updates + flatpak_updates))
+total_updates=$((official_updates_count + aur_updates + flatpak_updates))
 
 if [ "$aur_helper" == "yay" ]; then
-  [ "${1}" == upgrade ] && printf "Official:  %-10s\nAUR ($aur_helper): %-10s\nFlatpak:   %-10s\n\n" "$official_updates" "$aur_updates" "$flatpak_updates" && exit
-  tooltip="Official:  $official_updates\nAUR ($aur_helper): $aur_updates\nFlatpak:   $flatpak_updates"
+  [ "${1}" == upgrade ] && printf "Official:  %-10s\nAUR ($aur_helper): %-10s\nFlatpak:   %-10s\n\n" "$official_updates_count" "$aur_updates" "$flatpak_updates" && exit
+  tooltip="Official:  $official_updates_count\nAUR ($aur_helper): $aur_updates\nFlatpak:   $flatpak_updates"
 elif [ "$aur_helper" == "paru" ]; then
-  [ "${1}" == upgrade ] && printf "Official:   %-10s\nAUR ($aur_helper): %-10s\nFlatpak:    %-10s\n\n" "$official_updates" "$aur_updates" "$flatpak_updates" && exit
-  tooltip="Official:   $official_updates\nAUR ($aur_helper): $aur_updates\nFlatpak:    $flatpak_updates"
+  [ "${1}" == upgrade ] && printf "Official:   %-10s\nAUR ($aur_helper): %-10s\nFlatpak:    %-10s\n\n" "$official_updates_count" "$aur_updates" "$flatpak_updates" && exit
+  tooltip="Official:   $official_updates_count\nAUR ($aur_helper): $aur_updates\nFlatpak:    $flatpak_updates"
 fi
 
 if [ $total_updates -eq 0 ]; then
@@ -4647,7 +4653,7 @@ hl.config({
             passes = 5,
             new_optimizations = true,
             ignore_opacity = true,
-            xray = trua,
+            xray = 'false',
             vibrancy = 0.24999999999999933,
             noise = 0,
             popups = true,
